@@ -4240,13 +4240,7 @@ async function analyzeProject(id){
   }).join('\n');
 
   try{
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:2000,
-        system:`당신은 업무 프로세스 매뉴얼 작성 전문가입니다.
+    const _sys1 = `당신은 업무 프로세스 매뉴얼 작성 전문가입니다.
 주어진 업무 목록을 분석해서 실무 매뉴얼 JSON을 반환하세요.
 반드시 JSON만 반환하고 다른 텍스트는 절대 포함하지 마세요.
 
@@ -4271,15 +4265,9 @@ async function analyzeProject(id){
 - step 수는 3~8개가 적당함 (너무 잘게 쪼개지 말 것)
 - title은 실무적이고 간결하게 (예: "샘플 기획", "시안 검토 및 수정", "최종 납품")
 - 날짜 정보를 활용해 시간 순서대로 step을 배치하고, 날짜가 비슷한 업무는 같은 단계로 묶을 것
-- 날짜미정 업무는 전후 맥락과 업무명으로 적절한 위치에 배치할 것`,
-        messages:[{
-          role:'user',
-          content:`프로젝트명: ${p.name}\n${p.desc?'설명: '+p.desc+'\n':''}\n업무 목록 (번호 · 날짜 · 업무명 순):\n${taskListForAI}\n\n날짜 흐름을 참고해서 업무들을 묶고 분류하여 업무 매뉴얼 JSON을 만들어주세요.`
-        }]
-      })
-    });
-    const data = await res.json();
-    let raw = data.content?.[0]?.text || '{}';
+- 날짜미정 업무는 전후 맥락과 업무명으로 적절한 위치에 배치할 것`;
+    const _usr1 = `프로젝트명: ${p.name}\n${p.desc?'설명: '+p.desc+'\n':''}\n업무 목록 (번호 · 날짜 · 업무명 순):\n${taskListForAI}\n\n날짜 흐름을 참고해서 업무들을 묶고 분류하여 업무 매뉴얼 JSON을 만들어주세요.`;
+    let raw = await callGemini(_sys1, _usr1, 2000);
     raw = raw.replace(/```json|```/g,'').trim();
     let parsed;
     try{ parsed = JSON.parse(raw); } catch(e){ parsed = {steps:[], summary:'분석 실패'}; }
@@ -4582,6 +4570,25 @@ function toggleDoneTaskList(id){
   body.style.display = isOpen ? 'none' : 'block';
   if(chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
 }
+
+// ════════════════════════════════════════
+//  Gemini API 공통 호출 헬퍼
+// ════════════════════════════════════════
+async function callGemini(systemPrompt, userPrompt, maxTokens){
+  maxTokens = maxTokens || 1200;
+  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyDoqp6y31pYQ5KPh091YgvsK5lCskhTXcg',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({
+      contents:[{ role:'user', parts:[{ text: systemPrompt + '\n\n' + userPrompt }] }],
+      generationConfig:{ maxOutputTokens: maxTokens, temperature:0.1 }
+    })
+  });
+  const data = await res.json();
+  if(data.error) throw new Error(data.error.message);
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
 // ════════════════════════════════════════
 //  AI 빠른 입력 (사이드바/모바일)
 // ════════════════════════════════════════
@@ -4648,13 +4655,7 @@ async function runAiQuickInput(isMobile){
   const projects = (D.projects||[]).filter(p=>p.status!=='done').map(p=>p.name);
 
   try{
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1200,
-        system:`오늘 날짜: ${todayStr}
+    const _sys2 = `오늘 날짜: ${todayStr}
 등록된 프로젝트: ${projects.join(', ')||'없음'}
 
 사용자 입력에서 일정/업무를 파싱해 JSON 배열만 반환하세요. 다른 텍스트 절대 없이 JSON만.
@@ -4676,12 +4677,9 @@ async function runAiQuickInput(isMobile){
 - 쉼표/슬래시로 여러 항목 구분된 경우 각각 별도 항목으로
 - 업무 이름에 프로젝트명이 언급되면 project 필드에 매핑
 - 시간 표현 없으면 startTime은 빈 문자열
-- type 기본값은 "task"`,
-        messages:[{ role:'user', content: text }]
-      })
-    });
-    const data = await res.json();
-    let raw = (data.content?.[0]?.text||'[]').replace(/```json|```/g,'').trim();
+- type 기본값은 "task"`;
+    let raw = await callGemini(_sys2, text, 1200);
+    raw = raw.replace(/```json|```/g,'').trim();
     let parsed;
     try{ parsed = JSON.parse(raw); } catch(e){ parsed = []; }
     if(!Array.isArray(parsed)||!parsed.length){ alert('일정을 인식하지 못했어요. 좀 더 구체적으로 입력해주세요.'); return; }
@@ -4894,13 +4892,7 @@ async function runMinPageAi(){
 
   const todayStr = dk(TODAY);
   try{
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1200,
-        system:`오늘 날짜: ${todayStr}
+    const _sysMin = `오늘 날짜: ${todayStr}
 사용자가 입력한 회의 내용을 항목별로 분리해 JSON 객체만 반환하세요. 다른 텍스트 절대 없이 JSON만.
 
 [절대 규칙]
@@ -4920,12 +4912,9 @@ async function runMinPageAi(){
   "outline": "배경/목적 관련 내용 (명시된 그대로, 없으면 빈 문자열)",
   "content": "회의 내용/논의 항목 (원문 그대로, 여러 항목이면 줄바꿈으로 구분)",
   "summary": "결론/후속조치 관련 내용 (원문 그대로, 없으면 빈 문자열)"
-}`,
-        messages:[{ role:'user', content: text }]
-      })
-    });
-    const data = await res.json();
-    let raw = (data.content?.[0]?.text||'{}').replace(/```json|```/g,'').trim();
+}`;
+    let raw = await callGemini(_sysMin, text, 1200);
+    raw = raw.replace(/```json|```/g,'').trim();
     let parsed;
     try{ parsed = JSON.parse(raw); } catch(e){ parsed = {}; }
     if(!parsed.title){ alert('회의 내용을 인식하지 못했어요. 좀 더 구체적으로 입력해주세요.'); return; }
@@ -4982,13 +4971,7 @@ async function runMinAi(){
   const todayStr = dk(TODAY);
 
   try{
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1200,
-        system:`오늘 날짜: ${todayStr}
+    const _sysMin = `오늘 날짜: ${todayStr}
 사용자가 입력한 회의 내용을 항목별로 분리해 JSON 객체만 반환하세요. 다른 텍스트 절대 없이 JSON만.
 
 [절대 규칙]
@@ -5008,12 +4991,9 @@ async function runMinAi(){
   "outline": "배경/목적 관련 내용 (명시된 그대로, 없으면 빈 문자열)",
   "content": "회의 내용/논의 항목 (원문 그대로, 여러 항목이면 줄바꿈으로 구분)",
   "summary": "결론/후속조치 관련 내용 (원문 그대로, 없으면 빈 문자열)"
-}`,
-        messages:[{ role:'user', content: text }]
-      })
-    });
-    const data = await res.json();
-    let raw = (data.content?.[0]?.text||'{}').replace(/```json|```/g,'').trim();
+}`;
+    let raw = await callGemini(_sysMin, text, 1200);
+    raw = raw.replace(/```json|```/g,'').trim();
     let parsed;
     try{ parsed = JSON.parse(raw); } catch(e){ parsed = {}; }
     if(!parsed.title){ alert('회의 내용을 인식하지 못했어요. 좀 더 구체적으로 입력해주세요.'); return; }
