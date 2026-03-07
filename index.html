@@ -2271,7 +2271,7 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
         <div class="fg"><label class="fl">장소</label><input type="text" class="fi" id="min-place" placeholder="예) 본사 9층 중회의실"></div>
       </div>
       <div class="fg"><label class="fl">참석자</label><input type="text" class="fi" id="min-attendees" placeholder="예) 김민정 팀장, 손희원 선임"></div>
-      <div class="fg"><label class="fl">개요</label><textarea class="ft" id="min-outline" style="min-height:60px;" placeholder="회의 목적 및 배경을 간략히 입력하세요..."></textarea></div>
+      <div class="fg"><label class="fl">배경</label><textarea class="ft" id="min-outline" style="min-height:60px;" placeholder="회의 배경을 간략히 입력하세요..."></textarea></div>
       <div class="fg"><label class="fl">회의 내용</label><textarea class="ft" id="min-content" style="min-height:140px;" placeholder="회의에서 논의된 내용을 입력하세요..."></textarea></div>
       <div class="fg"><label class="fl">결론 / 후속조치</label><textarea class="ft" id="min-summary" style="min-height:90px;" placeholder="결론 및 후속 조치 사항을 입력하세요..."></textarea></div>
       <!-- 이미지 첨부 (결론 아래) -->
@@ -6354,7 +6354,7 @@ function showMinuteDetail(id){
       <div class="min-detail-body">
         ${m.outline?`
         <div class="min-section">
-          <div class="min-section-title"><i class="fa-solid fa-align-left"></i> 개요</div>
+          <div class="min-section-title"><i class="fa-solid fa-align-left"></i> 배경</div>
           <div class="min-content">${escHtml(m.outline)}</div>
         </div>`:''}
         ${m.content?`
@@ -6939,22 +6939,30 @@ function exportMinute(id){
   if(m.client)  meta.push(`  - 거래처 : ${m.client}`);
   if(m.person)  meta.push(`  - 담당자 : ${m.person}`);
   if(m.attendees) meta.push(`  - 참석자 : ${m.attendees}`);
+  let secNum = 1;
   if(meta.length){
-    lines.push('1. 개요');
+    lines.push(secNum++ + '. 개요');
     meta.forEach(l=>lines.push(l));
+    lines.push('');
+  }
+
+  // 배경 (outline 있을 때만)
+  if(m.outline){
+    lines.push(secNum++ + '. 배경');
+    lines.push(m.outline);
     lines.push('');
   }
 
   // 회의 내용
   if(m.content){
-    lines.push('2. 진행 내용 및 고객사 의견');
+    lines.push(secNum++ + '. 진행 내용 및 고객사 의견');
     lines.push(m.content);
     lines.push('');
   }
 
   // 결론/후속조치
   if(m.summary){
-    lines.push('3. 결론 / 후속조치');
+    lines.push(secNum++ + '. 결론 / 후속조치');
     lines.push(m.summary);
     lines.push('');
   }
