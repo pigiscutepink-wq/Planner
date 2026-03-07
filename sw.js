@@ -22,6 +22,7 @@ const BYPASS_ORIGINS = [
   'script.googleusercontent.com',
   'sheets.googleapis.com',
   'api.anthropic.com', // ← 추가: AI 기능 fetch 오류 방지
+  'generativelanguage.googleapis.com', // ← Gemini API
 ];
 
 // ── 설치: 앱 파일 캐싱 ──
