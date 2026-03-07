@@ -3162,6 +3162,9 @@ async function load(){
       setSyncStatus('saved');
       renderCal(); renderDash(); renderProjs(); renderArchive(); renderMemoPad();
       renderMinutesList(); renderWeeklyRptPage(); renderWeeklyReport();
+      // 데이터 로드 후 현재 페이지 유지 (새로고침 시 hash 복원)
+      const curPage = (location.hash||'').replace('#','') || 'dashboard';
+      navigateTo(curPage);
 
       // 로드 성공 후 혹시 큐에 오프라인 변경사항 있으면 flush
       if(getQueue().length > 0){
@@ -3259,11 +3262,17 @@ function navigateTo(pg){
   if(sidebarAiBtn) sidebarAiBtn.style.display = (pg==='calendar') ? '' : 'none';
   if(mobileAiBtn) mobileAiBtn.style.display = (pg==='calendar') ? '' : 'none';
   // hash 업데이트 (popstate 루프 방지)
-  if(location.hash !== '#'+pg) history.replaceState(null,'','#'+pg);
+  if(location.hash !== '#'+pg) history.pushState(null,'','#'+pg);
 }
 
 document.querySelectorAll('.nav-btn').forEach(btn=>{
   btn.onclick=()=>{ navigateTo(btn.dataset.page); };
+});
+
+// 브라우저 뒤로/앞으로 가기 시 hash 복원
+window.addEventListener('popstate', function(){
+  const pg = (location.hash||'').replace('#','') || 'dashboard';
+  navigateTo(pg);
 });
 
 // ════════════════════════════════════════
@@ -4961,12 +4970,13 @@ async function runMinAi(){
   const text = (inp?.value||'').trim();
   if(!text) return;
 
-  const btn = inp.nextElementSibling?.querySelector('button:last-child') ||
-    inp.parentElement?.querySelector('button:last-child');
+  // 버튼은 패널 안의 마지막 버튼
+  const minAiPanel = document.getElementById('min-ai-panel');
+  const btn = minAiPanel ? minAiPanel.querySelector('button:last-child') : null;
   const origPlaceholder = inp.placeholder;
   inp.disabled = true;
   inp.placeholder = 'AI 분석 중...';
-  if(btn){ btn.disabled=true; btn.textContent='분석 중...'; }
+  if(btn){ btn.disabled=true; btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> 분석 중...'; }
 
   const todayStr = dk(TODAY);
 
