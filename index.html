@@ -1397,6 +1397,16 @@ main.main{display:block;}
     box-shadow:0 2px 10px var(--shadow);
     cursor:pointer;color:var(--ink-mid);font-size:14px;
   }
+  /* 모바일 키 버튼 */
+  #mobile-key-btn{
+    display:flex!important;
+    position:fixed;top:12px;right:102px;z-index:300;
+    width:36px;height:36px;border-radius:50%;
+    background:var(--white);border:1.5px solid var(--rose-light);
+    align-items:center;justify-content:center;
+    box-shadow:0 2px 10px var(--shadow);
+    cursor:pointer;color:var(--ink-soft);font-size:13px;
+  }
   /* 모바일 AI 버튼 — 검색 버튼 왼쪽 */
   #mobile-ai-btn{
     display:flex!important;
@@ -1740,6 +1750,12 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
 
 <!-- GLOBAL SEARCH -->
 <!-- MOBILE AI + SEARCH (≤767px) -->
+<button id="mobile-key-btn" style="display:none;" onclick="changeApiKey()">
+  <i class="fa-solid fa-key"></i>
+</button>
+<button id="mobile-key-btn" onclick="changeApiKey()">
+  <i class="fa-solid fa-key"></i>
+</button>
 <button id="mobile-ai-btn" style="display:none;" onclick="toggleMobileAi()">
   <i class="fa-solid fa-wand-magic-sparkles"></i>
 </button>
@@ -3262,8 +3278,10 @@ function navigateTo(pg){
   // AI 버튼: 캘린더 페이지에서만 표시
   const sidebarAiBtn = document.getElementById('sidebar-ai-btn');
   const mobileAiBtn = document.getElementById('mobile-ai-btn');
+  const mobileKeyBtn = document.getElementById('mobile-key-btn');
   if(sidebarAiBtn) sidebarAiBtn.style.display = (pg==='calendar') ? '' : 'none';
   if(mobileAiBtn) mobileAiBtn.style.display = (pg==='calendar') ? '' : 'none';
+  if(mobileKeyBtn) mobileKeyBtn.style.display = '';
   // hash 업데이트 (popstate 루프 방지)
   if(location.hash !== '#'+pg) history.pushState(null,'','#'+pg);
 }
