@@ -1791,6 +1791,9 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
     <button id="sidebar-search-btn" onclick="toggleSidebarSearch()">
       <i class="fa-solid fa-magnifying-glass"></i> 검색
     </button>
+    <button onclick="changeApiKey()" title="AI API 키 설정" style="display:flex;align-items:center;gap:5px;padding:0 11px;height:100%;border:none;background:none;font-size:12px;font-weight:500;color:#B0A0A0;cursor:pointer;transition:all .18s;font-family:inherit;white-space:nowrap;">
+      <i class="fa-solid fa-key" style="font-size:11px;"></i>
+    </button>
     <div id="sidebar-search-panel">
       <div style="position:relative;">
         <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-soft);font-size:11px;pointer-events:none;"></i>
@@ -4585,7 +4588,9 @@ function toggleDoneTaskList(id){
 // ════════════════════════════════════════
 async function callGemini(systemPrompt, userPrompt, maxTokens){
   maxTokens = maxTokens || 3000;
-  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyDJE4XypWJNgBn2IxeSft17jQrKWSrhTwk',{
+  const GEMINI_KEY = localStorage.getItem('gemini_api_key')||'';
+  if(!GEMINI_KEY){ showApiKeyModal(); throw new Error('API 키를 먼저 입력해주세요.'); }
+  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+GEMINI_KEY,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body: JSON.stringify({
@@ -8892,5 +8897,49 @@ function backToProjList(){
   }
 })();
 </script>
+
+<!-- ══ GEMINI API KEY MODAL ══ -->
+<div id="apikey-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:16px;padding:28px 28px 24px;width:92%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
+    <div style="font-size:18px;font-weight:700;color:#3A2E2E;margin-bottom:6px;">🔑 Gemini API 키 설정</div>
+    <div style="font-size:12px;color:#7A6A6A;margin-bottom:16px;line-height:1.6;">
+      AI 기능을 사용하려면 Gemini API 키가 필요해요.<br>
+      키는 이 기기에만 저장되며 외부로 전송되지 않아요.<br>
+      <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#C9A8AA;">👉 무료 키 발급받기 (Google AI Studio)</a>
+    </div>
+    <input id="apikey-input" type="password" placeholder="AIzaSy..." 
+      style="width:100%;box-sizing:border-box;border:1.5px solid #EFEFEF;border-radius:10px;padding:10px 13px;font-size:13px;font-family:inherit;outline:none;margin-bottom:12px;"
+      onkeydown="if(event.key==='Enter') saveApiKey()">
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button onclick="closeApiKeyModal()" style="padding:8px 18px;border:1.5px solid #EFEFEF;border-radius:10px;background:white;color:#7A6A6A;font-size:12px;cursor:pointer;">취소</button>
+      <button onclick="saveApiKey()" style="padding:8px 18px;border:none;border-radius:10px;background:#C9A8AA;color:white;font-size:12px;font-weight:700;cursor:pointer;">저장</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showApiKeyModal(){
+  const overlay = document.getElementById('apikey-modal-overlay');
+  overlay.style.display = 'flex';
+  setTimeout(()=>document.getElementById('apikey-input')?.focus(), 80);
+}
+function closeApiKeyModal(){
+  document.getElementById('apikey-modal-overlay').style.display = 'none';
+}
+function saveApiKey(){
+  const key = document.getElementById('apikey-input').value.trim();
+  if(!key){ alert('API 키를 입력해주세요.'); return; }
+  localStorage.setItem('gemini_api_key', key);
+  closeApiKeyModal();
+  alert('✅ API 키가 저장됐어요! 이제 AI 기능을 사용할 수 있어요.');
+}
+// 설정 버튼에서도 키 변경 가능하도록
+function changeApiKey(){
+  const cur = localStorage.getItem('gemini_api_key')||'';
+  document.getElementById('apikey-input').value = cur;
+  showApiKeyModal();
+}
+</script>
+
 </body>
 </html>
