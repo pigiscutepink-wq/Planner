@@ -4924,8 +4924,15 @@ async function runMinPageAi(){
 }`;
     let raw = await callGemini(_sysMin, text, 3000);
     raw = raw.replace(/```json|```/g,'').trim();
+    // JSON 블록만 추출 (앞뒤 텍스트 제거)
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if(jsonMatch) raw = jsonMatch[0];
     let parsed;
-    try{ parsed = JSON.parse(raw); } catch(e){ parsed = {}; }
+    try{ parsed = JSON.parse(raw); } catch(e){
+      console.error('AI 파싱 실패. 원본:', raw);
+      alert('AI가 올바른 형식으로 응답하지 않았어요.\n잠시 후 다시 시도해주세요.');
+      return;
+    }
     if(!parsed.title){ alert('회의 내용을 인식하지 못했어요. 좀 더 구체적으로 입력해주세요.'); return; }
 
     // 패널 닫고 새 회의록 모달 열기
@@ -5004,8 +5011,15 @@ async function runMinAi(){
 }`;
     let raw = await callGemini(_sysMin, text, 3000);
     raw = raw.replace(/```json|```/g,'').trim();
+    // JSON 블록만 추출 (앞뒤 텍스트 제거)
+    const jsonMatch = raw.match(/\{[\s\S]*\}/);
+    if(jsonMatch) raw = jsonMatch[0];
     let parsed;
-    try{ parsed = JSON.parse(raw); } catch(e){ parsed = {}; }
+    try{ parsed = JSON.parse(raw); } catch(e){
+      console.error('AI 파싱 실패. 원본:', raw);
+      alert('AI가 올바른 형식으로 응답하지 않았어요.\n잠시 후 다시 시도해주세요.');
+      return;
+    }
     if(!parsed.title){ alert('회의 내용을 인식하지 못했어요. 좀 더 구체적으로 입력해주세요.'); return; }
 
     // 폼에 채우기
