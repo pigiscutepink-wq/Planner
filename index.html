@@ -4584,7 +4584,7 @@ function toggleDoneTaskList(id){
 //  Gemini API 공통 호출 헬퍼
 // ════════════════════════════════════════
 async function callGemini(systemPrompt, userPrompt, maxTokens){
-  maxTokens = maxTokens || 1200;
+  maxTokens = maxTokens || 3000;
   const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=AIzaSyDJE4XypWJNgBn2IxeSft17jQrKWSrhTwk',{
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -4922,7 +4922,7 @@ async function runMinPageAi(){
   "content": "회의 내용 전체 (원문 그대로, 항목별 줄바꿈 유지)",
   "summary": "결론 및 후속조치"
 }`;
-    let raw = await callGemini(_sysMin, text, 3000);
+    let raw = await callGemini(_sysMin, text, 8000);
     raw = raw.replace(/```json|```/g,'').trim();
     // JSON 블록만 추출 (앞뒤 텍스트 제거)
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
@@ -5009,7 +5009,7 @@ async function runMinAi(){
   "content": "회의 내용 전체 (원문 그대로, 항목별 줄바꿈 유지)",
   "summary": "결론 및 후속조치"
 }`;
-    let raw = await callGemini(_sysMin, text, 3000);
+    let raw = await callGemini(_sysMin, text, 8000);
     raw = raw.replace(/```json|```/g,'').trim();
     // JSON 블록만 추출 (앞뒤 텍스트 제거)
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
