@@ -89,7 +89,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow-x:hidden;overflow-y:auto;}
 
-body{font-family:'Inter','Noto Sans KR',sans-serif;background:#F9F4F4;color:var(--ink);display:flex;}
+body{font-family:'Inter','Noto Sans KR',sans-serif;background:#F9F4F4;color:var(--ink);}
 
 /* ── TOP NAV BAR ── */
 .sidebar{
@@ -1753,9 +1753,6 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
 <button id="mobile-key-btn" style="display:none;" onclick="changeApiKey()">
   <i class="fa-solid fa-key"></i>
 </button>
-<button id="mobile-key-btn" onclick="changeApiKey()">
-  <i class="fa-solid fa-key"></i>
-</button>
 <button id="mobile-ai-btn" style="display:none;" onclick="toggleMobileAi()">
   <i class="fa-solid fa-wand-magic-sparkles"></i>
 </button>
@@ -1807,9 +1804,11 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
     <button id="sidebar-search-btn" onclick="toggleSidebarSearch()">
       <i class="fa-solid fa-magnifying-glass"></i> 검색
     </button>
-    <button onclick="changeApiKey()" title="AI API 키 설정" style="display:flex;align-items:center;gap:5px;padding:0 11px;height:100%;border:none;background:none;font-size:12px;font-weight:500;color:#B0A0A0;cursor:pointer;transition:all .18s;font-family:inherit;white-space:nowrap;">
-      <i class="fa-solid fa-key" style="font-size:11px;"></i>
+    <button onclick="changeApiKey()" title="AI 키 설정" style="display:flex;align-items:center;gap:4px;padding:6px 10px;height:32px;border:1.5px solid var(--gray);border-radius:8px;background:white;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;font-family:inherit;margin-left:6px;">
+      <i class="fa-solid fa-key" style="font-size:10px;"></i> AI 키
     </button>
+
+
     <div id="sidebar-search-panel">
       <div style="position:relative;">
         <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-soft);font-size:11px;pointer-events:none;"></i>
