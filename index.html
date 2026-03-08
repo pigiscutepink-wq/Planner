@@ -1308,6 +1308,7 @@ main.main{display:block;}
 .ac-tag.proj{background:#EBF0F5;color:#8FA8C0;}
 /* 상세 패널 */
 .ac-detail-card{background:var(--white);border:1px solid var(--gray);border-radius:var(--r);padding:24px;box-shadow:0 2px 10px var(--shadow);}
+.ac-layout-grid{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start;}
 .ac-detail-head{border-bottom:1px solid var(--gray);padding-bottom:16px;margin-bottom:16px;}
 .ac-detail-title{font-size:20px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.35;}
 .ac-detail-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--ink-mid);}
@@ -1833,6 +1834,10 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
   #archive-tab-note.detail-open .ac-toggle-btn,
   #archive-tab-note.detail-open #ac-proj-btn,
   #archive-tab-note.detail-open #ac-sort { display: none !important; }
+  /* 모바일: 상세 패널은 detail-open 상태에서만 표시, 그리드→단일 컬럼 */
+  #archive-tab-note #ac-detail-wrap { display: none; }
+  #archive-tab-note .ac-layout-grid { grid-template-columns: 1fr !important; }
+  #archive-tab-note #ac-list { display: flex !important; flex-direction: column; gap: 8px; width: 100%; }
   #p-weeklyrpt.detail-open #rpt-week-list-wrap { display: none !important; }
   /* 상세 패널 상단에 뒤로가기 버튼 */
   .mobile-detail-back {
@@ -3589,7 +3594,7 @@ function renderArchivingInTab(){
         <div style="flex:1;"></div>
         <button class="btn btn-p" onclick="openArchivingModal()" style="flex-shrink:0;"><i class="fa-solid fa-plus"></i> 새 노트</button>
       </div>
-      <div style="display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start;">
+      <div class="ac-layout-grid">
         <div id="ac-list" style="display:flex;flex-direction:column;gap:8px;"></div>
         <div id="ac-detail-wrap">
           <div class="empty-state" id="ac-empty"><i class="fa-regular fa-note-sticky"></i>노트를 선택하거나<br>새 노트를 추가하세요</div>
