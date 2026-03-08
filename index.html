@@ -3999,17 +3999,9 @@ function renderCal(){
             <div class="cal-sec-lbl">일정</div>
             <div class="task-drop-zone" id="ev-${key}" data-key="${key}" data-zone="ev"></div>
           </div>
-          <div class="cal-sec-lunch">
-            <div class="cal-sec-lbl">점심</div>
-            <div class="task-drop-zone" id="ln-${key}" data-key="${key}" data-zone="ln"></div>
-          </div>
           <div class="cal-sec-task">
             <div class="cal-sec-lbl">업무</div>
             <div class="task-drop-zone" id="ts-${key}" data-key="${key}" data-zone="ts"></div>
-          </div>
-          <div class="cal-sec-dinner">
-            <div class="cal-sec-lbl">저녁</div>
-            <div class="task-drop-zone" id="dn-${key}" data-key="${key}" data-zone="dn"></div>
           </div>
         </div>
       `;
@@ -4190,12 +4182,8 @@ function updateCalRange(){
 function renderItems(key){
   const evEl=document.getElementById('ev-'+key);
   const tsEl=document.getElementById('ts-'+key);
-  const lnEl=document.getElementById('ln-'+key);
-  const dnEl=document.getElementById('dn-'+key);
   if(!evEl||!tsEl) return;
   evEl.innerHTML=''; tsEl.innerHTML='';
-  if(lnEl) lnEl.innerHTML='';
-  if(dnEl) dnEl.innerHTML='';
   // 시간 있는 것 먼저, 없는 것(allDay) 나중으로 정렬
   const items=(D.items[key]||[]).slice().sort((a,b)=>{
     const at=a.startTime||''; const bt=b.startTime||'';
@@ -4206,16 +4194,13 @@ function renderItems(key){
   items.forEach((it,idx)=>{
     if(it.isSpan) return; // 멀티데이 span은 overlay로 처리
     const chip=makeChip(it,key,idx);
-    if(it.type==='ev-lunch'){
-      if(lnEl) lnEl.appendChild(chip);
-    } else if(it.type==='ev-dinner'){
-      if(dnEl) dnEl.appendChild(chip);
-    } else if(it.type==='task'){
+    // 일정존: 회의/외근출장/중요/기타 (멀티데이 아닌 것만)
+    if(['ev-meet','ev-out','ev-imp','ev-etc'].includes(it.type)){
+      if(!it.endDate || it.endDate<=key) evEl.appendChild(chip);
+    } else {
+      // task, ev-lunch, ev-dinner, ev-personal, ev-exercise, ev-hobby, ev-dayoff → 업무존
       tsEl.appendChild(chip);
-    } else if(!it.endDate || it.endDate<=key){
-      evEl.appendChild(chip);
     }
-    // 멀티데이 일정(endDate>key)은 renderMultiDayBars가 처리
   });
 }
 
