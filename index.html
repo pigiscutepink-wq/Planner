@@ -1308,7 +1308,6 @@ main.main{display:block;}
 .ac-tag.proj{background:#EBF0F5;color:#8FA8C0;}
 /* 상세 패널 */
 .ac-detail-card{background:var(--white);border:1px solid var(--gray);border-radius:var(--r);padding:24px;box-shadow:0 2px 10px var(--shadow);}
-.ac-layout-grid{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start;}
 .ac-detail-head{border-bottom:1px solid var(--gray);padding-bottom:16px;margin-bottom:16px;}
 .ac-detail-title{font-size:20px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.35;}
 .ac-detail-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--ink-mid);}
@@ -1834,10 +1833,6 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
   #archive-tab-note.detail-open .ac-toggle-btn,
   #archive-tab-note.detail-open #ac-proj-btn,
   #archive-tab-note.detail-open #ac-sort { display: none !important; }
-  /* 모바일: 상세 패널은 detail-open 상태에서만 표시, 그리드→단일 컬럼 */
-  #archive-tab-note #ac-detail-wrap { display: none; }
-  #archive-tab-note .ac-layout-grid { grid-template-columns: 1fr !important; }
-  #archive-tab-note #ac-list { display: flex !important; flex-direction: column; gap: 8px; width: 100%; }
   #p-weeklyrpt.detail-open #rpt-week-list-wrap { display: none !important; }
   /* 상세 패널 상단에 뒤로가기 버튼 */
   .mobile-detail-back {
@@ -3594,7 +3589,7 @@ function renderArchivingInTab(){
         <div style="flex:1;"></div>
         <button class="btn btn-p" onclick="openArchivingModal()" style="flex-shrink:0;"><i class="fa-solid fa-plus"></i> 새 노트</button>
       </div>
-      <div class="ac-layout-grid">
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start;">
         <div id="ac-list" style="display:flex;flex-direction:column;gap:8px;"></div>
         <div id="ac-detail-wrap">
           <div class="empty-state" id="ac-empty"><i class="fa-regular fa-note-sticky"></i>노트를 선택하거나<br>새 노트를 추가하세요</div>
@@ -3771,13 +3766,13 @@ function renderWeeklyView(){
       const proj = D.projects.find(p=>p.id===it.project);
       const projTag = proj ? `<span class="wv-proj">${proj.name.slice(0,4)}</span>` : '';
       const done = it.status==='done';
-      return `<div class="wv-item${done?' done':''}" style="--ic:${col}" onclick="openEdit('${key}',${idx})">
+      return `<div class="wv-item${done?' done':''}" style="--ic:${col}" onclick="openEditById('${it.id}')">
         <div class="wv-item-dot" style="background:${col}"></div>
         <div class="wv-item-body">
           <span class="wv-item-name${done?' wv-done':''}">${escHtml(it.name)}</span>
           ${timeStr}${projTag}
         </div>
-        <button class="wv-done-btn${done?' active':''}" onclick="event.stopPropagation();setStatusWv('${key}',${idx},'done')" title="완료">
+        <button class="wv-done-btn${done?' active':''}" onclick="event.stopPropagation();setStatusWvById('${it.id}','done')" title="완료">
           <i class="fa-solid fa-check"></i>
         </button>
       </div>`;
@@ -4156,7 +4151,7 @@ function renderMultiDayBars(weekRow, weekDays){
         bar.style.top = topOffset+'px';
         bar.textContent = it.name;
         bar.title = it.name;
-        bar.onclick = ()=>openEdit(key, idx);
+        bar.onclick = ()=>openEditById(it.id);
         weekRow.appendChild(bar);
       });
     });
@@ -4169,6 +4164,23 @@ function findItemById(id){
     if(idx>-1) return {it: D.items[key][idx], key, idx};
   }
   return null;
+}
+
+// id 기반 편집/상태변경 — 정렬 후 idx 불일치 문제 방지
+function openEditById(id){
+  const found = findItemById(id);
+  if(!found) return;
+  openEdit(found.key, found.idx);
+}
+function setStatusById(id, st){
+  const found = findItemById(id);
+  if(!found) return;
+  setStatus(found.key, found.idx, st);
+}
+function setStatusWvById(id, st){
+  const found = findItemById(id);
+  if(!found) return;
+  setStatusWv(found.key, found.idx, st);
 }
 
 function updateCalRange(){
@@ -4227,10 +4239,10 @@ function makeChip(it,key,idx){
   const partnerTag=it.partner?`<span style="font-size:9px;color:var(--ink-mid);flex-shrink:0">👤${it.partner}</span>`:'';
   div.innerHTML=`
     ${proj?`<span class="chip-proj" title="${proj.name}">${proj.name.slice(0,1)}</span>`:''}
-    <span class="cn" onclick="openEdit('${key}',${idx})" title="${it.name}">${it.name}</span>
+    <span class="cn" onclick="openEditById('${it.id}')" title="${it.name}">${it.name}</span>
     ${partnerTag}
     <div class="chip-acts">
-      <button class="ca done" onclick="setStatus('${key}',${idx},'done')" title="완료"><i class="fa-solid fa-check"></i></button>
+      <button class="ca done" onclick="setStatusById('${it.id}','done')" title="완료"><i class="fa-solid fa-check"></i></button>
     </div>
   `;
   return div;
@@ -4386,6 +4398,10 @@ function restoreProjField(projId){
 // ════════════════════════════════════════
 //  ITEM MODAL HELPERS
 // ════════════════════════════════════════
+// 소속 프로젝트 표시 여부 (점심·저녁·연차 제외하고 모두 표시)
+function showProjField(type){
+  return !['ev-lunch','ev-dinner','ev-dayoff'].includes(type);
+}
 // type pills
 document.querySelectorAll('.type-pill').forEach(pill=>{
   pill.onclick=()=>{
@@ -4396,7 +4412,7 @@ document.querySelectorAll('.type-pill').forEach(pill=>{
     const isTask=selType==='task';
     const isDayOff=selType==='ev-dayoff';
     document.getElementById('meal-fields').style.display=isMeal?'block':'none';
-    document.getElementById('proj-field').style.display=isTask?'block':'none';
+    document.getElementById('proj-field').style.display=showProjField(selType)?'block':'none';
     document.getElementById('enddate-field').style.display=isTask?'none':'block';
     // 연차 선택 시: 이름 자동 입력, 시간 제거
     if(isDayOff){
@@ -4415,7 +4431,7 @@ function openAdd(key, opts={}){
   const selPill=document.querySelector(`.type-pill[data-v="${selType}"]`);
   if(selPill) selPill.classList.add('sel');
   document.getElementById('meal-fields').style.display='none';
-  document.getElementById('proj-field').style.display=selType==='task'?'block':'none';
+  document.getElementById('proj-field').style.display=showProjField(selType)?'block':'none';
   document.getElementById('enddate-field').style.display=selType==='task'?'none':'block';
   document.getElementById('item-enddate').value='';
   document.getElementById('item-modal-title').textContent='일정 추가';
@@ -4441,7 +4457,7 @@ function openEdit(key,idx){
   const isMeal=selType==='ev-lunch'||selType==='ev-dinner';
   const isTask=selType==='task';
   document.getElementById('meal-fields').style.display=isMeal?'block':'none';
-  document.getElementById('proj-field').style.display=isTask?'block':'none';
+  document.getElementById('proj-field').style.display=showProjField(selType)?'block':'none';
   document.getElementById('enddate-field').style.display=isTask?'none':'block';
   document.getElementById('item-enddate').value=it.endDate||'';
   document.getElementById('item-modal-title').textContent='일정 수정';
@@ -4472,7 +4488,7 @@ document.getElementById('item-save-btn').onclick=()=>{
     endTime:   allDay ? '' : (document.getElementById('item-time-end').value.trim()||''),
     endDate,
     memo: document.getElementById('item-memo').value.trim(),
-    project: isTask ? resolveOrCreateProj() : '',
+    project: showProjField(selType) ? resolveOrCreateProj() : '',
     partner: document.getElementById('meal-partner').value.trim(),
     status: editIdx!==null ? D.items[editKey][editIdx].status : 'active'
   };
@@ -4881,7 +4897,7 @@ async function analyzeProject(id){
   // 캘린더 연결 업무 + 프로젝트 자체 tasks 모두 수집 (인덱스 포함)
   const linked = [];
   Object.entries(D.items||{}).forEach(([date, arr])=>{
-    (arr||[]).forEach(it=>{ if(it.project===id && !it.isSpan) linked.push({date, name:it.name, itemId:it.id, src:'cal'}); });
+    (arr||[]).forEach(it=>{ if(it.project===id && !it.isSpan) linked.push({date, name:it.name, type:it.type, itemId:it.id, src:'cal'}); });
   });
   (p.tasks||[]).forEach(tk=>{
     linked.push({date: tk.date||'9999-99-99', name: tk.name, itemId:tk.id, src:'task'});
@@ -4893,7 +4909,8 @@ async function analyzeProject(id){
     const dateLabel = (l.date && l.date !== '9999-99-99')
       ? (()=>{ try{ const dd=new Date(l.date); return `${dd.getFullYear()}-${String(dd.getMonth()+1).padStart(2,'0')}-${String(dd.getDate()).padStart(2,'0')}`; }catch(e){return '';} })()
       : '날짜미정';
-    return `${i+1}. [${dateLabel}] ${l.name}`;
+    const typeLabel = {task:'[업무]','ev-meet':'[일정/회의]','ev-out':'[외근/출장]','ev-imp':'[중요]','ev-etc':'[기타]','ev-personal':'[개인]','ev-exercise':'[운동]','ev-hobby':'[취미]'}[l.type]||'[업무]';
+    return `${i+1}. [${dateLabel}] ${typeLabel} ${l.name}`;
   }).join('\n');
 
   try{
@@ -4922,7 +4939,8 @@ async function analyzeProject(id){
 - step 수는 3~8개가 적당함 (너무 잘게 쪼개지 말 것)
 - title은 실무적이고 간결하게 (예: "샘플 기획", "시안 검토 및 수정", "최종 납품")
 - 날짜 정보를 활용해 시간 순서대로 step을 배치하고, 날짜가 비슷한 업무는 같은 단계로 묶을 것
-- 날짜미정 업무는 전후 맥락과 업무명으로 적절한 위치에 배치할 것`;
+- 날짜미정 업무는 전후 맥락과 업무명으로 적절한 위치에 배치할 것
+- 각 항목의 [업무]/[일정·회의]/[외근·출장] 태그를 참고해 성격에 맞게 step을 구성할 것 (예: 외근·출장은 '현장 방문' 단계로, 회의는 '미팅·협의' 단계로 묶기)`;
     const _usr1 = `프로젝트명: ${p.name}\n${p.desc?'설명: '+p.desc+'\n':''}\n업무 목록 (번호 · 날짜 · 업무명 순):\n${taskListForAI}\n\n날짜 흐름을 참고해서 업무들을 묶고 분류하여 업무 매뉴얼 JSON을 만들어주세요.`;
     let raw = await callGemini(_sys1, _usr1, 2000);
     raw = raw.replace(/```json|```/g,'').trim();
@@ -7359,8 +7377,7 @@ function renderPlannerCardView(){
   const alldays = items.filter(it => it.allDay || !it.startTime);
   alldayEl.innerHTML = alldays.length ? alldays.map(it => {
     const meta = TYPE_META[it.type] || TYPE_META['ev-etc'];
-    const idx  = items.indexOf(it);
-    return `<div class="pcard-item${it.status==='done'?' done':''}" onclick="openEdit('${plannerKey}',${idx})">
+    return `<div class="pcard-item${it.status==='done'?' done':''}" onclick="openEditById('${it.id}')">
       <span class="pcard-item-icon">${meta.icon}</span>
       <div class="pcard-item-body">
         <div class="pcard-item-name">${escHtml(it.name)}</div>
@@ -7384,9 +7401,8 @@ function renderPlannerCardView(){
       secItems.forEach(it => {
         const meta = TYPE_META[it.type] || TYPE_META['ev-etc'];
         const timeStr = it.startTime ? (it.endTime ? `${it.startTime}–${it.endTime}` : it.startTime) : '';
-        const idx = items.indexOf(it);
         const projName = it.project ? (D.projects.find(p=>p.id===it.project)||{}).name||'' : '';
-        html += `<div class="pcard-item${it.status==='done'?' done':''}" onclick="openEdit('${plannerKey}',${idx})">
+        html += `<div class="pcard-item${it.status==='done'?' done':''}" onclick="openEditById('${it.id}')">
           <span class="pcard-item-icon">${meta.icon}</span>
           <div class="pcard-item-body">
             <div class="pcard-item-name">${escHtml(it.name)}</div>
@@ -7778,7 +7794,7 @@ function renderPlanner(){
 
     block.addEventListener('click',e=>{
       if(e.target.closest('.planner-event-resize')) return;
-      openEdit(plannerKey, items.indexOf(it));
+      openEditById(it.id);
     });
 
     makePlannerDrag(block, it);
@@ -7826,7 +7842,7 @@ function renderPlanner(){
         c.style.opacity='.5';
       });
       c.addEventListener('dragend',()=>{ c.style.opacity='1'; });
-      c.onclick=()=>openEdit(plannerKey,items.indexOf(it));
+      c.onclick=()=>openEditById(it.id);
       row.appendChild(c);
     });
   }
