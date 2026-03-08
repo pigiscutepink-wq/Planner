@@ -76,15 +76,7 @@
   --shadow:     rgba(222,192,194,0.22);
   --r:          14px;
   --rs:         8px;
-  --ev-meet:    #D8E5EE;
-  --ev-out:     #D8EAE4;
-  --ev-imp:     #EEE0E0;
-  --ev-etc:     #EAE7E3;
-  --ev-lunch:   #EDE5D8;
-  --ev-dinner:  #E5E0EE;
-  --ev-personal:#DCF0F4;
-  --ev-exercise:#DCF0E4;
-  --ev-hobby:   #F0E0F4;
+
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow-x:hidden;overflow-y:auto;}
@@ -113,7 +105,6 @@ body{font-family:'Inter','Noto Sans KR',sans-serif;background:#F9F4F4;color:var(
   letter-spacing:.01em;white-space:nowrap;
   overflow:hidden;text-overflow:ellipsis;
 }
-.logo-ko{display:none;}
 /* 각 페이지 page-title 숨김 — 상단바에 표시하므로 */
 .page-title{ display:none; }
 .page-sub{ margin-top:0; }
@@ -301,8 +292,6 @@ main.main{display:block;}
   display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
   position:relative;
   background:#FAF8F8;
-}
-
   box-shadow:0 2px 10px rgba(200,170,170,.10);
 }
 
@@ -354,6 +343,7 @@ main.main{display:block;}
   font-size:12px;font-weight:700;color:var(--ink-mid);border-radius:50%;transition:all .15s;
 }
 .cal-day-dow{font-size:11px;color:var(--ink-soft);font-weight:500;}
+.cal-day-num{font-size:13px;font-weight:700;}
 
 /* 토/일 컬러 */
 .cal-day.sat-col .cal-day-num{ color:#7B8EC8; }
@@ -583,6 +573,21 @@ main.main{display:block;}
 .fi:focus,.fs:focus,.ft:focus{border-color:var(--rose);background:white;}
 
 /* ── MEETING PAGE FILTER PILLS ── */
+/* 필터 모달 pill */
+.mf-pill{
+  padding:6px 14px;border-radius:50px;
+  border:1.5px solid var(--rose-light);
+  background:var(--rose-pale);
+  font-size:12px;font-weight:500;
+  color:var(--ink-mid);cursor:pointer;
+  font-family:inherit;transition:all .14s;
+  white-space:nowrap;
+}
+.mf-pill:hover{ border-color:var(--rose-mid); color:var(--rose-mid); }
+.mf-pill.on{
+  background:var(--rose-mid);color:white;
+  border-color:var(--rose-mid);font-weight:700;
+}
 .meet-filter-pill-wrap{
   position:relative;
   display:inline-flex;
@@ -780,7 +785,7 @@ main.main{display:block;}
 
 .ct-inline{
   width:100%;border:none;background:transparent;font-size:12px;color:var(--ink);
-  font-family:inherit;padding:5px 8px;outline:none;
+  font-family:inherit;padding:3px 8px;outline:none;
   border-radius:4px;transition:background .13s;
 }
 .ct-inline:focus,.ct-inline:hover{background:var(--rose-pale);}
@@ -813,7 +818,7 @@ main.main{display:block;}
 .company-group.open .company-group-body{display:block;}
 .contact-person-row{
   display:flex;align-items:center;gap:10px;
-  padding:10px 18px;cursor:pointer;transition:background .13s;
+  padding:6px 18px;cursor:pointer;transition:background .13s;
   border-bottom:1px solid var(--gray);
 }
 .contact-person-row:last-child{border-bottom:none;}
@@ -895,6 +900,17 @@ main.main{display:block;}
 }
 .arch-tab:hover{color:var(--ink);}
 .arch-tab.on{ color:var(--rose-mid);border-bottom-color:var(--rose); }
+/* 세 페이지 공통 탭바 */
+.page-tab-bar{
+  display:flex;align-items:center;
+  border-bottom:2px solid var(--gray);
+  margin-bottom:20px;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+  flex-wrap:nowrap;
+}
+.page-tab-bar::-webkit-scrollbar{display:none;}
 .arch-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
 .info-tbl{width:100%;border-collapse:collapse;font-size:12px;}
 .info-tbl th{text-align:left;padding:8px 10px;background:var(--rose-pale);color:var(--rose-mid);font-size:10px;font-weight:700;letter-spacing:.08em;border-bottom:1px solid var(--rose-light);}
@@ -968,7 +984,7 @@ main.main{display:block;}
 .memo-editor strong{font-weight:700;color:var(--ink);}
 .memo-editor .mk-pink{color:var(--rose);font-weight:600;}
 .memo-pad-resize{
-  position:absolute;bottom:4px;right:4px;width:14px;height:14px;cursor:se-resize;
+  position:absolute;bottom:2px;right:2px;width:24px;height:24px;cursor:se-resize;
   color:#D0C0C0;font-size:10px;display:flex;align-items:center;justify-content:center;
   opacity:.5;
 }
@@ -1064,6 +1080,43 @@ main.main{display:block;}
   border-top:1px solid #EFEFEF;background:#FAFAFA;justify-content:flex-end;
 }
 
+/* ── WEEKLY VIEW ── */
+.wv-week-block{margin-bottom:20px;background:white;border-radius:14px;border:1px solid var(--rose-light);overflow:hidden;box-shadow:0 2px 8px rgba(40,28,28,.05);}
+.wv-week-label{font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--rose-mid);background:var(--rose-pale);padding:6px 14px;border-bottom:1px solid var(--rose-light);}
+.wv-day{border-bottom:1px solid #F3ECEA;transition:background .14s;}
+.wv-day:last-child{border-bottom:none;}
+.wv-day.wv-today{background:#FFF5F9;}
+.wv-day.wv-offday{background:#FAFAFA;}
+.wv-day-head{display:flex;align-items:center;justify-content:space-between;padding:8px 14px 6px;cursor:pointer;}
+.wv-day-num-wrap{display:flex;align-items:center;gap:6px;}
+.wv-day-num{font-size:15px;font-weight:700;color:var(--ink);width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
+.wv-today-num{background:var(--rose);color:white;animation:todayGlow 2.5s ease-in-out infinite;}
+.wv-day-dow{font-size:11px;font-weight:600;color:var(--ink-soft);}
+.wv-sun{color:#C07070!important;}
+.wv-sat{color:#7090C0!important;}
+.wv-hol{font-size:9px;color:var(--rose-mid);font-weight:700;background:var(--rose-pale);padding:1px 6px;border-radius:8px;}
+.wv-add-btn{width:26px;height:26px;border:none;background:none;font-size:18px;color:var(--rose-mid);cursor:pointer;border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s,background .15s;}
+.wv-day-head:hover .wv-add-btn{opacity:1;}
+.wv-day-head:hover{background:rgba(243,168,198,.07);}
+.wv-day-body{padding:2px 14px 8px;}
+.wv-item{display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:8px;cursor:pointer;transition:background .12s;margin-bottom:3px;}
+.wv-item:hover{background:var(--rose-pale);}
+.wv-item.done{opacity:.55;}
+.wv-item-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.wv-item-body{display:flex;align-items:center;gap:6px;flex:1;min-width:0;flex-wrap:wrap;}
+.wv-item-name{font-size:13px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;}
+.wv-done .wv-item-name{text-decoration:line-through;color:var(--ink-soft);}
+.wv-time{font-size:10px;color:var(--ink-soft);background:#F5F0F0;padding:1px 6px;border-radius:6px;flex-shrink:0;}
+.wv-proj{font-size:9px;font-weight:700;color:var(--rose-mid);background:var(--rose-pale);padding:1px 6px;border-radius:6px;flex-shrink:0;}
+.wv-done-btn{background:none;border:none;width:24px;height:24px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#ccc;font-size:11px;flex-shrink:0;transition:all .13s;}
+.wv-done-btn:hover,.wv-done-btn.active{background:#E8F5EE;color:#5A9A6A;}
+.wv-empty{font-size:11px;color:#D0C8C8;padding:2px 0 4px;font-style:italic;}
+/* 모바일에서 wv-add-btn 항상 표시 */
+@media(max-width:950px){
+  .wv-add-btn{opacity:1;}
+  .wv-item-name{max-width:calc(100vw - 140px);}
+}
+
 /* ── PAPER PLANNER MODAL ── */
 #planner-overlay{ display:none!important; }
 #planner-overlay.open{ display:flex!important; }
@@ -1071,6 +1124,7 @@ main.main{display:block;}
   padding:4px 11px;border-radius:50px;border:1.5px solid var(--c,#ccc);
   font-size:11px;font-weight:600;cursor:pointer;color:var(--c,#888);
   background:transparent;transition:all .15s;font-family:inherit;
+  white-space:nowrap;flex-shrink:0;
 }
 .planner-type-btn:hover,.planner-type-btn.active{
   background:var(--c,#ccc);color:#fff;
@@ -1156,6 +1210,9 @@ main.main{display:block;}
 }
 #sidebar-ai-btn:hover{background:var(--rose);color:white;border-color:var(--rose);}
 #sidebar-ai-btn i{font-size:12px;}
+
+/* 플로팅 버튼 기본 숨김 — 미디어쿼리로만 표시 */
+#mobile-ai-btn, #mobile-search-btn { display:none; }
 #sidebar-ai-panel{
   display:none;
   position:fixed;top:56px;right:100px;
@@ -1289,7 +1346,7 @@ main.main{display:block;}
   .nav-btn i{ font-size:14px; }
   /* 대시보드 */
   .dash-grid{ grid-template-columns:1fr 1fr; }
-  .dash-grid-wide{ grid-template-columns:1fr; }
+  .dash-grid-wide{ grid-template-columns:2fr 1fr; }
   /* 프로젝트 */
   .proj-layout{ grid-template-columns:260px 1fr;gap:12px; }
   /* 아카이브 */
@@ -1326,7 +1383,7 @@ main.main{display:block;}
   .nav-btn i{ font-size:15px;width:auto; }
   .nav-btn.active{
     background:var(--rose-pale);color:var(--rose-mid);
-    box-shadow:none;border-top:2px solid var(--rose);
+    box-shadow:none;border-top:none;
   }
   /* 메인 콘텐츠 */
   .main{
@@ -1334,16 +1391,46 @@ main.main{display:block;}
     padding:16px 14px 70px; /* 하단 탭바 높이만큼 패딩 */
   }
   /* 모바일 페이지 타이틀 헤더 */
+  /* ── 모바일 페이지 헤더 (Task / Archive / Report 공통) ── */
   .mobile-page-header{
     display:flex;align-items:center;justify-content:space-between;
-    margin-bottom:18px;padding-bottom:12px;
+    margin-bottom:0;padding-bottom:12px;
     border-bottom:1px solid var(--gray);
   }
   .mobile-page-header .mobile-page-title{
     font-size:22px;font-weight:700;color:var(--ink);letter-spacing:-.02em;
   }
-  /* 상단 페이지 헤더 */
+  /* 탭바 상단 여백 통일 */
+  .page-tab-bar{
+    margin-top:12px;
+    margin-bottom:16px;
+  }
+  .arch-tab{
+    font-size:11px;
+    padding:7px 14px;
+  }
+  /* 상단 페이지 헤더 - Task/Archive/Report는 숨김 */
   .page-head{ flex-wrap:wrap;gap:10px;margin-bottom:16px; }
+  #p-task .page-head,
+  #p-archive .page-head,
+  #p-weeklyrpt > .page-head{ display:none; }
+  /* 대시보드 page-head: 데스크탑 타이틀/버튼 숨기고 날짜만 심플하게 */
+  #dash-page-head{
+    border-bottom:none !important;
+    margin-bottom:14px;
+    padding-bottom:0;
+  }
+  #dash-page-head .page-title{ display:none; }
+  #dash-aikey-btn{ display:none !important; }
+  /* 대시보드 날짜를 모바일 타이틀 스타일로 */
+  #dash-date-lbl{
+    font-size:13px !important;
+    font-weight:500 !important;
+    color:var(--ink-mid) !important;
+    margin-top:0 !important;
+  }
+  /* 먼슬리 요일 숨김 */
+  .cal-day-dow-hide-mobile{ display:none; }
   /* 그리드 → 1컬럼 */
   .dash-grid{ grid-template-columns:1fr;gap:12px; }
   .dash-grid-wide{ grid-template-columns:1fr; }
@@ -1355,6 +1442,7 @@ main.main{display:block;}
   .proj-layout.detail-open #proj-back-btn{ display:inline-flex!important;margin-bottom:12px; }
   /* 보고서 그리드 */
   #report-this-week,#report-next-week{ width:100%; }
+  .dash-grid[style*="1fr 1fr"]:not(#weekly-report-grid){ grid-template-columns:1fr!important; }
   /* 카드 */
   .card{ padding:14px; border-radius:10px; }
   /* 모달 */
@@ -1397,16 +1485,8 @@ main.main{display:block;}
     box-shadow:0 2px 10px var(--shadow);
     cursor:pointer;color:var(--ink-mid);font-size:14px;
   }
-  /* 모바일 키 버튼 */
-  #mobile-key-btn{
-    display:flex!important;
-    position:fixed;top:12px;right:102px;z-index:300;
-    width:36px;height:36px;border-radius:50%;
-    background:var(--white);border:1.5px solid var(--rose-light);
-    align-items:center;justify-content:center;
-    box-shadow:0 2px 10px var(--shadow);
-    cursor:pointer;color:var(--ink-soft);font-size:13px;
-  }
+  /* 모바일 키 버튼 — 숨김 (대시보드로 이동) */
+  #mobile-key-btn{ display:none!important; }
   /* 모바일 AI 버튼 — 검색 버튼 왼쪽 */
   #mobile-ai-btn{
     display:flex!important;
@@ -1419,10 +1499,11 @@ main.main{display:block;}
   }
   #mobile-search-panel{
     display:none;
-    position:fixed;top:0;left:0;right:0;z-index:500;
+    position:fixed;top:50px;left:0;right:0;z-index:500;
     background:var(--white);padding:14px 16px;
     border-bottom:1px solid var(--rose-light);
-    box-shadow:0 4px 20px var(--shadow);
+    border-radius:0 0 14px 14px;
+    box-shadow:0 6px 24px var(--shadow);
   }
   #mobile-search-panel.open{ display:block; }
   #mobile-search-panel input{
@@ -1433,10 +1514,11 @@ main.main{display:block;}
   }
   /* 모바일 AI 패널 */
   #mobile-ai-panel{
-    position:fixed;top:0;left:0;right:0;z-index:500;
+    position:fixed;top:50px;left:0;right:0;z-index:500;
     background:var(--white);
     border-bottom:1.5px solid var(--rose-light);
-    box-shadow:0 4px 20px var(--shadow);
+    border-radius:0 0 14px 14px;
+    box-shadow:0 6px 24px var(--shadow);
   }
   #mobile-ai-panel input{
     width:100%;padding:10px 14px 10px 36px;
@@ -1503,6 +1585,73 @@ main.main{display:block;}
   }
 }
 
+/* ── iPad AI/검색 플로팅 버튼 (768px ~ 950px) ── */
+@media (min-width:768px) and (max-width:950px){
+  /* sidebar의 AI/검색 버튼 숨김 (≤950px에서 이미 숨김) */
+  #sidebar-search-btn{ display:none!important; }
+  #sidebar-ai-btn{ display:none!important; }
+
+  /* iPad용 플로팅 AI 버튼 */
+  #mobile-ai-btn{
+    display:flex!important;
+    position:fixed;top:10px;right:56px;z-index:300;
+    width:34px;height:34px;border-radius:50%;
+    background:var(--white);border:1.5px solid var(--rose-light);
+    align-items:center;justify-content:center;
+    box-shadow:0 2px 10px var(--shadow);
+    cursor:pointer;color:var(--rose-mid);font-size:13px;
+  }
+  #mobile-ai-btn.active{
+    background:var(--rose-pale);border-color:var(--rose-mid);
+  }
+
+  /* iPad용 플로팅 검색 버튼 */
+  #mobile-search-btn{
+    display:flex!important;
+    position:fixed;top:10px;right:14px;z-index:300;
+    width:34px;height:34px;border-radius:50%;
+    background:var(--white);border:1.5px solid var(--rose-light);
+    align-items:center;justify-content:center;
+    box-shadow:0 2px 10px var(--shadow);
+    cursor:pointer;color:var(--ink-mid);font-size:13px;
+  }
+  #mobile-search-btn.active{
+    background:var(--rose-pale);border-color:var(--rose-mid);color:var(--rose-mid);
+  }
+
+  /* iPad용 패널들 */
+  #mobile-search-panel{
+    position:fixed;top:54px;left:0;right:0;z-index:500;
+    background:var(--white);padding:14px 20px;
+    border-bottom:1px solid var(--rose-light);
+    border-radius:0 0 16px 16px;
+    box-shadow:0 6px 24px var(--shadow);
+  }
+  #mobile-search-panel input{
+    width:100%;padding:10px 14px 10px 36px;
+    border-radius:50px;border:1.5px solid var(--rose-light);
+    background:var(--rose-pale);font-size:13px;font-family:inherit;
+    color:var(--ink);outline:none;
+  }
+  #mobile-ai-panel{
+    position:fixed;top:54px;left:0;right:0;z-index:500;
+    background:var(--white);
+    border-bottom:1.5px solid var(--rose-light);
+    border-radius:0 0 16px 16px;
+    box-shadow:0 6px 24px var(--shadow);
+  }
+  #mobile-ai-panel input{
+    width:100%;padding:10px 14px 10px 36px;
+    border-radius:50px;border:1.5px solid var(--rose-light);
+    background:var(--rose-pale);font-size:13px;font-family:inherit;
+    color:var(--ink);outline:none;
+  }
+  #global-search-results{
+    position:fixed!important;top:60px!important;left:16px!important;right:16px!important;
+    width:auto!important;bottom:auto;max-height:60vh!important;
+  }
+}
+
 /* ════════════════════════════════════════
    PWA / iOS / iPadOS 최적화
    ════════════════════════════════════════ */
@@ -1518,7 +1667,7 @@ main.main{display:block;}
 /* 터치 기본 최적화 */
 * { -webkit-tap-highlight-color: transparent; }
 button, select, input, textarea { touch-action: manipulation; }
-body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
+body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
 
 /* 스크롤 부드럽게 (iOS) */
 .main, .modal, #min-list, #proj-list, #ac-list {
@@ -1528,6 +1677,9 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
 /* ── iPad (768px~1023px) 최적화 ── */
 @media (min-width:768px) and (max-width:1023px) {
   .mobile-page-header { display: none !important; }
+  /* iPad: page-tab-bar 기본 여백 */
+  .page-tab-bar { margin-bottom: 20px; }
+  .arch-tab { font-size: 12px; padding: 9px 18px; }
   .sidebar {
     height: 54px;
     padding: 0 24px;
@@ -1550,7 +1702,7 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
   .nav-btn span { display: block !important; font-size: 11px; }
   .nav-btn i { font-size: 13px; }
   .dash-grid { grid-template-columns: 1fr 1fr; }
-  .dash-grid-wide { grid-template-columns: 1fr; }
+  .dash-grid-wide { grid-template-columns: 2fr 1fr; }
   .proj-layout { grid-template-columns: 280px 1fr; gap: 16px; }
   .modal {
     width: 580px !important;
@@ -1566,6 +1718,14 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
   #p-archiving [style*="grid-template-columns:300px"] {
     grid-template-columns: 280px 1fr !important;
   }
+}
+
+/* ── 모바일 Task 탭 순서: 위클리 / 프로젝트 / 캘린더 ── */
+@media (max-width:767px) {
+  #task-tab-weekly { order: 1; }
+  #task-tab-proj   { order: 2; }
+  #task-tab-cal    { order: 3; }
+  #task-tab-bar    { display: flex; }
 }
 
 /* ── 모바일 safe area 반영 ── */
@@ -1611,10 +1771,16 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
   /* 버튼 터치 크기 최소 44px */
   .btn { min-height: 44px; }
   .cal-btn { min-height: 44px; }
+  /* 탭 버튼은 44px 예외 */
+  .page-tab-bar .arch-tab { min-height: 36px; padding:7px 12px; }
+  /* 기호설정 아이콘 버튼 */
+  .sym-icon-btn { min-height: 36px !important; width:36px!important; height:36px!important; }
 }
 
 /* ── 스마트폰 캘린더 최적화 ── */
 @media (max-width:600px) {
+  /* 위클리 리포트는 모바일에서 세로 */
+  #weekly-report-grid { grid-template-columns:1fr !important; }
   /* 날짜 셀 높이 축소 */
   .cal-day { min-height: 80px !important; }
 
@@ -1655,6 +1821,11 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
   /* 상세 패널이 열릴 때 목록 숨기기 */
   #p-minutes.detail-open #min-list { display: none !important; }
   #p-archiving.detail-open #ac-list { display: none !important; }
+  #archive-tab-note.detail-open #ac-list { display: none !important; }
+  #archive-tab-note.detail-open #ac-detail-wrap { display: block !important; }
+  #archive-tab-note.detail-open .ac-toggle-btn,
+  #archive-tab-note.detail-open #ac-proj-btn,
+  #archive-tab-note.detail-open #ac-sort { display: none !important; }
   #p-weeklyrpt.detail-open #rpt-week-list-wrap { display: none !important; }
   /* 상세 패널 상단에 뒤로가기 버튼 */
   .mobile-detail-back {
@@ -1731,6 +1902,108 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
 </head>
 <body>
 
+<!-- PULL TO REFRESH -->
+<style>
+#ptr-indicator {
+  position: fixed;
+  top: 0; /* 모바일: 화면 최상단 */
+  left: 0; right: 0;
+  z-index: 9000;
+  height: 0;
+  overflow: hidden;
+  background: var(--rose-pale);
+  border-bottom: 1px solid var(--rose-light);
+  pointer-events: none;
+  transition: height 0.15s ease;
+}
+/* 데스크탑: 네비바 아래 */
+@media (min-width: 951px) {
+  #ptr-indicator { top: 50px; z-index: 200; }
+}
+#ptr-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+#ptr-spinner {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  border: 2.5px solid var(--rose-light);
+  border-top-color: var(--rose-mid);
+  flex-shrink: 0;
+}
+#ptr-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--rose-mid);
+  font-family: 'Noto Sans KR', sans-serif;
+}
+@keyframes ptr-spin { to { transform: rotate(360deg); } }
+.ptr-spinning { animation: ptr-spin 0.7s linear infinite !important; }
+
+/* ── 초기 로딩 스플래시 ── */
+#app-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #F9F4F4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  transition: opacity 0.4s ease;
+}
+#app-splash.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.splash-logo {
+  width: 72px; height: 72px;
+  background: var(--rose);
+  border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px; font-weight: 700; color: white;
+  font-family: serif;
+  box-shadow: 0 8px 24px rgba(222,192,194,0.5);
+}
+.splash-title {
+  font-size: 17px; font-weight: 600;
+  color: var(--ink); font-family: 'Noto Sans KR', sans-serif;
+  letter-spacing: -0.3px;
+}
+.splash-spinner {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 3px solid var(--rose-light);
+  border-top-color: var(--rose);
+  animation: ptr-spin 0.8s linear infinite;
+}
+.splash-sub {
+  font-size: 12px; color: var(--ink-soft);
+  font-family: 'Noto Sans KR', sans-serif;
+  margin-top: -8px;
+}
+</style>
+<div id="ptr-indicator">
+  <div id="ptr-inner">
+    <div id="ptr-spinner"></div>
+    <span id="ptr-text">당겨서 새로고침</span>
+  </div>
+</div>
+
+<!-- 초기 로딩 스플래시 -->
+<div id="app-splash">
+  <div class="splash-logo">B</div>
+  <div class="splash-title">보닥데코 업무 스케줄러</div>
+  <div class="splash-spinner"></div>
+  <div class="splash-sub">데이터 불러오는 중...</div>
+</div>
+
 <!-- PWA: iOS 홈화면 추가 배너 -->
 <div id="pwa-ios-banner">
   <div class="pwa-icon">B</div>
@@ -1741,7 +2014,7 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
       공유 버튼 → <b style="color:var(--rose);">홈 화면에 추가</b>
     </div>
   </div>
-  <button class="pwa-close" onclick="document.getElementById('pwa-ios-banner').style.display='none';localStorage.setItem('pwa-banner-closed','1')">✕</button>
+  <button class="pwa-close" onclick="document.getElementById('pwa-ios-banner').style.display='none'">✕</button>
 </div>
 <!-- PWA: Android 설치 버튼 -->
 <button id="pwa-install-btn" onclick="window._pwaPrompt&&window._pwaPrompt.prompt()">
@@ -1753,10 +2026,10 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
 <button id="mobile-key-btn" style="display:none;" onclick="changeApiKey()">
   <i class="fa-solid fa-key"></i>
 </button>
-<button id="mobile-ai-btn" style="display:none;" onclick="toggleMobileAi()">
+<button id="mobile-ai-btn" onclick="toggleMobileAi()">
   <i class="fa-solid fa-wand-magic-sparkles"></i>
 </button>
-<button id="mobile-search-btn" style="display:none;" onclick="toggleMobileSearch()">
+<button id="mobile-search-btn" onclick="toggleMobileSearch()">
   <i class="fa-solid fa-magnifying-glass"></i>
 </button>
 <div id="mobile-search-panel">
@@ -1767,11 +2040,11 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
   </div>
 </div>
 <div id="mobile-ai-panel" style="display:none;">
-  <div style="position:relative;">
-    <i class="fa-solid fa-wand-magic-sparkles" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--rose-mid);font-size:12px;pointer-events:none;"></i>
+  <div style="position:relative;padding:10px 14px;">
+    <i class="fa-solid fa-wand-magic-sparkles" style="position:absolute;left:26px;top:50%;transform:translateY(-50%);color:var(--rose-mid);font-size:12px;pointer-events:none;"></i>
     <input id="mobile-ai-input" type="text" placeholder="예) 3/6 샘플북 기획, 시안 컨펌" autocomplete="off"
       onkeydown="if(event.key==='Enter')runAiQuickInput(true);if(event.key==='Escape')closeMobileAi()">
-    <button onclick="closeMobileAi()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:14px;color:var(--ink-soft);cursor:pointer;">✕</button>
+    <button onclick="closeMobileAi()" style="position:absolute;right:24px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:14px;color:var(--ink-soft);cursor:pointer;">✕</button>
   </div>
   <div id="mobile-ai-preview-list"></div>
   <div id="mobile-ai-preview-actions" style="display:none;padding:6px 12px 8px;display:none;justify-content:flex-end;gap:6px;border-top:1px solid var(--rose-light);background:white;">
@@ -1790,37 +2063,38 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
   </div>
   <div class="nav">
     <button class="nav-btn active" data-page="dashboard"><i class="fa-solid fa-house"></i> <span>Dashboard</span></button>
-    <button class="nav-btn" data-page="calendar"><i class="fa-regular fa-calendar-days"></i> <span>Calendar</span></button>
-    <button class="nav-btn" data-page="projects"><i class="fa-solid fa-diagram-project"></i> <span>Projects</span></button>
-    <button class="nav-btn" data-page="archiving"><i class="fa-solid fa-layer-group"></i> <span>Note</span></button>
+    <button class="nav-btn" data-page="task"><i class="fa-solid fa-list-check"></i> <span>Task</span></button>
     <button class="nav-btn" data-page="archive"><i class="fa-solid fa-box-archive"></i> <span>Archive</span></button>
     <button class="nav-btn" data-page="weeklyrpt"><i class="fa-solid fa-file-lines"></i> <span>Report</span></button>
-    <button class="nav-btn" data-page="minutes"><i class="fa-solid fa-book-open"></i> <span>Meeting</span></button>
   </div>
   <div class="sidebar-search-wrap">
-    <button id="sidebar-ai-btn" style="display:none;" onclick="toggleSidebarAi()">
+    <button id="sidebar-ai-btn" onclick="toggleSidebarAi()">
       <i class="fa-solid fa-wand-magic-sparkles"></i> AI
     </button>
     <button id="sidebar-search-btn" onclick="toggleSidebarSearch()">
       <i class="fa-solid fa-magnifying-glass"></i> 검색
     </button>
-    <button onclick="changeApiKey()" title="AI 키 설정" style="display:flex;align-items:center;gap:4px;padding:6px 10px;height:32px;border:1.5px solid var(--gray);border-radius:8px;background:white;font-size:11px;font-weight:500;color:var(--ink-mid);cursor:pointer;font-family:inherit;margin-left:6px;">
-      <i class="fa-solid fa-key" style="font-size:10px;"></i> AI 키
-    </button>
 
 
     <div id="sidebar-search-panel">
-      <div style="position:relative;">
-        <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-soft);font-size:11px;pointer-events:none;"></i>
-        <input type="text" id="global-search-input" placeholder="통합 검색..." autocomplete="off">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div style="position:relative;flex:1;">
+          <i class="fa-solid fa-magnifying-glass" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink-soft);font-size:11px;pointer-events:none;"></i>
+          <input type="text" id="global-search-input" placeholder="통합 검색..." autocomplete="off"
+            onkeydown="if(event.key==='Escape'){this.value='';document.getElementById('global-search-results').classList.remove('open');toggleSidebarSearch();}">
+        </div>
+        <button onclick="document.getElementById('global-search-input').dispatchEvent(new Event('input'))" style="flex-shrink:0;padding:0 12px;height:32px;border-radius:16px;border:none;background:var(--rose-mid);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;"><i class="fa-solid fa-magnifying-glass"></i></button>
       </div>
       <div id="global-search-results"></div>
     </div>
     <div id="sidebar-ai-panel">
-      <div style="position:relative;">
-        <i class="fa-solid fa-wand-magic-sparkles" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--rose-mid);font-size:11px;pointer-events:none;"></i>
-        <input type="text" id="ai-quick-input" placeholder="예) 3/6 샘플북 기획, 시안 컨펌" autocomplete="off"
-          onkeydown="if(event.key==='Enter')runAiQuickInput();if(event.key==='Escape')closeSidebarAi()">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div style="position:relative;flex:1;">
+          <i class="fa-solid fa-wand-magic-sparkles" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--rose-mid);font-size:11px;pointer-events:none;"></i>
+          <input type="text" id="ai-quick-input" placeholder="예) 3/6 샘플북 기획, 시안 컨펌" autocomplete="off"
+            onkeydown="if(event.key==='Enter')runAiQuickInput();if(event.key==='Escape')closeSidebarAi()">
+        </div>
+        <button onclick="runAiQuickInput()" style="flex-shrink:0;padding:0 12px;height:32px;border-radius:16px;border:none;background:var(--rose-mid);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;"><i class="fa-solid fa-wand-magic-sparkles"></i></button>
       </div>
       <div id="ai-quick-preview-list" style="display:none;"></div>
       <div id="ai-quick-preview-actions" style="display:none;padding:6px 10px 8px;display:none;justify-content:flex-end;gap:6px;border-top:1px solid var(--rose-light);">
@@ -1838,18 +2112,21 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
 
   <!-- ══ PAGE: DASHBOARD ══ -->
   <div class="page active" id="p-dashboard">
-    <div class="page-head">
+    <div class="page-head" id="dash-page-head">
       <div>
         <div class="page-title">Dashboard</div>
         <div class="page-sub" id="dash-date-lbl"></div>
       </div>
+      <button id="dash-aikey-btn" onclick="changeApiKey()" title="AI 키 설정" style="display:flex;align-items:center;gap:5px;padding:7px 14px;height:34px;border:1.5px solid var(--rose-light);border-radius:20px;background:var(--rose-pale);font-size:12px;font-weight:600;color:var(--ink-mid);cursor:pointer;font-family:inherit;transition:all .18s;" onmouseover="this.style.background='var(--rose)';this.style.color='white'" onmouseout="this.style.background='var(--rose-pale)';this.style.color='var(--ink-mid)'">
+        <i class="fa-solid fa-key" style="font-size:11px;"></i> AI 키
+      </button>
     </div>
     <!-- 상단: stats 카드 하나에 3개 수치 나란히 -->
     <div class="card" style="margin-bottom:20px;padding:18px 28px;">
       <div id="dash-stats" style="display:flex;align-items:stretch;gap:0;"></div>
     </div>
     <!-- 중단: 좌(오늘 일정) + 우(식사+프로젝트) -->
-    <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px;">
+    <div class="dash-grid-wide" style="margin-bottom:20px;">
       <!-- 좌: 오늘의 일정 & 업무 -->
       <div class="card">
         <div class="card-title"><i class="fa-regular fa-calendar-check"></i> 오늘의 일정 &amp; 업무</div>
@@ -1875,20 +2152,30 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
           <div class="page-title" style="font-size:20px;">Weekly Report</div>
           <span id="dash-week-badge" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;background:var(--rose-pale);color:var(--rose-mid);border:1px solid var(--rose-light);"></span>
         </div>
-        <button class="cal-btn" onclick="copyWeeklyReport()" title="텍스트 복사"><i class="fa-regular fa-copy"></i> Copy Report</button>
+        <button onclick="copyWeeklyReport()" title="텍스트 복사" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;background:var(--rose-pale);color:var(--rose-mid);border:1px solid var(--rose-light);cursor:pointer;font-family:inherit;transition:background .15s;" onmouseover="this.style.background='var(--rose-light)'" onmouseout="this.style.background='var(--rose-pale)'"><i class="fa-regular fa-copy"></i> Copy Report</button>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="dash-grid" id="weekly-report-grid" style="grid-template-columns:1fr 1fr;">
         <div class="report-card" id="report-this-week"></div>
         <div class="report-card" id="report-next-week"></div>
       </div>
     </div>
   </div>
 
-  <!-- ══ PAGE: CALENDAR ══ -->
-  <div class="page" id="p-calendar">
+  <!-- ══ PAGE: TASK ══ -->
+  <div class="page" id="p-task">
   <div class="mobile-page-header">
-    <div class="mobile-page-title">Calendar</div>
+    <div class="mobile-page-title">Task</div>
   </div>
+  <!-- Task 하위 탭 -->
+  <div class="page-tab-bar" id="task-tab-bar">
+    <button class="arch-tab on" id="task-tab-cal" onclick="switchTaskTab('calendar',this)"><i class="fa-regular fa-calendar-days" style="margin-right:5px;"></i> 캘린더뷰</button>
+    <button class="arch-tab" id="task-tab-weekly" onclick="switchTaskTab('weekly',this)"><i class="fa-regular fa-rectangle-list" style="margin-right:5px;"></i> 위클리뷰</button>
+    <button class="arch-tab" id="task-tab-proj" onclick="switchTaskTab('projects',this)"><i class="fa-solid fa-diagram-project" style="margin-right:5px;"></i> 프로젝트뷰</button>
+  </div>
+
+  <!-- ── 캘린더뷰 ── -->
+  <div id="task-view-calendar">
+  <div class="page" id="p-calendar" style="display:block;padding:0;max-width:none;margin:0;">
 
     <div class="page-head">
       <div style="position:relative;display:inline-block;">
@@ -1920,10 +2207,17 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
     </div>
     <div id="cal-grid-wrap"></div>
   </div>
+  </div><!-- /task-view-calendar -->
 
-  <!-- ══ PAGE: PROJECTS ══ -->
-  <div class="page" id="p-projects">
-  <div class="mobile-page-header">
+  <!-- ── 위클리뷰 ── -->
+  <div id="task-view-weekly" style="display:none;">
+    <div id="weekly-view-wrap" style="position:relative;"></div>
+  </div>
+
+  <!-- ── 프로젝트뷰 ── -->
+  <div id="task-view-projects" style="display:none;">
+  <div class="page" id="p-projects" style="display:block;padding:0;max-width:none;margin:0;">
+  <div class="mobile-page-header" style="display:none;">
     <div class="mobile-page-title">Projects</div>
   </div>
     <div class="page-head">
@@ -1957,31 +2251,42 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
       </div>
     </div>
   </div>
+  </div><!-- /p-projects -->
+  </div><!-- /task-view-projects -->
+  </div><!-- /p-task -->
 
-  <!-- ══ PAGE: ARCHIVE ══ -->
+  <!-- ══ PAGE: ARCHIVE (통합) ══ -->
   <div class="page" id="p-archive">
   <div class="mobile-page-header">
     <div class="mobile-page-title">Archive</div>
   </div>
     <div class="page-head">
-      <div class="page-title">아카이브</div>
+      <div class="page-title">Archive</div>
     </div>
-    <!-- 탭 -->
-    <div style="display:flex;gap:0;border-bottom:2px solid var(--gray);margin-bottom:20px;">
-      <button class="arch-tab on" data-tab="memo" onclick="switchArchTab('memo',this)">📝 Memo Pad</button>
-      <button class="arch-tab" data-tab="system" onclick="switchArchTab('system',this)">🔐 System Info</button>
-      <button class="arch-tab" data-tab="contacts" onclick="switchArchTab('contacts',this)">📒 Contacts</button>
+    <!-- 통합 탭 -->
+    <div class="page-tab-bar">
+      <button class="arch-tab on" data-atab="memo" onclick="switchArchiveTab('memo',this)">📝 Memo Pad</button>
+      <button class="arch-tab" data-atab="note" onclick="switchArchiveTab('note',this)"><i class="fa-solid fa-layer-group" style="margin-right:4px;"></i> Note</button>
+      <button class="arch-tab" data-atab="minutes" onclick="switchArchiveTab('minutes',this)"><i class="fa-solid fa-book-open" style="margin-right:4px;"></i> Meeting</button>
+      <button class="arch-tab" data-atab="system" onclick="switchArchiveTab('system',this)">🔐 System Info</button>
+      <button class="arch-tab" data-atab="contacts" onclick="switchArchiveTab('contacts',this)">📒 Contacts</button>
+    </div>
+    <!-- Note 탭 (archiving) -->
+    <div id="archive-tab-note" style="display:none;">
     </div>
     <!-- Memo Pad 탭 -->
-    <div id="arch-tab-memo">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div class="card-title" style="margin:0"><i class="fa-regular fa-note-sticky"></i> Memo Pad</div>
-        <button class="btn btn-p" style="font-size:11px;padding:6px 14px" onclick="addMemo()"><i class="fa-solid fa-plus"></i> Add Memo</button>
+    <div id="archive-tab-memo">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+        <input type="text" class="fi" id="memo-search" placeholder="🔍  메모 검색..." style="flex:1;" oninput="renderMemoPad()">
+        <button class="btn btn-p" style="font-size:11px;padding:6px 14px;flex-shrink:0;" onclick="addMemo()"><i class="fa-solid fa-plus"></i> Add Memo</button>
       </div>
       <div id="memo-pad-wrap" style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;"></div>
     </div>
+    <!-- Meeting 탭 -->
+    <div id="archive-tab-minutes" style="display:none;">
+    </div>
     <!-- System Info 탭 -->
-    <div id="arch-tab-system" style="display:none;">
+    <div id="archive-tab-system" style="display:none;">
       <div class="card">
         <div class="card-title"><i class="fa-solid fa-server"></i> System Info</div>
         <table class="info-tbl"><thead><tr><th>항목</th><th>ID</th><th>Password</th><th>비고</th><th></th></tr></thead>
@@ -1990,10 +2295,8 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
       </div>
     </div>
     <!-- Contacts 탭 -->
-    <div id="arch-tab-contacts" style="display:none;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div class="card-title" style="margin:0;"><i class="fa-solid fa-address-book"></i> Contacts</div>
-      </div>
+    <div id="archive-tab-contacts" style="display:none;">
+
       <!-- 빠른 입력 -->
       <div style="display:flex;gap:6px;align-items:center;margin-bottom:14px;background:var(--white);border:1.5px solid var(--rose-light);border-radius:var(--rs);padding:8px 10px;">
         <input type="text" class="ct-inline" id="qi-company" placeholder="소속" style="flex:1.2;border-right:1px solid var(--gray);border-radius:0;" list="ct-company-list">
@@ -2016,27 +2319,26 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
     <div class="page-head">
       <div>
         <div class="page-title">Report</div>
-        <div class="page-sub">주간 보고서 및 분기 수시실적을 관리합니다</div>
       </div>
     </div>
     <!-- 탭 -->
-    <div style="display:flex;align-items:center;border-bottom:2px solid var(--gray);margin-bottom:20px;">
+    <div class="page-tab-bar">
       <button class="arch-tab on" onclick="switchRptTab('weekly',this)">📋 Weekly Report</button>
       <button class="arch-tab" onclick="switchRptTab('periodic',this)">📊 수시실적</button>
-      <div style="flex:1;"></div>
-      <button class="btn btn-g" style="font-size:11px;padding:5px 12px;margin-bottom:2px;" onclick="openSymModal()"><i class="fa-solid fa-sliders"></i> 기호 설정</button>
     </div>
 
     <!-- ── WEEKLY REPORT 탭 ── -->
     <div id="rpt-tab-weekly">
-      <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:16px;">
-        <button class="btn btn-g" onclick="openManualRptModal()"><i class="fa-solid fa-pen-to-square"></i> 수기 입력</button>
-        <button class="btn btn-p" onclick="saveWeeklySnapshot()"><i class="fa-solid fa-floppy-disk"></i> 이번 주 보고서 저장</button>
-      </div>
       <div style="display:grid;grid-template-columns:260px 1fr;gap:20px;">
         <div id="rpt-week-list-wrap">
           <div class="card" style="padding:14px;">
-            <div class="card-title" style="margin-bottom:10px;"><i class="fa-solid fa-clock-rotate-left"></i> Saved Reports</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+              <div class="card-title" style="margin:0;"><i class="fa-solid fa-clock-rotate-left"></i> Saved Reports</div>
+              <div style="display:flex;gap:5px;">
+                <button class="btn btn-g" style="font-size:10px;padding:4px 8px;" onclick="openManualRptModal()" title="수기 입력"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button class="btn btn-p" style="font-size:10px;padding:4px 8px;" onclick="saveWeeklySnapshot()" title="이번 주 보고서 저장"><i class="fa-solid fa-floppy-disk"></i></button>
+              </div>
+            </div>
             <div id="rpt-week-list" style="display:flex;flex-direction:column;gap:6px;"></div>
           </div>
         </div>
@@ -2082,31 +2384,22 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
                 <div id="periodic-title" style="font-size:16px;font-weight:700;color:var(--ink);"></div>
                 <div id="periodic-quarter-label" style="font-size:11px;color:var(--ink-soft);margin-top:2px;"></div>
               </div>
-              <button class="btn btn-g" onclick="copyPeriodicReport()"><i class="fa-regular fa-copy"></i> 전체 복사</button>
+              <div style="display:flex;gap:6px;align-items:center;">
+                <button class="btn btn-g" onclick="copyPeriodicReport()"><i class="fa-regular fa-copy"></i> 전체 복사</button>
+                <button class="btn btn-g sym-icon-btn" onclick="openSymModal()" title="기호 설정" style="width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa-solid fa-sliders" style="font-size:13px;"></i></button>
+              </div>
             </div>
             <div id="periodic-actions" style="display:flex;flex-direction:column;gap:10px;"></div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+    </div><!-- /rpt-tab-periodic -->
 
-  <!-- ══ PAGE: MINUTES ══ -->
-  <div class="page" id="p-minutes">
-  <div class="mobile-page-header">
-    <div class="mobile-page-title">Meeting</div>
-  </div>
-    <div class="page-head">
-      <div>
-        <div class="page-title">Meeting Notes</div>
-        <div class="page-sub">회의 이력을 기록하고 관리합니다</div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn-g" onclick="openMinExportSettings()"><i class="fa-solid fa-sliders"></i> 내보내기 설정</button>
-        <button id="min-page-ai-btn" class="btn btn-g" onclick="toggleMinPageAiPanel()" style="border-color:var(--rose-mid);color:var(--rose-mid);"><i class="fa-solid fa-wand-magic-sparkles"></i> AI 입력</button>
-        <button class="btn btn-p" onclick="openMinutesModal()"><i class="fa-solid fa-plus"></i> 새 회의록</button>
-      </div>
-    </div>
+    <!-- ── Meeting 탭 ── -->
+    <div id="rpt-tab-minutes" style="display:none;">
+    <div class="page" id="p-minutes" style="display:block;padding:0;max-width:none;margin:0;">
+
     <!-- AI 입력 패널 -->
     <div id="min-page-ai-panel" style="display:none;background:var(--rose-pale);border-radius:12px;padding:14px 16px;margin-bottom:16px;border:1px solid var(--rose-light);">
       <div style="font-size:11px;color:var(--ink-mid);margin-bottom:8px;font-weight:600;"><i class="fa-solid fa-wand-magic-sparkles" style="color:var(--rose-mid);margin-right:4px;"></i> 회의 내용을 자유롭게 입력하면 항목별로 분리해서 새 회의록에 채워줍니다</div>
@@ -2117,40 +2410,22 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
       </div>
     </div>
     <!-- 필터 & 검색 -->
+    <!-- 통합 한 줄: 검색+필터+버튼 -->
     <div class="meet-filter-bar" style="display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap;">
-      <input type="text" class="fi" id="min-search" placeholder="🔍  회의명, 거래처, 담당자 검색..." style="flex:1;min-width:180px;max-width:280px;" oninput="renderMinutesList()">
-      <div class="meet-filter-pill-wrap">
-        <select class="meet-filter-pill" id="min-filter-type" onchange="renderMinutesList()">
-          <option value="">유형</option>
-          <option value="고객사 미팅">고객사 미팅</option>
-          <option value="협력사 미팅">협력사 미팅</option>
-          <option value="내부회의">내부회의</option>
-          <option value="보고">보고</option>
-          <option value="기타">기타</option>
-        </select>
-      </div>
-      <div class="meet-filter-pill-wrap">
-        <select class="meet-filter-pill" id="min-filter-client" onchange="renderMinutesList()">
-          <option value="">거래처</option>
-        </select>
-      </div>
-      <div class="meet-filter-pill-wrap">
-        <select class="meet-filter-pill" id="min-filter-year" onchange="renderMinutesList()">
-          <option value="">년도</option>
-        </select>
-      </div>
-      <div class="meet-filter-pill-wrap">
-        <select class="meet-filter-pill" id="min-filter-person" onchange="renderMinutesList()">
-          <option value="">담당자</option>
-        </select>
-      </div>
-      <div style="display:flex;gap:4px;margin-left:auto;flex-shrink:0;">
-        <button class="min-sort-btn active" id="min-sort-date-desc" onclick="setMinSort('date-desc')"><i class="fa-solid fa-arrow-down-wide-short"></i> 최신순</button>
-        <button class="min-sort-btn" id="min-sort-date-asc" onclick="setMinSort('date-asc')"><i class="fa-solid fa-arrow-up-wide-short"></i> 오래된순</button>
-        <button class="min-sort-btn" id="min-sort-title-asc" onclick="setMinSort('title-asc')"><i class="fa-solid fa-arrow-down-a-z"></i> 이름↑</button>
-        <button class="min-sort-btn" id="min-sort-title-desc" onclick="setMinSort('title-desc')"><i class="fa-solid fa-arrow-down-z-a"></i> 이름↓</button>
-      </div>
+      <input type="text" class="fi" id="min-search" placeholder="🔍  회의명, 거래처, 담당자 검색..." style="flex:1;min-width:140px;" oninput="renderMinutesList()">
+      <button id="min-filter-btn" onclick="openMinFilterModal()" style="flex-shrink:0;display:flex;align-items:center;gap:5px;padding:9px 12px;border-radius:var(--rs);border:1.5px solid var(--rose-light);background:var(--rose-pale);font-size:12px;font-weight:600;color:var(--ink-mid);cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;">
+        <i class="fa-solid fa-sliders" style="font-size:11px;"></i> 필터
+        <span id="min-filter-badge" style="display:none;background:var(--rose);color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:50px;min-width:18px;text-align:center;"></span>
+      </button>
+      <button class="btn btn-g" onclick="openMinExportSettings()" style="white-space:nowrap;"><i class="fa-solid fa-sliders"></i> 내보내기</button>
+      <button id="min-page-ai-btn" class="btn btn-g" onclick="toggleMinPageAiPanel()" style="border-color:var(--rose-mid);color:var(--rose-mid);white-space:nowrap;"><i class="fa-solid fa-wand-magic-sparkles"></i> AI 입력</button>
+      <button class="btn btn-p" onclick="openMinutesModal()" style="white-space:nowrap;"><i class="fa-solid fa-plus"></i> 새 회의록</button>
     </div>
+    <!-- 숨겨진 필터 셀렉트 (기존 로직 유지용) -->
+    <select id="min-filter-type"   style="display:none;"><option value="">유형</option><option value="고객사 미팅">고객사 미팅</option><option value="협력사 미팅">협력사 미팅</option><option value="내부회의">내부회의</option><option value="보고">보고</option><option value="기타">기타</option></select>
+    <select id="min-filter-client" style="display:none;"><option value="">거래처</option></select>
+    <select id="min-filter-year"   style="display:none;"><option value="">년도</option></select>
+    <select id="min-filter-person" style="display:none;"><option value="">담당자</option></select>
 
     <div style="display:grid;grid-template-columns:360px 1fr;gap:20px;align-items:start;">
       <!-- 목록 -->
@@ -2163,10 +2438,12 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
         <div id="min-detail" style="display:none;"></div>
       </div>
     </div>
-  </div>
+    </div><!-- /p-minutes -->
+    </div><!-- /rpt-tab-minutes -->
+  </div><!-- /p-weeklyrpt -->
 
-  <!-- ══ PAGE: ARCHIVING ══ -->
-  <div class="page" id="p-archiving">
+  <!-- archiving 콘텐츠는 archive-tab-note에서 렌더링 (p-archiving 유지, hidden) -->
+  <div class="page" id="p-archiving" style="display:none!important;">
   <div class="mobile-page-header">
     <div class="mobile-page-title">Note</div>
   </div>
@@ -2246,9 +2523,10 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
       </div>
 
       <!-- Quick Add -->
-      <div style="padding:10px 20px;border-bottom:1px solid #F0EAEA;background:#FFFCFC;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-        <span style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#C9A8AA;white-space:nowrap;">+ 일정 추가</span>
-        <div style="display:flex;gap:5px;flex-wrap:wrap;">
+      <div style="padding:10px 16px;border-bottom:1px solid #F0EAEA;background:#FFFCFC;">
+        <div style="display:flex;align-items:center;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap;padding-bottom:2px;">
+        <span style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#C9A8AA;white-space:nowrap;flex-shrink:0;">+ 일정 추가</span>
+        <div style="display:flex;gap:5px;flex-wrap:nowrap;flex-shrink:0;">
           <button class="planner-type-btn" data-type="task"        style="--c:#A89090" onclick="plannerQuickAdd('task')">📋 업무</button>
           <button class="planner-type-btn" data-type="ev-meet"     style="--c:#8FA8C0" onclick="plannerQuickAdd('ev-meet')">🤝 일정</button>
           <button class="planner-type-btn" data-type="ev-out"      style="--c:#89A89A" onclick="plannerQuickAdd('ev-out')">🚗 외근/출장</button>
@@ -2261,7 +2539,8 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior: none; }
           <button class="planner-type-btn" data-type="ev-etc"      style="--c:#B0A898" onclick="plannerQuickAdd('ev-etc')">📌 기타</button>
           <button class="planner-type-btn" data-type="ev-dayoff"   style="--c:#C9A8AA" onclick="plannerQuickAdd('ev-dayoff')">🌸 연차</button>
         </div>
-        <span style="font-size:10px;color:#C8B8B8;margin-left:4px;">버튼 클릭 → 시간 입력 가능 &nbsp;|&nbsp; 타임라인 드래그 → 시간 자동 지정 &nbsp;|&nbsp; 더블클릭 → 30분 단위</span>
+        </div>
+        <div style="font-size:10px;color:#C8B8B8;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">버튼 클릭 → 시간 입력 가능 &nbsp;|&nbsp; 타임라인 드래그 → 시간 자동 지정 &nbsp;|&nbsp; 더블클릭 → 30분 단위</div>
       </div>
 
       <!-- Don't Forget -->
@@ -2949,114 +3228,105 @@ let D = {
   routines: []      // [{id, title, icon, startTime, endTime, color, repeat, repeatEnd}]
 };
 
-const SAVE_KEY = 'bodaq_v5';
-const GS_URL = 'https://script.google.com/macros/s/AKfycbyvdAvanqSCW64txxXd-E2zauROgX5oOPMtQK-fvJXgEUZDs9ThzGAirPqe9EEABUz1/exec';
+const GS_URL = 'https://script.google.com/macros/s/AKfycbzBO6ZfORHBJtGwSByHhus-nu0cF6iIxSnLRJe92MR7LboOSDx-aPEUbtR5AWQKOd6KcA/exec';
 
-// GS 활성화 여부 체크
-function isGsEnabled(){ return GS_URL && !GS_URL.includes('YOUR_') && GS_URL.startsWith('http'); }
-
-// 업로드 진행 배너
-let _uploadBanner = null;
-function showUploadBanner(msg){
-  if(!_uploadBanner){
-    _uploadBanner = document.createElement('div');
-    _uploadBanner.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#333;color:#fff;padding:8px 20px;border-radius:20px;font-size:12px;z-index:9999;transition:opacity .3s;pointer-events:none;';
-    document.body.appendChild(_uploadBanner);
-  }
-  _uploadBanner.textContent = msg;
-  _uploadBanner.style.opacity = '1';
-  _uploadBanner.style.display = 'block';
-}
-function hideUploadBanner(){
-  if(_uploadBanner){ _uploadBanner.style.opacity='0'; setTimeout(()=>{ if(_uploadBanner) _uploadBanner.style.display='none'; },300); }
-}
-const QUEUE_KEY = 'bodak_sync_queue'; // 오프라인 중 변경 큐
+// GS 항상 활성화
+function isGsEnabled(){ return true; }
 
 // ════════════════════════════════════════
-//  오프라인 Sync 큐 시스템
+//  GS 통신 — 최종 설계 v8
+//  전략: 시트별 분리 전송 + _isFirst 플래그로 clear/append 제어
+//  → 중복 없음 + 405 없음 + 저장 응답에 최신 데이터 포함 → GET 추가 불필요
 // ════════════════════════════════════════
 
-// 큐 저장/불러오기
-function getQueue(){ try{ return JSON.parse(localStorage.getItem(QUEUE_KEY)||'[]'); }catch(e){ return []; } }
-function setQueue(q){ try{ localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); }catch(e){} }
-function clearQueue(){ localStorage.removeItem(QUEUE_KEY); }
+const GS_BODY_LIMIT = 100_000; // 100KB per chunk (GAS POST body 안전 범위)
 
-// 큐에 현재 데이터 스냅샷 추가
-function enqueue(){
-  const q = getQueue();
-  // 같은 타입이 이미 있으면 덮어쓰기 (마지막 상태만 유지)
-  const idx = q.findIndex(x => x.action === 'saveAll');
-  const entry = {
-    action: 'saveAll',
-    ts: Date.now(),
-    data: {
-      items:       D.items,
-      projects:    D.projects,
-      minutes:     D.minutes,
-      archiving:   D.archiving,
-      plannerMeta: D.plannerMeta,
-      misc: {
-        contacts:          D.contacts,
-        system:            D.system,
-        globalMemo:        D.globalMemo,
-        meals:             D.meals,
-        weeklyReports:     D.weeklyReports,
-        annualGoals:       D.annualGoals,
-        minExportSettings: D.minExportSettings,
-        symSettings:       D.symSettings,
-        memos:             D.memos,
-        weekMemos:         D.weekMemos,
-        routines:          D.routines,
+// 단일 POST 전송
+async function gsSend(payload){
+  const res = await fetch(GS_URL, {
+    method: 'POST',
+    mode: 'cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(payload),
+    redirect: 'follow',
+  });
+  if(!res.ok && res.status !== 0) throw new Error('HTTP ' + res.status);
+  try { return await res.json(); } catch { return { ok: true }; }
+}
+
+// 이미지 업로드 전용
+async function gsGet(payload){
+  return gsSend(payload);
+}
+
+// 저장 전용: 시트별 분리 + _isFirst 플래그
+// _isFirst:true  → GAS가 해당 시트 clearContents() 후 씀  (처음만)
+// _isFirst:false → GAS가 append만                         (이후 청크)
+async function gsSaveAll(data){
+  // 시트별로 순차 전송
+  const SHEETS = ['items','projects','minutes','archiving','plannerMeta','misc'];
+  // 각 시트별 _isFirst 추적 (시트 단위로 첫 청크인지 판단)
+  const firstSent = {};
+  let lastRes = { ok: true };
+
+  for(const field of SHEETS){
+    const val = data[field];
+    if(val === undefined || val === null) continue;
+    if(Array.isArray(val) && val.length === 0 && field !== 'misc') continue;
+    if(field === 'plannerMeta' && typeof val === 'object' && !Object.keys(val).length) continue;
+
+    const isFirst = !firstSent[field];
+
+    // items: 날짜 키 단위로 분할 (데이터 클 수 있음)
+    if(field === 'items' && typeof val === 'object'){
+      const keys = Object.keys(val);
+      let batch = {};
+      for(const k of keys){
+        const test = { ...batch, [k]: val[k] };
+        const bodyLen = JSON.stringify({ action:'save', _isFirst: !firstSent[field], data:{ items: test }}).length;
+        if(bodyLen > GS_BODY_LIMIT && Object.keys(batch).length > 0){
+          lastRes = await gsSend({ action:'save', _isFirst: !firstSent['items'], data:{ items: batch }});
+          firstSent['items'] = true;
+          batch = { [k]: val[k] };
+        } else {
+          batch = test;
+        }
       }
+      if(Object.keys(batch).length > 0){
+        lastRes = await gsSend({ action:'save', _isFirst: !firstSent['items'], data:{ items: batch }});
+        firstSent['items'] = true;
+      }
+      continue;
     }
-  };
-  if(idx > -1) q[idx] = entry; else q.push(entry);
-  setQueue(q);
-}
 
-// 큐에 쌓인 항목을 구글 시트로 flush
-let _flushing = false;
-async function flushQueue(){
-  if(_flushing) return;
-  const q = getQueue();
-  if(!q.length) return;
-  if(!navigator.onLine) return;
-  _flushing = true;
-  setSyncStatus('saving');
-  try{
-    const entry = q[q.length - 1];
-    const data = entry.data || entry;
-    // POST 방식 — 큐 flush도 POST로 (대용량 데이터 안전)
-    const res = await fetch(GS_URL, {
-      method: 'POST',
-      body: JSON.stringify({ action: 'save', data }),
-      redirect: 'follow'
-    });
-    const json = await res.json();
-    if(json.ok){
-      if(json.data) applyGSData(json.data);
-      clearQueue();
-      setSyncStatus('saved');
-    } else {
-      setSyncStatus('error');
+    // minutes: 건 단위로 분할
+    if(field === 'minutes' && Array.isArray(val)){
+      let batch = [];
+      for(const item of val){
+        const test = [...batch, item];
+        const bodyLen = JSON.stringify({ action:'save', _isFirst: !firstSent['minutes'], data:{ minutes: test }}).length;
+        if(bodyLen > GS_BODY_LIMIT && batch.length > 0){
+          lastRes = await gsSend({ action:'save', _isFirst: !firstSent['minutes'], data:{ minutes: batch }});
+          firstSent['minutes'] = true;
+          batch = [item];
+        } else {
+          batch = test;
+        }
+      }
+      if(batch.length > 0){
+        lastRes = await gsSend({ action:'save', _isFirst: !firstSent['minutes'], data:{ minutes: batch }});
+        firstSent['minutes'] = true;
+      }
+      continue;
     }
-  } catch(e){
-    setSyncStatus('error');
-    console.warn('[Sync] flush 실패, 재시도 대기:', e);
-  } finally{
-    _flushing = false;
+
+    // 그 외 시트: 단일 전송
+    lastRes = await gsSend({ action:'save', _isFirst: isFirst, data:{ [field]: val }});
+    firstSent[field] = true;
   }
-}
 
-// 온라인 복귀 감지 → 자동 flush
-window.addEventListener('online', ()=>{
-  console.log('[Sync] 온라인 복귀 감지 → 큐 flush 시도');
-  setSyncStatus('saving');
-  setTimeout(flushQueue, 1000); // 1초 후 시도 (연결 안정화 대기)
-});
-window.addEventListener('offline', ()=>{
-  setSyncStatus('error');
-});
+  return lastRes;
+}
 
 // ── 동기화 상태 표시 ──
 function setSyncStatus(state){
@@ -3066,14 +3336,12 @@ function setSyncStatus(state){
   const cfg = {
     saving:  { icon:'⏳', text:'저장 중', color:'var(--ink-soft)' },
     saved:   { icon:'✅', text:'저장됨',  color:'#89A89A' },
-    error:   { icon:'⚠️', text:'오프라인', color:'#C08080' },
+    error:   { icon:'⚠️', text:'오류',    color:'#C08080' },
     loading: { icon:'🔄', text:'로딩 중', color:'var(--ink-soft)' },
-    queued:  { icon:'📦', text:'오프라인 저장됨', color:'#A89A60' },
   };
   const c = cfg[state] || { icon:'', text:'', color:'var(--ink-soft)' };
   el.style.color = c.color;
   el.textContent = c.icon + ' ' + c.text;
-  // 저장됨 상태는 3초 후 숨기기
   clearTimeout(wrap._hideTimer);
   wrap.style.opacity = '1';
   if(state === 'saved'){
@@ -3102,100 +3370,101 @@ function applyGSData(d){
   if(m.memos)             D.memos             = m.memos;
   if(m.weekMemos)         D.weekMemos         = m.weekMemos;
   if(m.routines)          D.routines          = m.routines;
-  saveLocal();
 }
 
-// ── 로컬 백업 ──
-function saveLocal(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(D)); }catch(e){} }
-function loadLocal(){ try{ const s=localStorage.getItem(SAVE_KEY); if(s) D={...D,...JSON.parse(s)}; }catch(e){} }
+// ── 저장 페이로드 생성 ──
+function buildPayload(){
+  return {
+    action: 'save',
+    data: {
+      items:       D.items,
+      projects:    D.projects,
+      minutes:     D.minutes,
+      archiving:   D.archiving,
+      plannerMeta: D.plannerMeta,
+      misc: {
+        contacts:          D.contacts,
+        system:            D.system,
+        globalMemo:        D.globalMemo,
+        meals:             D.meals,
+        weeklyReports:     D.weeklyReports,
+        annualGoals:       D.annualGoals,
+        minExportSettings: D.minExportSettings,
+        symSettings:       D.symSettings,
+        memos:             D.memos,
+        weekMemos:         D.weekMemos,
+        routines:          D.routines,
+      }
+    }
+  };
+}
 
-// ── 저장 (GET 방식 — CORS 완전 해결, 응답 확인 가능) ──
+// ── 즉시 저장 (백그라운드 진입 시 호출) ──
+function saveNow(){
+  gsSaveAll(buildPayload().data)
+    .then(res => {
+      // 저장 응답에 최신 데이터 포함돼 있으면 바로 반영
+      if(res && res.ok && res.data){ applyGSData(res.data); renderAll(); }
+      setSyncStatus('saved');
+    })
+    .catch(()=>setSyncStatus('error'));
+}
+
+// ── visibilitychange: 백그라운드 진입 시 즉시 저장 ──
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState === 'hidden'){
+    clearTimeout(_saveTimer);
+    saveNow();
+  }
+});
+
+// ── 저장 (디바운스 800ms) ──
+// gsSaveAll이 시트별 분리 전송 후 마지막 응답에 최신 데이터 포함
+// → 별도 GET 없이 응답 데이터로 화면 반영
 let _saveTimer = null;
 function save(){
-  saveLocal();
-  enqueue();
-
-  if(!navigator.onLine){ setSyncStatus('queued'); return; }
-
   setSyncStatus('saving');
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(async ()=>{
-    const payload = {
-      action: 'save',
-      data: {
-        items:       D.items,
-        projects:    D.projects,
-        minutes:     D.minutes,
-        archiving:   D.archiving,
-        plannerMeta: D.plannerMeta,
-        misc: {
-          contacts:          D.contacts,
-          system:            D.system,
-          globalMemo:        D.globalMemo,
-          meals:             D.meals,
-          weeklyReports:     D.weeklyReports,
-          annualGoals:       D.annualGoals,
-          minExportSettings: D.minExportSettings,
-          symSettings:       D.symSettings,
-          memos:             D.memos,
-          weekMemos:         D.weekMemos,
-          routines:          D.routines,
-        }
-      }
-    };
     try{
-      // POST 방식 — URL 길이 제한 없음, 이미지 URL 포함 대용량 데이터 안전
-      const res = await fetch(GS_URL, {
-        method: 'POST',
-        body: JSON.stringify(payload),
-        redirect: 'follow'
-      });
-      const json = await res.json();
-      if(json.ok){
-        if(json.data){ applyGSData(json.data); }
-        clearQueue();
-        setSyncStatus('saved');
-      } else {
-        console.warn('[Sync] 저장 응답 오류:', json.error);
-        setSyncStatus('error');
-      }
+      const res = await gsSaveAll(buildPayload().data);
+      if(res && res.ok && res.data){ applyGSData(res.data); renderAll(); }
+      setSyncStatus('saved');
     } catch(e){
       console.warn('[Sync] 저장 실패:', e);
-      setSyncStatus('queued');
+      setSyncStatus('error');
     }
-  }, 2000);
+  }, 800);
 }
 
 // ── 구글 시트에서 불러오기 ──
 async function load(){
   setSyncStatus('loading');
-  // 먼저 로컬 불러오기 (빠른 초기 렌더)
-  loadLocal();
   try{
-    const res = await fetch(GS_URL + '?t=' + Date.now(), { redirect: 'follow' });
+    const res = await fetch(GS_URL + '?t=' + Date.now(), {
+      method: 'GET',
+      redirect: 'follow',
+    });
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     if(json.ok && json.data){
       applyGSData(json.data);
+      renderAll();
       setSyncStatus('saved');
-      renderCal(); renderDash(); renderProjs(); renderArchive(); renderMemoPad();
-      renderMinutesList(); renderWeeklyRptPage(); renderWeeklyReport();
-      // 데이터 로드 후 현재 페이지 유지 (새로고침 시 hash 복원)
-      const curPage = (location.hash||'').replace('#','') || 'dashboard';
-      navigateTo(curPage);
-
-      // 로드 성공 후 혹시 큐에 오프라인 변경사항 있으면 flush
-      if(getQueue().length > 0){
-        console.log('[Sync] 로드 후 미동기화 큐 발견 → flush');
-        setTimeout(flushQueue, 2000);
-      }
     } else {
-      setSyncStatus('saved');
+      setSyncStatus('error');
     }
   } catch(e){
-    setSyncStatus(navigator.onLine ? 'error' : 'queued');
-    console.warn('GS load error, using local:', e);
+    setSyncStatus('error');
+    console.warn('GS load error:', e);
   }
+}
+
+function renderAll(){
+  renderCal(); renderDash(); renderProjs(); renderArchive(); renderMemoPad();
+  renderMinutesList(); renderWeeklyRptPage(); renderWeeklyReport();
+  const curPage = (location.hash||'').replace('#','') || 'dashboard';
+  navigateTo(curPage);
 }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
 
@@ -3218,7 +3487,7 @@ function monOfWeek(d){
   return r;
 }
 
-let weekOffset=-1; // 전주부터 시작 (전주/이번주/다음주/다다음주)
+let weekOffset=0; // 이번 주부터 시작
 
 function getMonday(offset){
   const m=monOfWeek(TODAY);
@@ -3236,7 +3505,7 @@ function weekOffsetOf(date){
 // 캘린더에서 특정 날짜 키로 이동
 function jumpToDate(key){
   const d = fromDk(key);
-  weekOffset = weekOffsetOf(d) - 1; // 해당 주 포함해서 전주부터 보이게
+  weekOffset = weekOffsetOf(d); // 해당 주로 이동
   navigateTo('calendar');
   setTimeout(()=>openPlanner(key, d), 150);
 }
@@ -3248,6 +3517,7 @@ const DOW_KO=['월','화','수','목','금','토','일'];
 // ════════════════════════════════════════
 const PAGE_TITLES = {
   dashboard: 'Dashboard',
+  task:      'Task',
   calendar:  'Calendar',
   projects:  'Projects',
   archiving: 'Note',
@@ -3256,31 +3526,152 @@ const PAGE_TITLES = {
   minutes:   'Meeting'
 };
 
+// Task 하위 탭 전환
+function switchTaskTab(view, btn){
+  document.querySelectorAll('#p-task .arch-tab').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  document.getElementById('task-view-calendar').style.display = (view==='calendar') ? '' : 'none';
+  const wv = document.getElementById('task-view-weekly');
+  if(wv) wv.style.display = (view==='weekly') ? '' : 'none';
+  document.getElementById('task-view-projects').style.display = (view==='projects') ? '' : 'none';
+  if(view==='calendar') renderCal();
+  if(view==='weekly') renderWeeklyView();
+  if(view==='projects') renderProjs();
+}
+
+// Archive 통합 탭 전환
+function switchArchiveTab(tab, btn){
+  document.querySelectorAll('#p-archive .arch-tab[data-atab]').forEach(b=>b.classList.remove('on'));
+  if(btn) btn.classList.add('on');
+  ['note','memo','minutes','system','contacts'].forEach(t=>{
+    const el = document.getElementById('archive-tab-'+t);
+    if(el) el.style.display = (t===tab) ? '' : 'none';
+  });
+  if(tab==='note') renderArchivingInTab();
+  if(tab==='memo') renderMemoPad();
+  if(tab==='minutes') renderMinutesInTab();
+}
+
+// Note 탭 렌더 (archiving 콘텐츠를 archive-tab-note에 동적 삽입)
+function renderArchivingInTab(){
+  const wrap = document.getElementById('archive-tab-note');
+  if(!wrap) return;
+  if(!wrap.dataset.init){
+    wrap.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <div id="ac-type-toggle" style="display:flex;border:1.5px solid var(--rose-light);border-radius:var(--rs);overflow:hidden;flex-shrink:0;">
+          <button class="ac-toggle-btn on" data-at="all">전체</button>
+          <button class="ac-toggle-btn" data-at="work">💼 업무</button>
+          <button class="ac-toggle-btn" data-at="personal">🌿 개인</button>
+          <button class="ac-toggle-btn" data-at="study">📚 스터디</button>
+          <button class="ac-toggle-btn" data-at="idea">💡 아이디어</button>
+        </div>
+        <div style="position:relative;flex-shrink:0;">
+          <button id="ac-proj-btn" onclick="toggleAcProjDrop()" style="display:flex;align-items:center;gap:6px;padding:7px 12px;border-radius:var(--rs);border:1.5px solid var(--rose-light);background:var(--white);font-size:12px;font-weight:600;color:var(--ink-mid);cursor:pointer;font-family:inherit;transition:all .15s;">
+            <i class="fa-solid fa-folder" style="font-size:11px;"></i>
+            <span id="ac-proj-label">프로젝트 전체</span>
+            <i class="fa-solid fa-chevron-down" style="font-size:9px;margin-left:2px;"></i>
+          </button>
+          <div id="ac-proj-drop" style="display:none;position:absolute;top:calc(100%+4px);left:0;min-width:180px;background:#fff;border-radius:var(--rs);border:1px solid var(--rose-light);box-shadow:0 6px 20px var(--shadow);z-index:50;overflow:hidden;"></div>
+        </div>
+        <select id="ac-sort" class="fs" style="font-size:11px;padding:6px 10px;max-width:110px;" onchange="renderArchivingPage()">
+          <option value="date-desc">최신순</option>
+          <option value="date-asc">오래된순</option>
+          <option value="title">제목순</option>
+        </select>
+        <div style="flex:1;"></div>
+        <button class="btn btn-p" onclick="openArchivingModal()" style="flex-shrink:0;"><i class="fa-solid fa-plus"></i> 새 노트</button>
+      </div>
+      <div style="display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start;">
+        <div id="ac-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <div id="ac-detail-wrap">
+          <div class="empty-state" id="ac-empty"><i class="fa-regular fa-note-sticky"></i>노트를 선택하거나<br>새 노트를 추가하세요</div>
+          <div id="ac-detail" style="display:none;"></div>
+        </div>
+      </div>`;
+    // 토글 버튼 이벤트 재등록
+    wrap.querySelectorAll('.ac-toggle-btn').forEach(b=>{
+      b.onclick=()=>{
+        wrap.querySelectorAll('.ac-toggle-btn').forEach(x=>x.classList.remove('on'));
+        b.classList.add('on');
+        renderArchivingPage();
+      };
+    });
+    wrap.dataset.init = '1';
+  }
+  renderArchivingPage();
+}
+
+// Archive 탭 렌더 (기존 archive 콘텐츠를 archive-tab-archive에 동적 삽입)
+function renderArchiveInTab(){
+  const wrap = document.getElementById('archive-tab-archive');
+  if(!wrap) return;
+  if(!wrap.dataset.init){
+    wrap.innerHTML = `<div id="archive-inner-content"></div>`;
+    wrap.dataset.init = '1';
+  }
+  renderArchive();
+}
+
+// Meeting 탭 렌더 (p-minutes 콘텐츠를 archive-tab-minutes에 동적 삽입)
+function renderMinutesInTab(){
+  const wrap = document.getElementById('archive-tab-minutes');
+  if(!wrap) return;
+  if(!wrap.dataset.init){
+    // p-minutes 안의 콘텐츠를 그대로 이동
+    const src = document.getElementById('p-minutes');
+    if(src) wrap.appendChild(src);
+    wrap.dataset.init = '1';
+  }
+  renderMinutesList();
+}
+
 // 페이지 전환 함수 (hash 동기화 포함)
 function navigateTo(pg){
-  const validPages = ['dashboard','calendar','projects','archive','weeklyrpt','minutes','archiving'];
-  if(!validPages.includes(pg)) pg = 'dashboard';
+  // 하위 탭 별칭 처리
+  const aliasMap = { calendar: 'task', projects: 'task', weekly: 'task', minutes: 'archive', archiving: 'archive' };
+  const validPages = ['dashboard','task','archive','weeklyrpt'];
+  const navPg = aliasMap[pg] || pg;
+  if(!validPages.includes(navPg)) { pg = 'dashboard'; }
+  const finalPg = aliasMap[pg] || pg;
+
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const btn = document.querySelector(`.nav-btn[data-page="${pg}"]`);
+  document.querySelectorAll('.page').forEach(p=>{ if(p.id !== 'p-archiving') p.classList.remove('active'); });
+  const btn = document.querySelector(`.nav-btn[data-page="${finalPg}"]`);
   if(btn) btn.classList.add('active');
-  document.getElementById('p-'+pg).classList.add('active');
+  const pageEl = document.getElementById('p-'+finalPg);
+  if(pageEl) pageEl.classList.add('active');
   const topTitle = document.getElementById('topbar-title');
-  if(topTitle) topTitle.textContent = PAGE_TITLES[pg] || pg;
-  if(pg==='dashboard') renderDash();
-  if(pg==='calendar') renderCal();
-  if(pg==='projects') renderProjs();
-  if(pg==='archive') renderArchive();
-  if(pg==='weeklyrpt'){ renderWeeklyRptPage(); renderGoalList(); applySymSettings(); }
-  if(pg==='minutes') renderMinutesList();
-  if(pg==='archiving') renderArchivingPage();
-  // AI 버튼: 캘린더 페이지에서만 표시
-  const sidebarAiBtn = document.getElementById('sidebar-ai-btn');
+  if(topTitle) topTitle.textContent = PAGE_TITLES[finalPg] || finalPg;
+
+  if(finalPg==='dashboard') renderDash();
+  if(finalPg==='task'){
+    // task 하위 탭 결정
+    if(pg==='projects') switchTaskTab('projects', document.getElementById('task-tab-proj'));
+    else if(pg==='weekly') switchTaskTab('weekly', document.getElementById('task-tab-weekly'));
+    else {
+      // 디바이스별 기본 탭: 모바일(iPhone) → 위클리, iPad/데스크탑 → 캘린더
+      const isMobilePhone = window.innerWidth < 768;
+      const defaultTab = isMobilePhone ? 'weekly' : 'calendar';
+      const defaultBtn = isMobilePhone
+        ? document.getElementById('task-tab-weekly')
+        : document.getElementById('task-tab-cal');
+      switchTaskTab(defaultTab, defaultBtn);
+    }
+  }
+  if(finalPg==='archive'){
+    if(pg==='archiving') switchArchiveTab('note', document.querySelector('[data-atab="note"]'));
+    else if(pg==='minutes') switchArchiveTab('minutes', document.querySelector('[data-atab="minutes"]'));
+    else switchArchiveTab('memo', document.querySelector('[data-atab="memo"]'));
+  }
+  if(finalPg==='weeklyrpt'){
+    renderWeeklyRptPage(); renderGoalList(); applySymSettings();
+  }
+  // AI 버튼: 항상 표시 (CSS 미디어쿼리로 제어, inline style 초기화만)
   const mobileAiBtn = document.getElementById('mobile-ai-btn');
   const mobileKeyBtn = document.getElementById('mobile-key-btn');
-  if(sidebarAiBtn) sidebarAiBtn.style.display = (pg==='calendar') ? '' : 'none';
-  if(mobileAiBtn) mobileAiBtn.style.display = (pg==='calendar') ? '' : 'none';
-  if(mobileKeyBtn) mobileKeyBtn.style.display = '';
+  if(mobileAiBtn) mobileAiBtn.style.display = '';
+  if(mobileKeyBtn) mobileKeyBtn.style.display = 'none';
   // hash 업데이트 (popstate 루프 방지)
   if(location.hash !== '#'+pg) history.pushState(null,'','#'+pg);
 }
@@ -3300,6 +3691,217 @@ window.addEventListener('popstate', function(){
 // ════════════════════════════════════════
 // 월요일 시작: 월화수목금토일
 const DOW_LABELS=['월','화','수','목','금','토','일'];
+
+// ════════════════════════════════════════
+//  WEEKLY VIEW (세로 리스트 주간뷰) — 1주 표시 + 주선택 드롭다운
+// ════════════════════════════════════════
+function renderWeeklyView(){
+  const wrap = document.getElementById('weekly-view-wrap');
+  if(!wrap) return;
+
+  const weekStart = getMonday(weekOffset);
+
+  // 주 라벨 (목요일 기준 월/주차)
+  const thu = new Date(weekStart); thu.setDate(thu.getDate()+3);
+  const monthN = thu.getMonth()+1;
+  const yearN  = thu.getFullYear();
+  const firstOfMonth = new Date(yearN, thu.getMonth(), 1);
+  const firstMon = new Date(firstOfMonth);
+  const dowFM = firstMon.getDay()||7;
+  if(dowFM!==1) firstMon.setDate(firstMon.getDate()-(dowFM-1));
+  const weekNum = Math.floor((thu-firstMon)/(7*24*3600*1000))+1;
+
+  const weekEnd = new Date(weekStart); weekEnd.setDate(weekEnd.getDate()+6);
+  const rangeStr = `${weekStart.getMonth()+1}.${weekStart.getDate()} ~ ${weekEnd.getMonth()+1}.${weekEnd.getDate()}`;
+
+  const isCurrentWeek = weekOffset===0;
+
+  let html = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;position:relative;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="cal-month-title wv-month-picker-btn" onclick="toggleWvPicker()" style="cursor:pointer;user-select:none;">
+          ${yearN}. ${String(monthN).padStart(2,'0')} <i class="fa-solid fa-chevron-down" style="font-size:11px;margin-left:3px;"></i>
+        </div>
+        <span style="font-size:12px;color:var(--ink-soft);font-weight:600;">${monthN}월 ${weekNum}주차 &nbsp;<span style="color:var(--ink-mid);font-weight:400;">${rangeStr}</span></span>
+        ${isCurrentWeek ? '<span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;background:var(--rose);color:white;margin-left:4px;">이번 주</span>' : ''}
+      </div>
+      <div class="cal-nav" style="gap:6px;">
+        <button class="cal-btn" onclick="weekOffset--;renderWeeklyView()"><i class="fa-solid fa-chevron-left"></i> 전주</button>
+        <button class="cal-btn today" onclick="weekOffset=0;renderWeeklyView()"><i class="fa-solid fa-rotate-left"></i> 오늘</button>
+        <button class="cal-btn" onclick="weekOffset++;renderWeeklyView()">다음주 <i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
+    <!-- 주 선택 드롭다운 -->
+    <div id="wv-picker" style="display:none;position:absolute;z-index:300;background:white;border:1px solid var(--rose-light);border-radius:14px;box-shadow:0 8px 32px rgba(40,28,28,.13);padding:14px;min-width:280px;left:0;top:52px;">
+      <div id="wv-picker-inner"></div>
+    </div>`;
+
+  // 1주치 날짜
+  html += `<div class="wv-week-block">`;
+
+  for(let d=0; d<7; d++){
+    const day = new Date(weekStart); day.setDate(day.getDate()+d);
+    const key = dk(day);
+    const isToday = sameDay(day, TODAY);
+    const isSat = d===5, isSun = d===6;
+    const isOff = isHoliday(day)||isDayOff(day)||isSat||isSun;
+    const holName = isHoliday(day) ? getHolidayName(day) : '';
+    const dowLabel = ['월','화','수','목','금','토','일'][d];
+    const items = (D.items[key]||[]).slice().sort((a,b)=>{
+      const at=a.startTime||''; const bt=b.startTime||'';
+      if(at&&!bt) return -1; if(!at&&bt) return 1;
+      return at.localeCompare(bt);
+    });
+
+    const itemsHtml = items.filter(it=>!it.isSpan).map((it,idx)=>{
+      const col = TYPE_COLOR[it.type]||'var(--rose-mid)';
+      const timeStr = it.startTime ? `<span class="wv-time">${it.startTime}</span>` : '';
+      const proj = D.projects.find(p=>p.id===it.project);
+      const projTag = proj ? `<span class="wv-proj">${proj.name.slice(0,4)}</span>` : '';
+      const done = it.status==='done';
+      return `<div class="wv-item${done?' done':''}" style="--ic:${col}" onclick="openEdit('${key}',${idx})">
+        <div class="wv-item-dot" style="background:${col}"></div>
+        <div class="wv-item-body">
+          <span class="wv-item-name${done?' wv-done':''}">${escHtml(it.name)}</span>
+          ${timeStr}${projTag}
+        </div>
+        <button class="wv-done-btn${done?' active':''}" onclick="event.stopPropagation();setStatusWv('${key}',${idx},'done')" title="완료">
+          <i class="fa-solid fa-check"></i>
+        </button>
+      </div>`;
+    }).join('');
+
+    html += `
+      <div class="wv-day${isToday?' wv-today':''}${isOff?' wv-offday':''}" id="wvd-${key}">
+        <div class="wv-day-head" ondblclick="openPlanner('${key}',new Date(${day.getFullYear()},${day.getMonth()},${day.getDate()}))">
+          <div class="wv-day-num-wrap">
+            <span class="wv-day-num${isToday?' wv-today-num':''}">${day.getMonth()+1}/${day.getDate()}</span>
+            <span class="wv-day-dow${isSun?' wv-sun':isSat?' wv-sat':''}">(${dowLabel})</span>
+            ${holName?`<span class="wv-hol">${holName}</span>`:''}
+          </div>
+          <button class="wv-add-btn" onclick="event.stopPropagation();openAdd('${key}')">+</button>
+        </div>
+        <div class="wv-day-body">
+          ${itemsHtml || `<div class="wv-empty">—</div>`}
+        </div>
+      </div>`;
+  }
+  html += `</div>`; // wv-week-block
+
+  wrap.innerHTML = html;
+
+  // 터치 더블탭 (모바일)
+  wrap.querySelectorAll('.wv-day').forEach(dayEl=>{
+    let lastTap=0;
+    dayEl.addEventListener('touchend', function(e){
+      if(e.target.closest('button')||e.target.closest('.wv-item')) return;
+      const now=Date.now();
+      const key = dayEl.id.replace('wvd-','');
+      if(now-lastTap < 350){ e.preventDefault(); openPlanner(key, fromDk(key)); }
+      lastTap=now;
+    },{passive:false});
+  });
+
+  // 피커 바깥 클릭 닫기
+  setTimeout(()=>{
+    document.addEventListener('click', _wvPickerOutsideClick, {once:true, capture:true});
+  }, 0);
+}
+
+function _wvPickerOutsideClick(e){
+  const picker = document.getElementById('wv-picker');
+  if(!picker) return;
+  if(!picker.contains(e.target) && !e.target.closest('.wv-month-picker-btn')){
+    picker.style.display='none';
+  } else {
+    // 피커 안쪽 클릭이면 다시 리스너 등록
+    setTimeout(()=>document.addEventListener('click',_wvPickerOutsideClick,{once:true,capture:true}),0);
+  }
+}
+
+function toggleWvPicker(){
+  const picker = document.getElementById('wv-picker');
+  if(!picker) return;
+  if(picker.style.display!=='none'){ picker.style.display='none'; return; }
+  renderWvPicker();
+  picker.style.display='block';
+}
+
+function renderWvPicker(){
+  const inner = document.getElementById('wv-picker-inner');
+  if(!inner) return;
+
+  // 현재 보는 주의 년/월 기준으로 ±2개월 범위 주 목록 생성
+  const baseDate = getMonday(weekOffset);
+  const baseThu  = new Date(baseDate); baseThu.setDate(baseThu.getDate()+3);
+  let pickerYear  = baseThu.getFullYear();
+  let pickerMonth = baseThu.getMonth(); // 0-based, 피커 상태
+
+  // 피커 상태 저장 (전역)
+  window._wvPickerYear  = pickerYear;
+  window._wvPickerMonth = pickerMonth;
+
+  _renderWvPickerMonth();
+}
+
+function _renderWvPickerMonth(){
+  const inner = document.getElementById('wv-picker-inner');
+  if(!inner) return;
+  const year  = window._wvPickerYear;
+  const month = window._wvPickerMonth; // 0-based
+
+  // 해당 달에 걸치는 주 목록 생성
+  const firstDay = new Date(year, month, 1);
+  const lastDay  = new Date(year, month+1, 0);
+
+  // 첫 날이 속한 주 월요일부터
+  let cur = monOfWeek(firstDay);
+  const weeks = [];
+  while(cur <= lastDay){
+    weeks.push(new Date(cur));
+    cur = new Date(cur); cur.setDate(cur.getDate()+7);
+  }
+
+  let html = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <button onclick="window._wvPickerMonth--;if(window._wvPickerMonth<0){window._wvPickerMonth=11;window._wvPickerYear--;}_renderWvPickerMonth()" style="border:none;background:none;cursor:pointer;font-size:14px;color:var(--rose-mid);padding:4px 8px;">‹</button>
+      <span style="font-size:13px;font-weight:700;color:var(--ink);">${year}년 ${month+1}월</span>
+      <button onclick="window._wvPickerMonth++;if(window._wvPickerMonth>11){window._wvPickerMonth=0;window._wvPickerYear++;}_renderWvPickerMonth()" style="border:none;background:none;cursor:pointer;font-size:14px;color:var(--rose-mid);padding:4px 8px;">›</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:4px;">`;
+
+  weeks.forEach(wMon=>{
+    const wEnd = new Date(wMon); wEnd.setDate(wEnd.getDate()+6);
+    const thu  = new Date(wMon); thu.setDate(thu.getDate()+3);
+    const mN   = thu.getMonth()+1;
+    const fOM  = new Date(thu.getFullYear(), thu.getMonth(), 1);
+    const fM   = new Date(fOM); const dfM=fM.getDay()||7; if(dfM!==1) fM.setDate(fM.getDate()-(dfM-1));
+    const wkN  = Math.floor((thu-fM)/(7*24*3600*1000))+1;
+    const rangeS=`${wMon.getMonth()+1}.${wMon.getDate()}~${wEnd.getMonth()+1}.${wEnd.getDate()}`;
+    const off   = weekOffsetOf(wMon);
+    const isSelected = off === weekOffset;
+    const isThisWeek = off === 0;
+    html += `<div onclick="weekOffset=${off};renderWeeklyView();document.getElementById('wv-picker').style.display='none';"
+      style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;border-radius:9px;cursor:pointer;
+             background:${isSelected?'var(--rose-pale)':'transparent'};border:1px solid ${isSelected?'var(--rose-light)':'transparent'};
+             transition:background .13s;"
+      onmouseover="this.style.background='var(--rose-pale)'" onmouseout="this.style.background='${isSelected?'var(--rose-pale)':'transparent'}'">
+      <span style="font-size:12px;font-weight:${isSelected?'700':'500'};color:${isSelected?'var(--rose-mid)':'var(--ink)'};">${mN}월 ${wkN}주차</span>
+      <span style="font-size:11px;color:var(--ink-soft);">${rangeS}${isThisWeek?' <span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:50px;background:var(--rose);color:white;margin-left:4px;">이번주</span>':''}</span>
+    </div>`;
+  });
+
+  html += `</div>`;
+  inner.innerHTML = html;
+}
+
+function setStatusWv(key,idx,st){
+  if(!D.items[key]||!D.items[key][idx]) return;
+  const it=D.items[key][idx];
+  it.status = it.status===st?'active':st;
+  if(it.status==='done') it.doneAt=new Date().toISOString();
+  save(); renderWeeklyView(); renderDash();
+}
 
 function renderCal(){
   const wrap=document.getElementById('cal-grid-wrap');
@@ -3379,8 +3981,8 @@ function renderCal(){
       cell.innerHTML=`
         <div class="cal-day-head">
           <div class="cal-day-num-wrap">
-            <span class="cal-day-num">${day.getDate()}</span>
-            <span class="cal-day-dow">(${dayOfWeek})</span>
+            <span class="cal-day-num">${day.getMonth()+1}/${day.getDate()}</span>
+            <span class="cal-day-dow cal-day-dow-hide-mobile">(${dayOfWeek})</span>
             ${holidayName ? `<span style="font-size:9px;color:var(--rose-mid);font-weight:600;margin-left:2px;">${holidayName}</span>` : ''}
           </div>
           <button class="cal-day-add" onclick="openAdd('${key}')">+</button>
@@ -3408,6 +4010,16 @@ function renderCal(){
         if(e.target.closest('button')||e.target.closest('.chip')) return;
         openPlanner(key, day);
       });
+      // 모바일 더블탭 감지 (iOS/Android dblclick 미지원 대응)
+      (function(_cell,_key,_day){
+        let _lastTap=0;
+        _cell.addEventListener('touchend', function(e){
+          if(e.target.closest('button')||e.target.closest('.chip')) return;
+          const now=Date.now();
+          if(now-_lastTap < 350){ e.preventDefault(); openPlanner(_key,_day); }
+          _lastTap=now;
+        }, {passive:false});
+      })(cell, key, day);
       weekdayRow.appendChild(cell);
     }
 
@@ -3430,8 +4042,8 @@ function renderCal(){
       cell.innerHTML=`
         <div class="cal-day-head">
           <div class="cal-day-num-wrap">
-            <span class="cal-day-num">${day.getDate()}</span>
-            <span class="cal-day-dow">(${dayOfWeek})</span>
+            <span class="cal-day-num">${day.getMonth()+1}/${day.getDate()}</span>
+            <span class="cal-day-dow cal-day-dow-hide-mobile">(${dayOfWeek})</span>
             ${weekendHolidayName ? `<span style="font-size:9px;color:var(--rose-mid);font-weight:600;margin-left:2px;">${weekendHolidayName}</span>` : ''}
           </div>
           <button class="cal-day-add" onclick="openAdd('${key}')">+</button>
@@ -3451,6 +4063,16 @@ function renderCal(){
         if(e.target.closest('button')||e.target.closest('.chip')) return;
         openPlanner(key, day);
       });
+      // 모바일 더블탭 감지
+      (function(_cell,_key,_day){
+        let _lastTap=0;
+        _cell.addEventListener('touchend', function(e){
+          if(e.target.closest('button')||e.target.closest('.chip')) return;
+          const now=Date.now();
+          if(now-_lastTap < 350){ e.preventDefault(); openPlanner(_key,_day); }
+          _lastTap=now;
+        }, {passive:false});
+      })(cell, key, day);
       weekendRow.appendChild(cell);
     }
 
@@ -3481,7 +4103,7 @@ const MULTIDAY_COLORS={
 
 function renderMultiDayBars(weekRow, weekDays){
   const weekKeys = weekDays.map(d=>dk(d));
-  const weekEnd = weekDays[6];
+  const weekEnd = weekDays[weekDays.length - 1];
   const seen = new Set();
 
   weekKeys.forEach(key=>{
@@ -3607,7 +4229,7 @@ function setStatus(key,idx,st){
   const it=D.items[key][idx];
   it.status= it.status===st?'active':st;
   if(it.status==='done') it.doneAt=new Date().toISOString();
-  save(); renderCal(); renderDash();
+  save(); renderCal(); renderWeeklyView(); renderDash();
 }
 
 function deleteItem(key,idx){
@@ -3747,13 +4369,7 @@ function restoreProjField(projId){
   fillProjSel(projId||'');
 }
 
-function getProjInputValue(){ return ''; } // 호환용 stub
-function filterProjSuggest(){} // 호환용 stub
-function selectProjSuggest(){} // 호환용 stub
-function onProjSelChange(){}
-function toggleNewProjInline(){}
-function cancelNewProjInline(){}
-function createProjInline(){}
+
 
 // ════════════════════════════════════════
 //  ITEM MODAL HELPERS
@@ -3884,7 +4500,7 @@ document.getElementById('item-save-btn').onclick=()=>{
     addMultiDaySpans(item, editKey, endDate);
   }
 
-  save(); closeItemModal(); renderCal(); renderDash(); renderProjs();
+  save(); closeItemModal(); renderCal(); renderWeeklyView(); renderDash(); renderProjs();
   if(plannerOpen) renderPlanner();
 };
 
@@ -3896,7 +4512,7 @@ document.getElementById('item-del-btn').onclick=()=>{
     }
     D.items[editKey].splice(editIdx,1);
     if(!D.items[editKey].length) delete D.items[editKey];
-    save(); closeItemModal(); renderCal(); renderDash(); renderProjs();
+    save(); closeItemModal(); renderCal(); renderWeeklyView(); renderDash(); renderProjs();
     if(plannerOpen) renderPlanner();
   }
 };
@@ -4603,9 +5219,11 @@ function toggleDoneTaskList(id){
 // ════════════════════════════════════════
 //  Gemini API 공통 호출 헬퍼
 // ════════════════════════════════════════
+let _geminiApiKey = localStorage.getItem('gemini_api_key') || ''; // localStorage에 보관
+
 async function callGemini(systemPrompt, userPrompt, maxTokens){
   maxTokens = maxTokens || 3000;
-  const GEMINI_KEY = localStorage.getItem('gemini_api_key')||'';
+  const GEMINI_KEY = _geminiApiKey;
   if(!GEMINI_KEY){ showApiKeyModal(); throw new Error('API 키를 먼저 입력해주세요.'); }
   const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+GEMINI_KEY,{
     method:'POST',
@@ -4641,19 +5259,31 @@ function closeSidebarAi(){
 }
 
 function toggleMobileAi(){
-  const panel = document.getElementById('mobile-ai-panel');
+  const panel    = document.getElementById('mobile-ai-panel');
+  const btn      = document.getElementById('mobile-ai-btn');
   // 검색 닫기
-  document.getElementById('mobile-search-panel')?.classList.remove('open');
+  const srchPanel = document.getElementById('mobile-search-panel');
+  const srchBtn   = document.getElementById('mobile-search-btn');
+  if(srchPanel){ srchPanel.classList.remove('open'); }
+  if(srchBtn)  { srchBtn.classList.remove('active'); }
+  document.getElementById('mobile-search-input') && (document.getElementById('mobile-search-input').value='');
+  document.getElementById('global-search-results')?.classList.remove('open');
+
   const isOpen = panel.style.display !== 'none' && panel.style.display !== '';
   if(isOpen){
     panel.style.display = 'none';
+    if(btn) btn.classList.remove('active');
   } else {
     panel.style.display = 'block';
+    if(btn) btn.classList.add('active');
     setTimeout(()=>document.getElementById('mobile-ai-input')?.focus(), 80);
   }
 }
 function closeMobileAi(){
-  document.getElementById('mobile-ai-panel').style.display='none';
+  const panel = document.getElementById('mobile-ai-panel');
+  const btn   = document.getElementById('mobile-ai-btn');
+  if(panel) panel.style.display='none';
+  if(btn)   btn.classList.remove('active');
   closeMobileAiPreview();
 }
 function closeMobileAiPreview(){
@@ -5455,11 +6085,15 @@ function renderMemoPad(){
   const wrap=document.getElementById('memo-pad-wrap');
   if(!wrap) return;
   wrap.innerHTML='';
-  if(!D.memos.length){
+  const q = (document.getElementById('memo-search')?.value||'').toLowerCase();
+  const memos = q
+    ? D.memos.filter(m=>(m.title||'').toLowerCase().includes(q)||(m.content||'').toLowerCase().includes(q))
+    : D.memos;
+  if(!memos.length){
     wrap.innerHTML='<div style="color:var(--ink-soft);font-size:13px;padding:20px 0">Add Memo 버튼으로 메모를 만들어보세요<br><span style="font-size:11px;opacity:.7">팁: 텍스트 선택 후 <b>B</b>=볼드, <span style="color:var(--rose);font-weight:600">P</span>=핑크 강조</span></div>';
     return;
   }
-  D.memos.forEach(m=>{
+  memos.forEach(m=>{
     const pad=document.createElement('div');
     pad.className='memo-pad';
     pad.style.width=m.w+'px';
@@ -5504,7 +6138,8 @@ function renderMemoPad(){
     const resize=document.createElement('div');
     resize.className='memo-pad-resize';
     resize.innerHTML='<i class="fa-solid fa-up-right-and-down-left-from-center" style="transform:rotate(90deg);font-size:9px"></i>';
-    resize.addEventListener('mousedown',e=>startResizeMemo(e,m.id));
+    resize.addEventListener('mousedown', e=>startResizeMemo(e,m.id));
+    resize.addEventListener('touchstart', e=>startResizeMemo(e.touches[0],m.id), {passive:false});
 
     body.appendChild(editor);
     body.appendChild(resize);
@@ -5531,21 +6166,34 @@ function delMemo(id){
 
 // Resize drag
 function startResizeMemo(e,id){
-  e.preventDefault(); e.stopPropagation();
+  if(e && e.preventDefault) e.preventDefault();
+  if(e && e.stopPropagation) e.stopPropagation();
   const pad=document.querySelector(`.memo-pad[data-id="${id}"]`); if(!pad) return;
   const startX=e.clientX, startY=e.clientY;
   const startW=pad.offsetWidth, startH=pad.offsetHeight;
+
+  function getXY(ev){ return ev.touches ? ev.touches[0] : ev; }
+
   function onMove(ev){
-    const newW=Math.max(180, startW+(ev.clientX-startX));
-    const newH=Math.max(120, startH+(ev.clientY-startY));
+    const p=getXY(ev);
+    const newW=Math.max(180, startW+(p.clientX-startX));
+    const newH=Math.max(120, startH+(p.clientY-startY));
     pad.style.width=newW+'px';
     pad.style.height=newH+'px';
     const m=D.memos.find(x=>x.id===id);
     if(m){m.w=newW;m.h=newH;}
   }
-  function onUp(){ document.removeEventListener('mousemove',onMove); document.removeEventListener('mouseup',onUp); save(); }
+  function onUp(){
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',onUp);
+    document.removeEventListener('touchmove',onMove);
+    document.removeEventListener('touchend',onUp);
+    save();
+  }
   document.addEventListener('mousemove',onMove);
   document.addEventListener('mouseup',onUp);
+  document.addEventListener('touchmove',onMove, {passive:false});
+  document.addEventListener('touchend',onUp);
 }
 
 // Header drag (reorder)
@@ -5626,7 +6274,7 @@ function renderContactsGrouped(){
 
     const rowsHtml = members.map(c=>`
       <tr class="ct-row">
-        <td style="padding:6px 10px;width:130px;">
+        <td style="padding:3px 10px;width:130px;">
           <span class="ct-person-link" onclick="openContactMemoModal('${c.id}')" title="메모 보기">${escHtml(c.person||'')}</span>
           ${(c.memos||[]).length ? `<span class="cp-memo-badge" style="margin-left:5px;">${(c.memos||[]).length}</span>` : ''}
         </td>
@@ -5656,7 +6304,7 @@ function renderContactsGrouped(){
         <table style="width:100%;border-collapse:collapse;">
           <thead>
             <tr style="background:#FAF6F6;">
-              <th style="padding:5px 10px;font-size:10px;font-weight:700;color:var(--ink-soft);text-align:left;border-bottom:1px solid var(--gray);">이름</th>
+              <th style="padding:4px 10px;font-size:10px;font-weight:700;color:var(--ink-soft);text-align:left;border-bottom:1px solid var(--gray);">이름</th>
               <th style="padding:5px 8px;font-size:10px;font-weight:700;color:var(--ink-soft);text-align:left;border-bottom:1px solid var(--gray);">직함</th>
               <th style="padding:5px 8px;font-size:10px;font-weight:700;color:var(--ink-soft);text-align:left;border-bottom:1px solid var(--gray);">연락처</th>
               <th style="padding:5px 8px;font-size:10px;font-weight:700;color:var(--ink-soft);text-align:left;border-bottom:1px solid var(--gray);">이메일</th>
@@ -6091,8 +6739,9 @@ function switchRptTab(tab, btn){
   document.getElementById('rpt-tab-weekly').style.display   = tab==='weekly'   ? 'block':'none';
   document.getElementById('rpt-tab-periodic').style.display = tab==='periodic' ? 'block':'none';
   document.querySelectorAll('#p-weeklyrpt .arch-tab').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on');
+  if(btn) btn.classList.add('on');
   if(tab==='periodic'){ renderGoalList(); applySymSettings(); }
+  if(tab==='weekly'){ renderWeeklyRptPage(); renderGoalList(); applySymSettings(); }
 }
 
 // ══ 기호 설정 ══
@@ -6151,7 +6800,6 @@ function applySymModal(){
   closeSymModal();
 }
 
-function saveSymSettings(){ /* legacy - no-op */ }
 function applySymSettings(){ /* no-op, modal방식으로 전환 */ }
 
 function getNumSymbol(n){
@@ -7989,11 +8637,7 @@ async function uploadImgToDrive(file){
       const base64=e.target.result.split(',')[1];
       showUploadBanner('📤 이미지 업로드 중...');
       try{
-        const res=await fetch(GS_URL,{
-          method:'POST',
-          body:JSON.stringify({action:'uploadImage',base64,filename:file.name,mimeType:file.type})
-        });
-        const d=await res.json();
+        const d=await gsGet({action:'uploadImage',base64,filename:file.name,mimeType:file.type});
         if(d.ok){ hideUploadBanner(); resolve(d.url); }
         else { hideUploadBanner(); reject(d.error||'업로드 실패'); }
       }catch(err){ hideUploadBanner(); reject(err); }
@@ -8009,11 +8653,7 @@ async function uploadDataUrlToDrive(dataUrl, filename){
   const mimeMatch = parts[0].match(/:(.*?);/);
   const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
   showUploadBanner('🔄 드라이브 업로드 중...');
-  const res = await fetch(GS_URL,{
-    method:'POST',
-    body:JSON.stringify({action:'uploadImage', base64, filename: filename||('sketch_'+Date.now()+'.png'), mimeType})
-  });
-  const d = await res.json();
+  const d = await gsGet({action:'uploadImage', base64, filename: filename||('sketch_'+Date.now()+'.png'), mimeType});
   if(d.ok){ hideUploadBanner(); return d.url; }
   hideUploadBanner();
   throw new Error(d.error||'업로드 실패');
@@ -8490,6 +9130,8 @@ document.getElementById('min-modal').onclick=e=>{
 function toggleSidebarSearch(){
   const panel = document.getElementById('sidebar-search-panel');
   const input  = document.getElementById('global-search-input');
+  // AI 패널 닫기
+  document.getElementById('sidebar-ai-panel')?.classList.remove('open');
   panel.classList.toggle('open');
   if(panel.classList.contains('open')) setTimeout(()=>input.focus(), 60);
   else { input.value=''; document.getElementById('global-search-results').classList.remove('open'); }
@@ -8794,9 +9436,14 @@ function renderArchivingPage(){
 function showAcDetail(id){
   const ac=(D.archiving||[]).find(x=>x.id===id);
   if(!ac) return;
-  document.getElementById('ac-empty').style.display='none';
-  const det=document.getElementById('ac-detail'); det.style.display='block';
-  document.getElementById('p-archiving').classList.add('detail-open');
+  // ac-empty / ac-detail 은 p-archiving 또는 archive-tab-note 어디에든 있을 수 있음
+  ['ac-empty'].forEach(eid=>{ const el=document.getElementById(eid); if(el) el.style.display='none'; });
+  const det=document.getElementById('ac-detail');
+  if(!det) return;
+  det.style.display='block';
+  // 모바일: 목록 숨기고 상세 표시 (p-archiving + archive-tab-note 모두 처리)
+  document.getElementById('p-archiving')?.classList.add('detail-open');
+  document.getElementById('archive-tab-note')?.classList.add('detail-open');
   const d=new Date(ac.date||ac.createdAt);
   const dateStr=`${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
   const linksHtml=(ac.links||[]).filter(lk=>lk.url).map(lk=>`
@@ -8807,7 +9454,13 @@ function showAcDetail(id){
     <button class="mobile-detail-back" onclick="closeAcDetail()"><i class="fa-solid fa-chevron-left"></i> 목록으로</button>
     <div class="ac-detail-card">
       <div class="ac-detail-head">
-        <div class="ac-detail-title">${escHtml(ac.title)}</div>
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+          <div class="ac-detail-title" style="flex:1;">${escHtml(ac.title)}</div>
+          <div style="display:flex;gap:6px;flex-shrink:0;margin-top:2px;">
+            <button onclick="deleteAcById('${ac.id}')" title="삭제" style="border:none;background:none;cursor:pointer;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#C08080;transition:background .15s;" onmouseover="this.style.background='#F8EFEF'" onmouseout="this.style.background='none'"><i class="fa-solid fa-trash" style="font-size:12px;"></i></button>
+            <button onclick="closeAcDetail()" title="닫기" style="border:none;background:none;cursor:pointer;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);transition:background .15s;" onmouseover="this.style.background='var(--gray)'" onmouseout="this.style.background='none'"><i class="fa-solid fa-xmark" style="font-size:14px;"></i></button>
+          </div>
+        </div>
         <div class="ac-detail-meta">
           <span><i class="fa-regular fa-calendar" style="color:var(--rose);"></i> ${dateStr}</span>
           <span>${{work:'💼 업무',personal:'🌿 개인',study:'📚 스터디',idea:'💡 아이디어'}[ac.type]||'💼 업무'}</span>
@@ -8831,21 +9484,43 @@ function showAcDetail(id){
 
 function closeAcDetail(){
   selAcId=null;
-  document.getElementById('ac-detail').style.display='none';
-  document.getElementById('ac-empty').style.display='block';
-  document.getElementById('p-archiving').classList.remove('detail-open');
+  const det=document.getElementById('ac-detail');
+  if(det) det.style.display='none';
+  const emp=document.getElementById('ac-empty');
+  if(emp) emp.style.display='block';
+  document.getElementById('p-archiving')?.classList.remove('detail-open');
+  document.getElementById('archive-tab-note')?.classList.remove('detail-open');
+}
+
+function deleteAcById(id){
+  if(!confirm('이 노트를 삭제할까요?')) return;
+  D.archiving=(D.archiving||[]).filter(x=>x.id!==id);
+  closeAcDetail();
+  save(); renderArchivingPage();
 }
 
 // ════════════════════════════════════════
 //  MOBILE SEARCH
 // ════════════════════════════════════════
 function toggleMobileSearch(){
-  document.getElementById('mobile-search-panel').classList.toggle('open');
-  if(document.getElementById('mobile-search-panel').classList.contains('open'))
-    setTimeout(()=>document.getElementById('mobile-search-input').focus(),60);
+  // AI 패널 닫기
+  const aiPanel = document.getElementById('mobile-ai-panel');
+  const aiBtn   = document.getElementById('mobile-ai-btn');
+  if(aiPanel){ aiPanel.style.display='none'; }
+  if(aiBtn)  { aiBtn.classList.remove('active'); }
+
+  const panel = document.getElementById('mobile-search-panel');
+  const btn   = document.getElementById('mobile-search-btn');
+  const isOpen = panel.classList.contains('open');
+  panel.classList.toggle('open');
+  if(btn) btn.classList.toggle('active', !isOpen);
+  if(!isOpen) setTimeout(()=>document.getElementById('mobile-search-input').focus(),60);
 }
 function closeMobileSearch(){
-  document.getElementById('mobile-search-panel').classList.remove('open');
+  const panel = document.getElementById('mobile-search-panel');
+  const btn   = document.getElementById('mobile-search-btn');
+  panel.classList.remove('open');
+  if(btn) btn.classList.remove('active');
   document.getElementById('mobile-search-input').value='';
   document.getElementById('global-search-results').classList.remove('open');
 }
@@ -8869,11 +9544,20 @@ function backToProjList(){
 
 // ── 초기 로드 (구글 시트 → 화면 렌더) ──
 (async ()=>{
+  const splash = document.getElementById('app-splash');
+  if(splash){
+    splash.querySelector('.splash-sub').textContent = '데이터 불러오는 중...';
+  }
   await load();
   initSampleMinutes();
   // hash가 있으면 해당 페이지로, 없으면 dashboard
   const initPage = (location.hash||'').replace('#','') || 'dashboard';
   navigateTo(initPage);
+  // 스플래시 숨기기
+  if(splash){
+    splash.classList.add('hidden');
+    setTimeout(()=>{ splash.style.display='none'; }, 450);
+  }
 })();
 </script>
 
@@ -8888,14 +9572,90 @@ function backToProjList(){
   var isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
   var isInStandalone = ('standalone' in navigator && navigator.standalone) ||
                        window.matchMedia('(display-mode: standalone)').matches;
-  var bannerClosed = localStorage.getItem('pwa-banner-closed');
 
-  if(isIOS && !isInStandalone && !bannerClosed){
+  if(isIOS && !isInStandalone){
     setTimeout(function(){
       var banner = document.getElementById('pwa-ios-banner');
       if(banner) banner.style.display = 'flex';
     }, 3000);
   }
+
+  // ── Pull-to-Refresh ──
+  (function(){
+    var ptr = document.getElementById('ptr-indicator');
+    var ptrInner = document.getElementById('ptr-inner');
+    var ptrSpinner = document.getElementById('ptr-spinner');
+    var ptrText = document.getElementById('ptr-text');
+    if(!ptr) return;
+
+    var startY = 0;
+    var pulling = false;
+    var refreshing = false;
+    var THRESHOLD = 72; // px: 이 이상 당겨야 새로고침
+
+    function getScrollTop(){
+      var main = document.querySelector('.main');
+      return main ? main.scrollTop : window.scrollY;
+    }
+
+    document.addEventListener('touchstart', function(e){
+      if(refreshing) return;
+      if(getScrollTop() > 2) return; // 최상단일 때만
+      startY = e.touches[0].clientY;
+      pulling = true;
+    }, { passive: true });
+
+    document.addEventListener('touchmove', function(e){
+      if(!pulling || refreshing) return;
+      if(getScrollTop() > 2){ pulling = false; return; }
+      var dy = e.touches[0].clientY - startY;
+      if(dy <= 0){ ptr.style.height = '0px'; ptrInner.style.opacity = 0; return; }
+
+      var h = Math.min(dy * 0.45, 60);
+      ptr.style.height = h + 'px';
+      var progress = Math.min(dy / THRESHOLD, 1);
+      ptrInner.style.opacity = progress;
+      ptrSpinner.style.transform = 'rotate(' + (progress * 270) + 'deg)';
+
+      if(dy >= THRESHOLD){
+        ptrText.textContent = '놓으면 새로고침';
+        ptrSpinner.style.borderTopColor = 'var(--rose)';
+      } else {
+        ptrText.textContent = '당겨서 새로고침';
+        ptrSpinner.style.borderTopColor = 'var(--rose-mid)';
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchend', function(e){
+      if(!pulling || refreshing) return;
+      pulling = false;
+      var dy = e.changedTouches[0].clientY - startY;
+
+      if(dy >= THRESHOLD){
+        // 새로고침 실행
+        refreshing = true;
+        ptr.style.height = '48px';
+        ptrInner.style.opacity = '1';
+        ptrText.textContent = '새로고침 중...';
+        ptrSpinner.classList.add('ptr-spinning');
+
+        // load() 호출 후 인디케이터 숨김
+        var p = (typeof load === 'function') ? load() : Promise.resolve();
+        Promise.resolve(p).then(function(){
+          setTimeout(function(){
+            ptr.style.height = '0px';
+            ptrInner.style.opacity = '0';
+            ptrSpinner.classList.remove('ptr-spinning');
+            ptrText.textContent = '당겨서 새로고침';
+            refreshing = false;
+          }, 600);
+        });
+      } else {
+        ptr.style.height = '0px';
+        ptrInner.style.opacity = '0';
+      }
+    }, { passive: true });
+  })();
 
   // Service Worker 등록 (sw.js)
   if('serviceWorker' in navigator){
@@ -8916,6 +9676,78 @@ function backToProjList(){
 </script>
 
 <!-- ══ GEMINI API KEY MODAL ══ -->
+<!-- ══ 미팅 필터 모달 ══ -->
+<div id="min-filter-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(40,28,28,.35);z-index:9999;align-items:flex-start;justify-content:center;padding-top:80px;" onclick="if(event.target===this)closeMinFilterModal()">
+  <div style="background:white;border-radius:18px;width:92%;max-width:460px;box-shadow:0 12px 48px rgba(40,28,28,.2);overflow:hidden;">
+    <!-- 헤더 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 22px 14px;border-bottom:1px solid var(--rose-light);">
+      <div style="font-size:15px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;">
+        <i class="fa-solid fa-sliders" style="color:var(--rose-mid);font-size:13px;"></i> 필터 설정
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button onclick="resetMinFilter()" style="font-size:11px;color:var(--ink-soft);background:none;border:1.5px solid var(--gray);border-radius:50px;padding:4px 12px;cursor:pointer;font-family:inherit;font-weight:600;">초기화</button>
+        <button onclick="closeMinFilterModal()" style="background:none;border:none;font-size:18px;color:var(--ink-soft);cursor:pointer;line-height:1;padding:2px 6px;">✕</button>
+      </div>
+    </div>
+    <!-- 바디 -->
+    <div style="padding:20px 22px;display:flex;flex-direction:column;gap:18px;">
+
+      <!-- 유형 -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--ink-soft);letter-spacing:.06em;margin-bottom:8px;">유형</div>
+        <div id="mf-type-pills" style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button class="mf-pill" data-group="type" data-val="">전체</button>
+          <button class="mf-pill" data-group="type" data-val="고객사 미팅">고객사 미팅</button>
+          <button class="mf-pill" data-group="type" data-val="협력사 미팅">협력사 미팅</button>
+          <button class="mf-pill" data-group="type" data-val="내부회의">내부회의</button>
+          <button class="mf-pill" data-group="type" data-val="보고">보고</button>
+          <button class="mf-pill" data-group="type" data-val="기타">기타</button>
+        </div>
+      </div>
+
+      <!-- 년도 -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--ink-soft);letter-spacing:.06em;margin-bottom:8px;">년도</div>
+        <div id="mf-year-pills" style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button class="mf-pill on" data-group="year" data-val="">전체</button>
+        </div>
+      </div>
+
+      <!-- 거래처 -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--ink-soft);letter-spacing:.06em;margin-bottom:8px;">거래처</div>
+        <div id="mf-client-pills" style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button class="mf-pill on" data-group="client" data-val="">전체</button>
+        </div>
+      </div>
+
+      <!-- 담당자 -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--ink-soft);letter-spacing:.06em;margin-bottom:8px;">담당자</div>
+        <div id="mf-person-pills" style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button class="mf-pill on" data-group="person" data-val="">전체</button>
+        </div>
+      </div>
+
+      <!-- 정렬 -->
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--ink-soft);letter-spacing:.06em;margin-bottom:8px;">정렬</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button class="mf-pill mf-sort on" data-sort="date-desc"><i class="fa-solid fa-arrow-down-wide-short"></i> 최신순</button>
+          <button class="mf-pill mf-sort" data-sort="date-asc"><i class="fa-solid fa-arrow-up-wide-short"></i> 오래된순</button>
+          <button class="mf-pill mf-sort" data-sort="title-asc"><i class="fa-solid fa-arrow-down-a-z"></i> 이름↑</button>
+          <button class="mf-pill mf-sort" data-sort="title-desc"><i class="fa-solid fa-arrow-down-z-a"></i> 이름↓</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 푸터 -->
+    <div style="padding:14px 22px 18px;border-top:1px solid var(--rose-light);display:flex;justify-content:flex-end;">
+      <button onclick="applyMinFilter()" style="padding:10px 28px;border:none;border-radius:10px;background:var(--rose-mid);color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">적용</button>
+    </div>
+  </div>
+</div>
+
 <div id="apikey-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
   <div style="background:white;border-radius:16px;padding:28px 28px 24px;width:92%;max-width:420px;box-shadow:0 8px 40px rgba(0,0,0,0.18);">
     <div style="font-size:18px;font-weight:700;color:#3A2E2E;margin-bottom:6px;">🔑 Gemini API 키 설정</div>
@@ -8935,6 +9767,122 @@ function backToProjList(){
 </div>
 
 <script>
+// ══ 미팅 필터 모달 ══
+// 현재 선택 상태 (즉시 반영 안 하고 적용 버튼으로 한번에)
+let _mfState = { type:'', year:'', client:'', person:'', sort:'date-desc' };
+
+function openMinFilterModal(){
+  const ov = document.getElementById('min-filter-modal-overlay');
+  ov.style.display = 'flex';
+
+  // 동적 옵션 생성 (현재 데이터 기반)
+  _buildMfPills('year',   [...new Set((D.minutes||[]).map(m=>normDate(m.date).slice(0,4)).filter(y=>/^\d{4}$/.test(y)))].sort().reverse());
+  _buildMfPills('client', [...new Set((D.minutes||[]).map(m=>m.client).filter(Boolean))].sort());
+  _buildMfPills('person', [...new Set((D.minutes||[]).map(m=>m.person).filter(Boolean))].sort());
+
+  // 현재 필터 상태 반영
+  _syncMfPills();
+}
+
+function _buildMfPills(group, vals){
+  const wrap = document.getElementById('mf-'+group+'-pills');
+  if(!wrap) return;
+  const prev = _mfState[group]||'';
+  wrap.innerHTML = `<button class="mf-pill${prev===''?' on':''}" data-group="${group}" data-val="">전체</button>`;
+  vals.forEach(v=>{
+    const btn = document.createElement('button');
+    btn.className = 'mf-pill' + (prev===v?' on':'');
+    btn.dataset.group = group;
+    btn.dataset.val   = v;
+    btn.textContent   = v;
+    wrap.appendChild(btn);
+  });
+}
+
+function _syncMfPills(){
+  // 정렬
+  document.querySelectorAll('.mf-sort').forEach(b=>{
+    b.classList.toggle('on', b.dataset.sort===_mfState.sort);
+  });
+  // 타입
+  document.querySelectorAll('[data-group="type"]').forEach(b=>{
+    b.classList.toggle('on', b.dataset.val===_mfState.type);
+  });
+}
+
+// pill 클릭 이벤트 (단일 선택, 같은 group 나머지 해제)
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('.mf-pill');
+  if(!btn) return;
+  if(btn.classList.contains('mf-sort')){
+    document.querySelectorAll('.mf-sort').forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    _mfState.sort = btn.dataset.sort;
+    return;
+  }
+  const group = btn.dataset.group;
+  if(!group) return;
+  document.querySelectorAll(`[data-group="${group}"]`).forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  _mfState[group] = btn.dataset.val;
+});
+
+function applyMinFilter(){
+  // 숨겨진 select에 값 반영 (기존 renderMinutesList 로직 그대로 활용)
+  const ts = document.getElementById('min-filter-type');
+  const cs = document.getElementById('min-filter-client');
+  const ys = document.getElementById('min-filter-year');
+  const ps = document.getElementById('min-filter-person');
+
+  // 옵션 동적 보장
+  function ensureOpt(sel, val){
+    if(!val) { sel.value=''; return; }
+    if(!sel.querySelector(`option[value="${val}"]`)){
+      const o = document.createElement('option');
+      o.value = val; o.textContent = val;
+      sel.appendChild(o);
+    }
+    sel.value = val;
+  }
+  if(ts) ensureOpt(ts, _mfState.type);
+  if(cs) ensureOpt(cs, _mfState.client);
+  if(ys) ensureOpt(ys, _mfState.year);
+  if(ps) ensureOpt(ps, _mfState.person);
+  minSortMode = _mfState.sort;
+
+  // 필터 뱃지 업데이트
+  const activeCount = [_mfState.type, _mfState.year, _mfState.client, _mfState.person].filter(Boolean).length;
+  const badge = document.getElementById('min-filter-badge');
+  const filterBtn = document.getElementById('min-filter-btn');
+  if(badge){
+    badge.style.display = activeCount > 0 ? 'inline-block' : 'none';
+    badge.textContent = activeCount;
+  }
+  if(filterBtn){
+    filterBtn.style.borderColor = activeCount > 0 ? 'var(--rose-mid)' : 'var(--rose-light)';
+    filterBtn.style.color       = activeCount > 0 ? 'var(--rose-mid)' : 'var(--ink-mid)';
+    filterBtn.style.background  = activeCount > 0 ? 'white'           : 'var(--rose-pale)';
+  }
+
+  closeMinFilterModal();
+  renderMinutesList();
+}
+
+function resetMinFilter(){
+  _mfState = { type:'', year:'', client:'', person:'', sort:'date-desc' };
+  _syncMfPills();
+  document.querySelectorAll('#min-filter-modal-overlay [data-group]').forEach(b=>{
+    b.classList.toggle('on', b.dataset.val==='');
+  });
+  document.querySelectorAll('.mf-sort').forEach(b=>{
+    b.classList.toggle('on', b.dataset.sort==='date-desc');
+  });
+}
+
+function closeMinFilterModal(){
+  document.getElementById('min-filter-modal-overlay').style.display='none';
+}
+
 function showApiKeyModal(){
   const overlay = document.getElementById('apikey-modal-overlay');
   overlay.style.display = 'flex';
@@ -8946,14 +9894,14 @@ function closeApiKeyModal(){
 function saveApiKey(){
   const key = document.getElementById('apikey-input').value.trim();
   if(!key){ alert('API 키를 입력해주세요.'); return; }
+  _geminiApiKey = key;
   localStorage.setItem('gemini_api_key', key);
   closeApiKeyModal();
   alert('✅ API 키가 저장됐어요! 이제 AI 기능을 사용할 수 있어요.');
 }
 // 설정 버튼에서도 키 변경 가능하도록
 function changeApiKey(){
-  const cur = localStorage.getItem('gemini_api_key')||'';
-  document.getElementById('apikey-input').value = cur;
+  document.getElementById('apikey-input').value = _geminiApiKey;
   showApiKeyModal();
 }
 </script>
