@@ -1720,11 +1720,18 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
   }
 }
 
-/* ── 모바일 Task 탭 순서: 위클리 / 프로젝트 / 캘린더 ── */
-@media (max-width:767px) {
+/* ── 폰 전용 Task 탭 순서: 위클리 / 프로젝트 / 캘린더 (480px 이하만) ── */
+@media (max-width:480px) {
   #task-tab-weekly { order: 1; }
   #task-tab-proj   { order: 2; }
   #task-tab-cal    { order: 3; }
+  #task-tab-bar    { display: flex; }
+}
+/* ── 아이패드/태블릿: 캘린더 / 프로젝트 / 위클리 ── */
+@media (min-width:481px) and (max-width:950px) {
+  #task-tab-cal    { order: 1; }
+  #task-tab-proj   { order: 2; }
+  #task-tab-weekly { order: 3; }
   #task-tab-bar    { display: flex; }
 }
 
@@ -3650,8 +3657,8 @@ function navigateTo(pg){
     if(pg==='projects') switchTaskTab('projects', document.getElementById('task-tab-proj'));
     else if(pg==='weekly') switchTaskTab('weekly', document.getElementById('task-tab-weekly'));
     else {
-      // 디바이스별 기본 탭: 모바일(iPhone) → 위클리, iPad/데스크탑 → 캘린더
-      const isMobilePhone = window.innerWidth < 768;
+      // 기본 탭: 480px 이하 폰만 위클리, 아이패드/데스크탑은 캘린더
+      const isMobilePhone = window.innerWidth <= 480;
       const defaultTab = isMobilePhone ? 'weekly' : 'calendar';
       const defaultBtn = isMobilePhone
         ? document.getElementById('task-tab-weekly')
