@@ -752,7 +752,9 @@ main.main{display:block;}
   background:var(--white);border:1px solid var(--gray);border-radius:var(--r);
   padding:22px;box-shadow:0 2px 10px var(--shadow);
 }
-.det-title{font-family:inherit;font-size:20px;font-weight:700;margin-bottom:16px;color:var(--ink-mid);}
+.det-title{font-family:inherit;font-size:20px;font-weight:700;margin-bottom:16px;color:var(--ink-mid);cursor:pointer;border-radius:6px;padding:2px 6px;margin-left:-6px;transition:background .15s;}
+.det-title:hover{background:var(--rose-pale);}
+.det-title-input{font-family:inherit;font-size:20px;font-weight:700;color:var(--ink-mid);border:2px solid var(--rose-mid);border-radius:6px;padding:2px 8px;outline:none;background:white;width:100%;box-sizing:border-box;margin-bottom:16px;}
 .det-sec-lbl{font-size:10px;font-weight:700;color:var(--ink-soft);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
 .det-task{
   display:flex;align-items:center;gap:8px;padding:8px 12px;
@@ -5031,8 +5033,8 @@ function renderProjDetail(id){
 
   det.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
-      <div class="det-title">${escHtml(p.name)}</div>
-      <div style="display:flex;gap:6px">
+      <div class="det-title" onclick="editProjName('${id}',this)" title="클릭해서 이름 수정">${escHtml(p.name)}</div>
+      <div style="display:flex;gap:6px;flex-shrink:0;margin-left:8px;">
         <select onchange="chProjStatus('${id}',this.value)" class="fs" style="font-size:11px;padding:4px 8px">
           <option value="upcoming" ${p.status==='upcoming'?'selected':''}>진행예정</option>
           <option value="ongoing"  ${p.status==='ongoing' ?'selected':''}>진행중</option>
@@ -5093,11 +5095,9 @@ function renderDoneDetail(p, id, pct, d, t, allTasksHtml){
   const headerHtml = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
       <div>
-        <div class="det-title">${escHtml(p.name)}</div>
+        <div class="det-title" onclick="editProjName('${p.id}',this)" title="클릭해서 이름 수정">${escHtml(p.name)}</div>
         <div style="font-size:11px;color:var(--rose-mid);font-weight:600;margin-top:2px;">
           <i class="fa-solid fa-circle-check" style="margin-right:4px;"></i>완료 · ${d}건 업무
-        </div>
-      </div>
       ${headerControls}
     </div>
     ${p.desc ? `<div style="font-size:12px;color:var(--ink-soft);margin-bottom:14px;padding:8px 12px;background:var(--rose-pale);border-radius:var(--rs);">${escHtml(p.desc)}</div>` : ''}`;
@@ -5828,11 +5828,8 @@ function renderRoutineDetail(p, det){
   det.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
       <div>
-        <div class="det-title">${escHtml(p.name)}</div>
+        <div class="det-title" onclick="editProjName('${id}',this)" title="클릭해서 이름 수정">${escHtml(p.name)}</div>
         <span class="badge badge-rt" style="margin-top:4px;display:inline-block;">루틴</span>
-      </div>
-      <div style="display:flex;gap:6px">
-        <select onchange="chProjStatus('${id}',this.value)" class="fs" style="font-size:11px;padding:4px 8px">
           <option value="upcoming">진행예정</option>
           <option value="ongoing">진행중</option>
           <option value="done">완료</option>
@@ -5994,6 +5991,30 @@ function editProjTaskDate(projId, taskId, btn){
   inp.onblur=apply;
   inp.onkeydown=e=>{if(e.key==='Enter')inp.blur();if(e.key==='Escape'){inp.value=tk.date;inp.blur();}};
 }
+function editProjName(id, el){
+  const p = D.projects.find(x=>x.id===id); if(!p) return;
+  const input = document.createElement('input');
+  input.className = 'det-title-input';
+  input.value = p.name;
+  el.replaceWith(input);
+  input.focus();
+  input.select();
+  function commit(){
+    const val = input.value.trim();
+    if(val && val !== p.name){
+      p.name = val;
+      save();
+      renderProjs();
+    }
+    renderProjDetail(id);
+  }
+  input.onblur = commit;
+  input.onkeydown = e=>{
+    if(e.key==='Enter'){ e.preventDefault(); input.blur(); }
+    if(e.key==='Escape'){ input.onblur=null; renderProjDetail(id); }
+  };
+}
+
 function chProjStatus(id,st){
   const p=D.projects.find(x=>x.id===id);
   if(p){
