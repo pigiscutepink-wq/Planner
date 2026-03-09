@@ -3237,7 +3237,7 @@ let D = {
   routines: []      // [{id, title, icon, startTime, endTime, color, repeat, repeatEnd}]
 };
 
-const GS_URL = 'https://script.google.com/macros/s/AKfycbzBO6ZfORHBJtGwSByHhus-nu0cF6iIxSnLRJe92MR7LboOSDx-aPEUbtR5AWQKOd6KcA/exec';
+const GS_URL = 'https://script.google.com/macros/s/AKfycbz-F5mt_o-wqVLVI4adgXbGTBo6INT3eVa1CBFEPo06CBUrylaWzW17fH8BAeiQopXMlw/exec';
 
 // GS 항상 활성화
 function isGsEnabled(){ return true; }
@@ -4417,7 +4417,8 @@ function openAdd(key, opts={}){
   document.querySelectorAll('.type-pill').forEach(p=>p.classList.remove('sel'));
   const selPill=document.querySelector(`.type-pill[data-v="${selType}"]`);
   if(selPill) selPill.classList.add('sel');
-  document.getElementById('meal-fields').style.display='none';
+  const isMealAdd = selType==='ev-lunch'||selType==='ev-dinner';
+  document.getElementById('meal-fields').style.display=isMealAdd?'block':'none';
   document.getElementById('proj-field').style.display=showProjField(selType)?'block':'none';
   document.getElementById('enddate-field').style.display=selType==='task'?'none':'block';
   document.getElementById('item-enddate').value='';
