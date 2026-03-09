@@ -3434,10 +3434,17 @@ let _saveTimer = null;
 function save(){
   setSyncStatus('saving');
   clearTimeout(_saveTimer);
+  // 저장 직전 items 스냅샷 (서버 응답이 로컬 변경을 덮어쓰는 것 방지)
+  const _snapItems = JSON.parse(JSON.stringify(D.items));
   _saveTimer = setTimeout(async ()=>{
     try{
       const res = await gsSaveAll(buildPayload().data);
-      if(res && res.ok && res.data){ applyGSData(res.data); renderAll(); }
+      if(res && res.ok && res.data){
+        applyGSData(res.data);
+        // misc/projects 등은 서버 최신값 유지, items는 스냅샷(로컬 최신) 우선
+        D.items = _snapItems;
+        renderAll();
+      }
       setSyncStatus('saved');
     } catch(e){
       console.warn('[Sync] 저장 실패:', e);
@@ -3472,6 +3479,7 @@ async function load(){
 function renderAll(){
   renderCal(); renderDash(); renderProjs(); renderArchive(); renderMemoPad();
   renderMinutesList(); renderWeeklyRptPage(); renderWeeklyReport();
+  if(typeof plannerOpen!=='undefined' && plannerOpen) renderPlanner();
   const curPage = (location.hash||'').replace('#','') || 'dashboard';
   navigateTo(curPage);
 }
