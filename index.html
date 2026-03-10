@@ -3251,7 +3251,7 @@ let D = {
   routines: []      // [{id, title, icon, startTime, endTime, color, repeat, repeatEnd}]
 };
 
-const GS_URL = 'https://script.google.com/macros/s/AKfycbxDsKyBseqrf27NpJC1T2K8dBgNU_m9sbNgncGnCpw5PmYKTzvsw9W4FQWUifGbBqjrQw/exec';
+const GS_URL = 'https://script.google.com/macros/s/AKfycbxrgTd-QGfRwRNeQCHaoMZL_ORxC0Lx7imFsyYHdrmpcPnEWTHS81M8Xt9VP58abwyJLw/exec';
 
 // GS 항상 활성화
 function isGsEnabled(){ return true; }
@@ -3464,14 +3464,17 @@ async function load(){
     const json = await res.json();
     if(json.ok && json.data){
       applyGSData(json.data);
-      renderAll();
       setSyncStatus('saved');
     } else {
+      console.warn('GS load 실패:', json.error||'unknown');
       setSyncStatus('error');
     }
   } catch(e){
     setSyncStatus('error');
     console.warn('GS load error:', e);
+  } finally {
+    // 성공/실패 관계없이 항상 화면은 렌더
+    renderAll();
   }
 }
 
