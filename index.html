@@ -2615,7 +2615,7 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
       <div style="position:relative;flex-shrink:0;">
         <button id="ac-proj-btn" onclick="toggleAcProjDrop()" style="display:flex;align-items:center;gap:6px;padding:0 12px;height:44px;box-sizing:border-box;border-radius:var(--rs);border:1.5px solid var(--rose-light);background:var(--white);font-size:12px;font-weight:600;color:var(--ink-mid);cursor:pointer;font-family:inherit;transition:all .15s;">
           <i class="fa-solid fa-folder" style="font-size:11px;"></i>
-          <span id="ac-proj-label">프로젝트 전체</span>
+          <span id="ac-proj-label">전체 보기</span>
           <i class="fa-solid fa-chevron-down" style="font-size:9px;margin-left:2px;"></i>
         </button>
         <div id="ac-proj-drop" style="display:none;position:absolute;top:calc(100%+4px);left:0;min-width:180px;background:#fff;border-radius:var(--rs);border:1px solid var(--rose-light);box-shadow:0 6px 20px var(--shadow);z-index:50;overflow:hidden;"></div>
@@ -3772,6 +3772,7 @@ function renderArchivingInTab(){
   if(!wrap.dataset.init){
     wrap.innerHTML = `
       <div id="ac-toolbar" style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap;">
         <div id="ac-type-toggle" style="display:flex;border:1.5px solid var(--rose-light);border-radius:var(--rs);overflow:hidden;flex-shrink:0;">
           <button class="ac-toggle-btn on" data-at="all">전체</button>
           <button class="ac-toggle-btn" data-at="work">💼 업무</button>
@@ -3781,8 +3782,8 @@ function renderArchivingInTab(){
         </div>
         <div style="position:relative;flex-shrink:0;">
           <button id="ac-proj-btn" onclick="toggleAcProjDrop()" style="display:flex;align-items:center;gap:6px;padding:0 12px;height:44px;box-sizing:border-box;border-radius:var(--rs);border:1.5px solid var(--rose-light);background:var(--white);font-size:12px;font-weight:600;color:var(--ink-mid);cursor:pointer;font-family:inherit;transition:all .15s;">
-            <i class="fa-solid fa-folder" style="font-size:11px;"></i>
-            <span id="ac-proj-label">프로젝트 전체</span>
+            <i class="fa-solid fa-layer-group" style="font-size:11px;"></i>
+            <span id="ac-proj-label">전체 보기</span>
             <i class="fa-solid fa-chevron-down" style="font-size:9px;margin-left:2px;"></i>
           </button>
           <div id="ac-proj-drop" style="display:none;position:absolute;top:calc(100%+4px);left:0;min-width:180px;background:#fff;border-radius:var(--rs);border:1px solid var(--rose-light);box-shadow:0 6px 20px var(--shadow);z-index:50;overflow:hidden;"></div>
@@ -3793,6 +3794,7 @@ function renderArchivingInTab(){
           <option value="title">제목순</option>
         </select>
         <input type="text" id="ac-search" class="fi" placeholder="🔍 노트 검색..." style="flex:1;min-width:120px;font-size:12px;height:44px;box-sizing:border-box;" oninput="renderArchivingPage()">
+        </div>
         <button id="ac-new-btn" class="btn btn-p" onclick="openArchivingModal()" style="flex-shrink:0;height:44px;box-sizing:border-box;padding:0 16px;white-space:nowrap;"><i class="fa-solid fa-plus"></i> 새 노트</button>
       </div>
       <div style="display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start;">
@@ -3807,6 +3809,11 @@ function renderArchivingInTab(){
       b.onclick=()=>{
         wrap.querySelectorAll('.ac-toggle-btn').forEach(x=>x.classList.remove('on'));
         b.classList.add('on');
+        acTypeFilter = b.dataset.at || 'all';
+        acProjFilter = '';
+        const projLabel = document.getElementById('ac-proj-label');
+        if(projLabel) projLabel.textContent = '전체 보기';
+        renderAcProjDrop();
         renderArchivingPage();
       };
     });
@@ -9755,7 +9762,7 @@ function renderAcProjDrop(){
   drop.innerHTML='';
   const allOpt=document.createElement('div'); allOpt.className='ac-proj-opt';
   allOpt.innerHTML=`<i class="fa-solid fa-layer-group" style="color:var(--rose-mid);font-size:10px;"></i> 전체 보기`;
-  allOpt.onclick=()=>{ acProjFilter=''; document.getElementById('ac-proj-label').textContent='프로젝트 전체'; drop.style.display='none'; renderArchivingPage(); };
+  allOpt.onclick=()=>{ acProjFilter=''; document.getElementById('ac-proj-label').textContent='전체 보기'; drop.style.display='none'; renderArchivingPage(); };
   drop.appendChild(allOpt);
   if(projs.length){ const dv=document.createElement('div'); dv.style.cssText='height:1px;background:var(--gray);margin:2px 0;'; drop.appendChild(dv); }
   projs.forEach(p=>{
