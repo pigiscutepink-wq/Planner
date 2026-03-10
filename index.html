@@ -3251,7 +3251,7 @@ let D = {
   routines: []      // [{id, title, icon, startTime, endTime, color, repeat, repeatEnd}]
 };
 
-const GS_URL = 'https://script.google.com/macros/s/AKfycbxrgTd-QGfRwRNeQCHaoMZL_ORxC0Lx7imFsyYHdrmpcPnEWTHS81M8Xt9VP58abwyJLw/exec';
+const GS_URL = 'https://script.google.com/macros/s/AKfycbwId3PXctZwtWy4ygrckJpwwieWdzgaDmfLLq2dcsnElRM0xmOsrewfrdxpT_GcVTRkbA/exec';
 
 // GS 항상 활성화
 function isGsEnabled(){ return true; }
@@ -3371,13 +3371,33 @@ function setSyncStatus(state){
 
 // ── GS 응답 데이터를 D에 반영 ──
 function applyGSData(d){
-  if(d.items)       D.items       = d.items;
+  // 시간값 정제 함수 — 구글 시트에서 "Sat Dec 30 1899..." 같은 값 제거
+  function cleanTime(v){
+    if(!v) return '';
+    var s = String(v).trim();
+    // HH:MM 형식만 허용
+    if(/^\d{1,2}:\d{2}$/.test(s)) return s;
+    // "HH:MM:SS" → "HH:MM"
+    var m = s.match(/^(\d{1,2}):(\d{2}):/);
+    if(m) return m[1].padStart(2,'0')+':'+m[2];
+    return '';
+  }
+  if(d.items){
+    // items 각 태스크의 startTime/endTime 정제
+    Object.keys(d.items).forEach(function(date){
+      (d.items[date]||[]).forEach(function(it){
+        it.startTime = cleanTime(it.startTime);
+        it.endTime   = cleanTime(it.endTime);
+        if(!it.startTime && !it.endTime) it.allDay = true;
+      });
+    });
+    D.items = d.items;
+  }
   if(d.projects)    D.projects    = d.projects;
   if(d.minutes)     D.minutes     = d.minutes;
   if(d.archiving)   D.archiving   = d.archiving;
   if(d.plannerMeta) D.plannerMeta = d.plannerMeta;
 
-  // v5: misc는 객체로 직접 전달
   const m = d.misc || {};
   if(m.contacts)          D.contacts          = m.contacts;
   if(m.system)            D.system            = m.system;
@@ -9608,7 +9628,6 @@ function showAcDetail(id){
         </div>
       </div>
     </div>`;
-}
 }
 
 function closeAcDetail(){
