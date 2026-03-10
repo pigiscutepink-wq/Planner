@@ -860,13 +860,13 @@ main.main{display:block;}
 .quarter-btn:hover{border-color:var(--rose-light);color:var(--ink);}
 .quarter-btn.on{border-color:var(--rose);background:var(--rose-pale);color:var(--rose-mid);}
 .goal-item{
-  padding:10px 14px;border-radius:12px;border:1.5px solid var(--gray);
-  background:var(--white);cursor:pointer;font-size:12px;color:var(--ink-mid);
+  padding:14px 16px;border-radius:12px;border:1.5px solid var(--gray);
+  background:var(--white);cursor:pointer;font-size:13px;color:var(--ink-mid);
   transition:all .15s;display:flex;align-items:center;justify-content:space-between;gap:8px;
 }
 .goal-item:hover{border-color:var(--rose-light);color:var(--ink);}
 .goal-item.sel{border-color:var(--rose);background:var(--rose-pale);color:var(--ink);font-weight:600;}
-.goal-item-name{flex:1;font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.goal-item-name{flex:1;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .action-block{border:1.5px solid var(--gray);border-radius:var(--rs);background:var(--white);overflow:hidden;margin-bottom:8px;}
 .action-header{
   display:flex;align-items:center;justify-content:space-between;
@@ -2374,50 +2374,41 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
 
     <!-- ── 수시실적 탭 ── -->
     <div id="rpt-tab-periodic" style="display:none;">
-      <div style="display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start;">
-        <!-- 좌측: 연간목표 목록 + 분기 선택 -->
-        <div style="display:flex;flex-direction:column;gap:12px;">
-          <div class="card" style="padding:14px;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-              <div class="card-title" style="margin:0;"><i class="fa-solid fa-bullseye"></i> 연간 목표</div>
-              <button class="btn btn-p" style="font-size:10px;padding:4px 10px;" onclick="openGoalModal()"><i class="fa-solid fa-plus"></i> 추가</button>
-            </div>
-            <div style="margin-bottom:10px;">
-              <select class="fs" id="goal-year-filter" style="width:100%;font-size:12px;" onchange="renderGoalList()">
-              </select>
-            </div>
-            <div id="goal-list" style="display:flex;flex-direction:column;gap:6px;"></div>
+      <div id="periodic-list-view">
+        <!-- 연간목표 목록 -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <select class="fs" id="goal-year-filter" style="font-size:12px;padding:6px 10px;" onchange="renderGoalList()"></select>
+          <button class="btn btn-p" style="font-size:11px;padding:6px 12px;" onclick="openGoalModal()"><i class="fa-solid fa-plus"></i> 새 목표</button>
+        </div>
+        <div id="goal-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;"></div>
+      </div>
+
+      <!-- 목표 상세 + 분기 선택 + 실적 (detail-open 시 표시) -->
+      <div id="periodic-detail-view" style="display:none;">
+        <button class="mobile-detail-back" style="display:flex;" onclick="closePeriodicDetail()"><i class="fa-solid fa-chevron-left"></i> 목표 목록</button>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+          <div>
+            <div id="periodic-title" style="font-size:16px;font-weight:700;color:var(--ink);"></div>
+            <div id="periodic-quarter-label" style="font-size:11px;color:var(--ink-soft);margin-top:2px;"></div>
           </div>
-          <div class="card" style="padding:14px;">
-            <div class="card-title" style="margin-bottom:10px;"><i class="fa-solid fa-calendar-quarter"></i> 분기 선택</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
-              <button class="quarter-btn on" onclick="selectQuarter(1,this)">1분기<span>1~3월</span></button>
-              <button class="quarter-btn" onclick="selectQuarter(2,this)">2분기<span>4~6월</span></button>
-              <button class="quarter-btn" onclick="selectQuarter(3,this)">3분기<span>7~9월</span></button>
-              <button class="quarter-btn" onclick="selectQuarter(4,this)">4분기<span>10~12월</span></button>
-            </div>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-g" onclick="copyPeriodicReport()"><i class="fa-regular fa-copy"></i> 전체 복사</button>
+            <button class="btn btn-g sym-icon-btn" onclick="openSymModal()" title="기호 설정" style="width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;"><i class="fa-solid fa-sliders" style="font-size:13px;"></i></button>
           </div>
         </div>
-        <!-- 우측: 실적 입력 영역 -->
-        <div>
-          <div id="periodic-empty" class="empty-state"><i class="fa-solid fa-chart-bar"></i>좌측에서 목표를 선택하세요</div>
-          <div id="periodic-content" style="display:none;">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
-              <div>
-                <div id="periodic-title" style="font-size:16px;font-weight:700;color:var(--ink);"></div>
-                <div id="periodic-quarter-label" style="font-size:11px;color:var(--ink-soft);margin-top:2px;"></div>
-              </div>
-              <div style="display:flex;gap:6px;align-items:center;">
-                <button class="btn btn-g" onclick="copyPeriodicReport()"><i class="fa-regular fa-copy"></i> 전체 복사</button>
-                <button class="btn btn-g sym-icon-btn" onclick="openSymModal()" title="기호 설정" style="width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i class="fa-solid fa-sliders" style="font-size:13px;"></i></button>
-              </div>
-            </div>
-            <div id="periodic-actions" style="display:flex;flex-direction:column;gap:10px;"></div>
-          </div>
+        <!-- 분기 버튼 -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:16px;">
+          <button class="quarter-btn on" onclick="selectQuarter(1,this)">1분기<span>1~3월</span></button>
+          <button class="quarter-btn" onclick="selectQuarter(2,this)">2분기<span>4~6월</span></button>
+          <button class="quarter-btn" onclick="selectQuarter(3,this)">3분기<span>7~9월</span></button>
+          <button class="quarter-btn" onclick="selectQuarter(4,this)">4분기<span>10~12월</span></button>
+        </div>
+        <div id="periodic-empty" class="empty-state" style="display:none;"><i class="fa-solid fa-chart-bar"></i>세부사항이 없습니다.<br>목표를 수정해 세부사항을 추가하세요.</div>
+        <div id="periodic-content">
+          <div id="periodic-actions" style="display:flex;flex-direction:column;gap:10px;"></div>
         </div>
       </div>
     </div>
-    </div><!-- /rpt-tab-periodic -->
 
     <!-- ── Meeting 탭 ── -->
     <div id="rpt-tab-minutes" style="display:none;">
@@ -3251,7 +3242,7 @@ let D = {
   routines: []      // [{id, title, icon, startTime, endTime, color, repeat, repeatEnd}]
 };
 
-const GS_URL = 'https://script.google.com/macros/s/AKfycbwId3PXctZwtWy4ygrckJpwwieWdzgaDmfLLq2dcsnElRM0xmOsrewfrdxpT_GcVTRkbA/exec';
+const GS_URL = 'https://script.google.com/macros/s/AKfycbwqIYRltedCyYTk6Axfo1AmIHNhbNY3vkK-4T7VS83JCvKzvFNxJNg7D7xozRkSXjg6oQ/exec';
 
 // GS 항상 활성화
 function isGsEnabled(){ return true; }
@@ -3291,7 +3282,7 @@ async function gsSaveAll(data){
   for(const field of SHEETS){
     const val = data[field];
     if(val === undefined || val === null) continue;
-    if(Array.isArray(val) && val.length === 0 && field !== 'misc') continue;
+    if(Array.isArray(val) && val.length === 0 && field !== 'misc' && field !== 'minutes') continue;
     if(field === 'plannerMeta' && typeof val === 'object' && !Object.keys(val).length) continue;
 
     // items: 날짜 키 단위로 분할
@@ -3317,8 +3308,13 @@ async function gsSaveAll(data){
       continue;
     }
 
-    // minutes: 건 단위로 분할
+    // minutes: 건 단위로 분할 (빈 배열도 반드시 전송)
     if(field === 'minutes' && Array.isArray(val)){
+      if(val.length === 0){
+        // 빈 배열: 전체 삭제 — 반드시 전송
+        sends.push(gsSend({ action:'save', _isFirst: true, data:{ minutes: [] }}));
+        continue;
+      }
       let batches = [];
       let batch = [];
       for(const item of val){
@@ -3499,11 +3495,15 @@ async function load(){
 }
 
 function renderAll(){
-  renderCal(); renderDash(); renderProjs(); renderArchive(); renderMemoPad();
-  renderMinutesList(); renderWeeklyRptPage(); renderWeeklyReport();
-  if(typeof plannerOpen!=='undefined' && plannerOpen) renderPlanner();
+  [renderCal, renderDash, renderProjs, renderArchive, renderMemoPad,
+   renderMinutesList, renderWeeklyRptPage, renderWeeklyReport].forEach(fn=>{
+    try{ fn(); } catch(e){ console.warn(fn.name+' 오류:', e); }
+  });
+  if(typeof plannerOpen!=='undefined' && plannerOpen){
+    try{ renderPlanner(); } catch(e){ console.warn('renderPlanner 오류:', e); }
+  }
   const curPage = (location.hash||'').replace('#','') || 'dashboard';
-  navigateTo(curPage);
+  try{ navigateTo(curPage); } catch(e){ console.warn('navigateTo 오류:', e); }
 }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
 
@@ -6992,15 +6992,13 @@ function saveGoal(){
     D.annualGoals.push(obj);
   }
   save(); closeGoalModal(); renderGoalList();
-  if(selGoalId===editGoalId||!editGoalId) { selGoalId=obj.id; renderPeriodicContent(); }
+  if(selGoalId===editGoalId||!editGoalId) { selGoalId=obj.id; openPeriodicDetail(); }
 }
 function deleteGoal(){
   if(!editGoalId||!confirm('이 목표를 삭제하시겠습니까?')) return;
   D.annualGoals=(D.annualGoals||[]).filter(g=>g.id!==editGoalId);
   if(selGoalId===editGoalId){
-    selGoalId=null;
-    document.getElementById('periodic-empty').style.display='block';
-    document.getElementById('periodic-content').style.display='none';
+    closePeriodicDetail();
   }
   save(); closeGoalModal(); renderGoalList();
 }
@@ -7008,12 +7006,10 @@ function renderGoalList(){
   const list=document.getElementById('goal-list');
   if(!list) return;
 
-  // 년도 드롭다운 갱신
   const yrFilter = document.getElementById('goal-year-filter');
   if(yrFilter){
     const years = [...new Set((D.annualGoals||[]).map(g=>g.year||new Date().getFullYear()))].sort((a,b)=>b-a);
     if(!years.length) years.push(new Date().getFullYear());
-    // 현재 선택값 유지
     const prev = yrFilter.value ? parseInt(yrFilter.value) : selGoalYear;
     yrFilter.innerHTML = years.map(y=>`<option value="${y}" ${y===prev?'selected':''}>${y}년</option>`).join('');
     selGoalYear = parseInt(yrFilter.value) || years[0];
@@ -7023,7 +7019,7 @@ function renderGoalList(){
   const filtered = (D.annualGoals||[]).filter(g=>(g.year||new Date().getFullYear())===selGoalYear);
 
   if(!filtered.length){
-    list.innerHTML='<div style="font-size:11px;color:var(--ink-soft);text-align:center;padding:8px 0;">이 년도의 목표가 없습니다</div>';
+    list.innerHTML='<div style="font-size:11px;color:var(--ink-soft);text-align:center;padding:16px 0;">이 년도의 목표가 없습니다</div>';
     return;
   }
   filtered.forEach(g=>{
@@ -7031,11 +7027,35 @@ function renderGoalList(){
     row.className='goal-item'+(g.id===selGoalId?' sel':'');
     row.innerHTML=`
       <span class="goal-item-name" title="${escAttr(g.name)}">${escHtml(g.name)}</span>
-      <button onclick="event.stopPropagation();openGoalModal('${g.id}')" style="border:none;background:none;cursor:pointer;color:var(--ink-soft);font-size:11px;padding:2px 4px;"><i class="fa-solid fa-pen"></i></button>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <button onclick="event.stopPropagation();openGoalModal('${g.id}')" style="border:none;background:none;cursor:pointer;color:var(--ink-soft);font-size:11px;padding:2px 4px;"><i class="fa-solid fa-pen"></i></button>
+        <i class="fa-solid fa-chevron-right" style="font-size:11px;color:var(--ink-soft);"></i>
+      </div>
     `;
-    row.onclick=()=>{ selGoalId=g.id; renderGoalList(); renderPeriodicContent(); };
+    row.onclick=()=>{
+      selGoalId=g.id;
+      renderGoalList();
+      openPeriodicDetail();
+    };
     list.appendChild(row);
   });
+}
+
+function openPeriodicDetail(){
+  const listView = document.getElementById('periodic-list-view');
+  const detailView = document.getElementById('periodic-detail-view');
+  if(listView) listView.style.display='none';
+  if(detailView) detailView.style.display='block';
+  renderPeriodicContent();
+}
+
+function closePeriodicDetail(){
+  const listView = document.getElementById('periodic-list-view');
+  const detailView = document.getElementById('periodic-detail-view');
+  if(listView) listView.style.display='block';
+  if(detailView) detailView.style.display='none';
+  selGoalId=null;
+  renderGoalList();
 }
 function selectQuarter(q, btn){
   selQuarter=q;
@@ -7046,23 +7066,25 @@ function selectQuarter(q, btn){
 
 // ══ 수시실적 콘텐츠 렌더링 ══
 function renderPeriodicContent(){
-  if(!selGoalId){ document.getElementById('periodic-empty').style.display='block'; document.getElementById('periodic-content').style.display='none'; return; }
+  const emptyEl = document.getElementById('periodic-empty');
+  const wrap = document.getElementById('periodic-actions');
+  if(!selGoalId || !wrap) return;
   const g=(D.annualGoals||[]).find(x=>x.id===selGoalId);
   if(!g) return;
-  document.getElementById('periodic-empty').style.display='none';
-  document.getElementById('periodic-content').style.display='block';
   const qLabels={1:'1분기 (1~3월)',2:'2분기 (4~6월)',3:'3분기 (7~9월)',4:'4분기 (10~12월)'};
-  document.getElementById('periodic-title').textContent=g.name;
-  document.getElementById('periodic-quarter-label').textContent=qLabels[selQuarter]+' 실적';
+  const titleEl = document.getElementById('periodic-title');
+  const quarterEl = document.getElementById('periodic-quarter-label');
+  if(titleEl) titleEl.textContent=g.name;
+  if(quarterEl) quarterEl.textContent=qLabels[selQuarter]+' 실적';
   const qKey='q'+selQuarter;
   if(!g.results) g.results={};
   if(!g.results[qKey]) g.results[qKey]={};
-  const wrap=document.getElementById('periodic-actions');
   wrap.innerHTML='';
   if(!(g.actions||[]).length){
-    wrap.innerHTML='<div class="empty-state" style="padding:20px;">세부사항이 없습니다. 목표를 수정해 세부사항을 추가하세요.</div>';
+    if(emptyEl){ emptyEl.style.display='block'; }
     return;
   }
+  if(emptyEl){ emptyEl.style.display='none'; }
   g.actions.forEach(action=>{
     const results=g.results[qKey][action.id]||[];
     const block=document.createElement('div');
@@ -9696,11 +9718,25 @@ function backToProjList(){
   if(splash){
     splash.querySelector('.splash-sub').textContent = '데이터 불러오는 중...';
   }
-  await load();
-  initSampleMinutes();
+  // 최대 10초 후 강제로 스플래시 숨기기 (안전장치)
+  const splashTimeout = setTimeout(()=>{
+    if(splash){ splash.classList.add('hidden'); setTimeout(()=>{ splash.style.display='none'; }, 450); }
+    renderAll();
+  }, 10000);
+
+  try {
+    await load();
+    try { initSampleMinutes(); } catch(e){ console.warn('initSampleMinutes 오류:', e); }
+  } catch(e){
+    console.warn('load 오류:', e);
+  }
+
+  clearTimeout(splashTimeout);
+
   // hash가 있으면 해당 페이지로, 없으면 dashboard
   const initPage = (location.hash||'').replace('#','') || 'dashboard';
-  navigateTo(initPage);
+  try { navigateTo(initPage); } catch(e){ console.warn('navigateTo 오류:', e); }
+
   // 스플래시 숨기기
   if(splash){
     splash.classList.add('hidden');
