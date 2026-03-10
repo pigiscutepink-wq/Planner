@@ -1004,15 +1004,15 @@ main.main{display:block;}
 .report-card-week{font-size:13px;font-weight:700;color:var(--rose-mid);}
 .report-card-label{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--ink-soft);text-transform:uppercase;}
 .report-card-body{padding:14px 18px;font-size:12.5px;line-height:1.75;min-height:120px;}
-.rpt-proj-name{font-weight:700;color:var(--rose-mid);margin-top:10px;margin-bottom:2px;}
+.rpt-proj-name{font-weight:700;color:var(--ink-mid);margin-top:10px;margin-bottom:2px;}
 .rpt-proj-name:first-child{margin-top:0;}
 .rpt-task-row{display:flex;align-items:baseline;gap:5px;padding:1px 0;}
 .rpt-dash{color:var(--rose);font-weight:700;flex-shrink:0;}
-.rpt-task-name{flex:1;color:var(--rose-mid);}
+.rpt-task-name{flex:1;color:var(--ink);}
 .rpt-task-date{font-size:10px;color:var(--rose-light);flex-shrink:0;}
 .rpt-done .rpt-task-name{text-decoration:line-through;opacity:.5;}
 .rpt-empty{color:var(--ink-soft);font-size:12px;font-style:italic;}
-.rpt-dayoff-note{margin-top:10px;padding-top:8px;border-top:1px dashed var(--rose-light);color:var(--rose-mid);font-size:11px;font-weight:500;line-height:1.8;}
+.rpt-dayoff-note{margin-top:10px;padding-top:8px;border-top:1px dashed var(--rose-light);color:var(--ink-mid);font-size:11px;font-weight:500;line-height:1.8;}
 
 /* ── WEEKLY REPORT ARCHIVE LIST ── */
 .rpt-week-item{
@@ -1293,13 +1293,15 @@ main.main{display:block;}
 }
 .ac-toggle-btn.on{background:var(--rose);color:#fff;}
 .ac-row{
-  background:var(--white);border:1px solid var(--gray);border-radius:var(--r);
-  padding:13px 15px;cursor:pointer;transition:all .18s;box-shadow:0 2px 8px var(--shadow);
+  background:var(--white);border:1px solid var(--gray);border-radius:var(--rs);
+  padding:12px 15px;cursor:pointer;transition:all .18s;
+  display:flex;flex-direction:column;gap:4px;
 }
-.ac-row:hover{border-color:var(--rose);transform:translateX(3px);}
-.ac-row.sel{border-color:var(--rose);box-shadow:0 4px 18px rgba(222,192,194,.4);}
+.ac-row:hover{border-color:var(--rose);background:var(--rose-pale);}
+.ac-row.sel{border-color:var(--rose);background:var(--rose-pale);box-shadow:0 2px 10px var(--shadow);}
+.ac-row.sel .ac-row-title{color:var(--rose-mid);}
 .ac-row-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:5px;}
-.ac-row-title{font-size:13px;font-weight:700;color:var(--ink);line-height:1.35;flex:1;}
+.ac-row-title{font-size:13px;font-weight:700;color:var(--ink);line-height:1.35;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;transition:color .18s;}
 .ac-row-date{font-size:10px;color:var(--ink-soft);white-space:nowrap;flex-shrink:0;}
 .ac-row-bottom{display:flex;gap:5px;flex-wrap:wrap;}
 .ac-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:50px;background:var(--rose-pale);color:var(--rose-mid);}
@@ -1308,13 +1310,21 @@ main.main{display:block;}
 .ac-tag.study{background:#E8EEF5;color:#8FA8C0;}
 .ac-tag.idea{background:#F5EEE0;color:#C0A070;}
 .ac-tag.proj{background:#EBF0F5;color:#8FA8C0;}
-/* 상세 패널 */
-.ac-detail-card{background:var(--white);border:1px solid var(--gray);border-radius:var(--r);padding:24px;box-shadow:0 2px 10px var(--shadow);}
-.ac-detail-head{border-bottom:1px solid var(--gray);padding-bottom:16px;margin-bottom:16px;}
-.ac-detail-title{font-size:20px;font-weight:700;color:var(--ink);margin-bottom:8px;line-height:1.35;}
+/* 상세 패널 — 미팅과 동일 구조 */
+.ac-detail-card{
+  background:var(--white);border:1px solid #EFEFEF;border-radius:14px;
+  box-shadow:0 2px 14px var(--shadow);overflow:hidden;
+}
+.ac-detail-head{
+  padding:20px 24px 16px;
+  background:linear-gradient(135deg,#FAF5F5,#F3ECEC);
+  border-bottom:1px solid #EFEFEF;
+}
+.ac-detail-title{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.35;}
 .ac-detail-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--ink-mid);}
 .ac-detail-meta span{display:flex;align-items:center;gap:4px;}
-.ac-detail-memo{font-size:13px;color:var(--ink);line-height:1.9;white-space:pre-wrap;margin-bottom:16px;}
+.ac-detail-body{padding:22px 24px;}
+.ac-detail-memo{font-size:13px;color:var(--ink);line-height:1.9;white-space:pre-wrap;margin-bottom:0;}
 .ac-links{display:flex;flex-wrap:wrap;gap:7px;margin-top:6px;}
 .ac-link-btn{
   display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:50px;
@@ -1827,14 +1837,18 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
   #p-weeklyrpt [style*="grid-template-columns:260px"] {
     grid-template-columns: 1fr !important;
   }
+  /* archive-tab-note 안의 그리드도 1열로 */
+  #archive-tab-note [style*="grid-template-columns:300px"] {
+    grid-template-columns: 1fr !important;
+  }
   /* 상세 패널이 열릴 때 목록 숨기기 */
   #p-minutes.detail-open #min-list { display: none !important; }
   #p-archiving.detail-open #ac-list { display: none !important; }
   #archive-tab-note.detail-open #ac-list { display: none !important; }
   #archive-tab-note.detail-open #ac-detail-wrap { display: block !important; }
-  #archive-tab-note.detail-open .ac-toggle-btn,
-  #archive-tab-note.detail-open #ac-proj-btn,
-  #archive-tab-note.detail-open #ac-sort { display: none !important; }
+  #archive-tab-note.detail-open #ac-toolbar { display: none !important; }
+  /* 기본 상태: 상세 패널 숨기기 */
+  #archive-tab-note:not(.detail-open) #ac-detail-wrap { display: none !important; }
   #p-weeklyrpt.detail-open #rpt-week-list-wrap { display: none !important; }
   /* 상세 패널 상단에 뒤로가기 버튼 */
   .mobile-detail-back {
@@ -2287,7 +2301,7 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
     <div id="archive-tab-memo">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
         <input type="text" class="fi" id="memo-search" placeholder="🔍  메모 검색..." style="flex:1;" oninput="renderMemoPad()">
-        <button class="btn btn-p" style="font-size:11px;padding:6px 14px;flex-shrink:0;" onclick="addMemo()"><i class="fa-solid fa-plus"></i> Add Memo</button>
+        <button class="btn btn-p" style="font-size:11px;padding:6px 14px;flex-shrink:0;" onclick="addMemo()"><i class="fa-solid fa-plus"></i> 새 메모</button>
       </div>
       <div id="memo-pad-wrap" style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;"></div>
     </div>
@@ -2300,7 +2314,7 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
         <div class="card-title"><i class="fa-solid fa-server"></i> System Info</div>
         <table class="info-tbl"><thead><tr><th>항목</th><th>ID</th><th>Password</th><th>비고</th><th></th></tr></thead>
         <tbody id="tb-system"></tbody></table>
-        <button class="add-row-btn" onclick="addRow('system')"><i class="fa-solid fa-plus"></i> Add</button>
+        <button class="add-row-btn" onclick="addRow('system')"><i class="fa-solid fa-plus"></i> 추가</button>
       </div>
     </div>
     <!-- Contacts 탭 -->
@@ -3237,7 +3251,7 @@ let D = {
   routines: []      // [{id, title, icon, startTime, endTime, color, repeat, repeatEnd}]
 };
 
-const GS_URL = 'https://script.google.com/macros/s/AKfycbz-F5mt_o-wqVLVI4adgXbGTBo6INT3eVa1CBFEPo06CBUrylaWzW17fH8BAeiQopXMlw/exec';
+const GS_URL = 'https://script.google.com/macros/s/AKfycbxDsKyBseqrf27NpJC1T2K8dBgNU_m9sbNgncGnCpw5PmYKTzvsw9W4FQWUifGbBqjrQw/exec';
 
 // GS 항상 활성화
 function isGsEnabled(){ return true; }
@@ -3269,14 +3283,10 @@ async function gsGet(payload){
 }
 
 // 저장 전용: 시트별 분리 + _isFirst 플래그
-// _isFirst:true  → GAS가 해당 시트 clearContents() 후 씀  (처음만)
-// _isFirst:false → GAS가 append만                         (이후 청크)
+// 모든 시트를 병렬로 전송해 속도 개선
 async function gsSaveAll(data){
-  // 시트별로 순차 전송
   const SHEETS = ['items','projects','minutes','archiving','plannerMeta','misc'];
-  // 각 시트별 _isFirst 추적 (시트 단위로 첫 청크인지 판단)
-  const firstSent = {};
-  let lastRes = { ok: true };
+  const sends = [];
 
   for(const field of SHEETS){
     const val = data[field];
@@ -3284,57 +3294,58 @@ async function gsSaveAll(data){
     if(Array.isArray(val) && val.length === 0 && field !== 'misc') continue;
     if(field === 'plannerMeta' && typeof val === 'object' && !Object.keys(val).length) continue;
 
-    const isFirst = !firstSent[field];
-
-    // items: 날짜 키 단위로 분할 (데이터 클 수 있음)
+    // items: 날짜 키 단위로 분할
     if(field === 'items' && typeof val === 'object'){
       const keys = Object.keys(val);
+      let batches = [];
       let batch = {};
       for(const k of keys){
         const test = { ...batch, [k]: val[k] };
-        const bodyLen = JSON.stringify({ action:'save', _isFirst: !firstSent[field], data:{ items: test }}).length;
+        const bodyLen = JSON.stringify({ action:'save', _isFirst: true, data:{ items: test }}).length;
         if(bodyLen > GS_BODY_LIMIT && Object.keys(batch).length > 0){
-          lastRes = await gsSend({ action:'save', _isFirst: !firstSent['items'], data:{ items: batch }});
-          firstSent['items'] = true;
+          batches.push(batch);
           batch = { [k]: val[k] };
         } else {
           batch = test;
         }
       }
-      if(Object.keys(batch).length > 0){
-        lastRes = await gsSend({ action:'save', _isFirst: !firstSent['items'], data:{ items: batch }});
-        firstSent['items'] = true;
-      }
+      if(Object.keys(batch).length > 0) batches.push(batch);
+      // 각 배치를 병렬 전송 (단, 첫 배치만 _isFirst:true)
+      batches.forEach((b, i) => {
+        sends.push(gsSend({ action:'save', _isFirst: i===0, data:{ items: b }}));
+      });
       continue;
     }
 
     // minutes: 건 단위로 분할
     if(field === 'minutes' && Array.isArray(val)){
+      let batches = [];
       let batch = [];
       for(const item of val){
         const test = [...batch, item];
-        const bodyLen = JSON.stringify({ action:'save', _isFirst: !firstSent['minutes'], data:{ minutes: test }}).length;
+        const bodyLen = JSON.stringify({ action:'save', _isFirst: true, data:{ minutes: test }}).length;
         if(bodyLen > GS_BODY_LIMIT && batch.length > 0){
-          lastRes = await gsSend({ action:'save', _isFirst: !firstSent['minutes'], data:{ minutes: batch }});
-          firstSent['minutes'] = true;
+          batches.push(batch);
           batch = [item];
         } else {
           batch = test;
         }
       }
-      if(batch.length > 0){
-        lastRes = await gsSend({ action:'save', _isFirst: !firstSent['minutes'], data:{ minutes: batch }});
-        firstSent['minutes'] = true;
-      }
+      if(batch.length > 0) batches.push(batch);
+      batches.forEach((b, i) => {
+        sends.push(gsSend({ action:'save', _isFirst: i===0, data:{ minutes: b }}));
+      });
       continue;
     }
 
     // 그 외 시트: 단일 전송
-    lastRes = await gsSend({ action:'save', _isFirst: isFirst, data:{ [field]: val }});
-    firstSent[field] = true;
+    sends.push(gsSend({ action:'save', _isFirst: true, data:{ [field]: val }}));
   }
 
-  return lastRes;
+  // 모든 전송을 병렬로 실행, 마지막 성공 응답 반환
+  const results = await Promise.allSettled(sends);
+  const lastOk = results.filter(r=>r.status==='fulfilled').map(r=>r.value).pop();
+  return lastOk || { ok: true };
 }
 
 // ── 동기화 상태 표시 ──
@@ -3411,12 +3422,8 @@ function buildPayload(){
 // ── 즉시 저장 (백그라운드 진입 시 호출) ──
 function saveNow(){
   gsSaveAll(buildPayload().data)
-    .then(res => {
-      // 저장 응답에 최신 데이터 포함돼 있으면 바로 반영
-      if(res && res.ok && res.data){ applyGSData(res.data); renderAll(); }
-      setSyncStatus('saved');
-    })
-    .catch(()=>setSyncStatus('error'));
+    .then(()=> setSyncStatus('saved'))
+    .catch(()=> setSyncStatus('error'));
 }
 
 // ── visibilitychange: 백그라운드 진입 시 즉시 저장 ──
@@ -3434,23 +3441,15 @@ let _saveTimer = null;
 function save(){
   setSyncStatus('saving');
   clearTimeout(_saveTimer);
-  // 저장 직전 items 스냅샷 (서버 응답이 로컬 변경을 덮어쓰는 것 방지)
-  const _snapItems = JSON.parse(JSON.stringify(D.items));
   _saveTimer = setTimeout(async ()=>{
     try{
-      const res = await gsSaveAll(buildPayload().data);
-      if(res && res.ok && res.data){
-        applyGSData(res.data);
-        // misc/projects 등은 서버 최신값 유지, items는 스냅샷(로컬 최신) 우선
-        D.items = _snapItems;
-        renderAll();
-      }
+      await gsSaveAll(buildPayload().data);
       setSyncStatus('saved');
     } catch(e){
       console.warn('[Sync] 저장 실패:', e);
       setSyncStatus('error');
     }
-  }, 800);
+  }, 300);
 }
 
 // ── 구글 시트에서 불러오기 ──
@@ -3494,6 +3493,22 @@ function dk(d){ return d.getFullYear()+'-'+S2(d.getMonth()+1)+'-'+S2(d.getDate()
 function S2(n){ return String(n).padStart(2,'0'); }
 function fromDk(k){ const[y,m,d]=k.split('-').map(Number); return new Date(y,m-1,d); }
 function sameDay(a,b){ return a.getTime()===b.getTime(); }
+// 타임스탬프(ms) → '26년 3월 2일' 형태 표시용
+function koDate(ts){
+  const d = new Date(typeof ts === 'string' ? ts : Number(ts));
+  if(isNaN(d.getTime())) return '';
+  return String(d.getFullYear()).slice(2)+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일';
+}
+// 오늘/어제/N일전 등 상대 표시
+function koDateSmart(ts){
+  const d = new Date(typeof ts === 'string' ? ts : Number(ts));
+  if(isNaN(d.getTime())) return '';
+  const now = new Date(); now.setHours(0,0,0,0);
+  const diff = Math.floor((now - new Date(d.getFullYear(),d.getMonth(),d.getDate())) / 86400000);
+  if(diff === 0) return '오늘';
+  if(diff === 1) return '어제';
+  return String(d.getFullYear()).slice(2)+'년 '+(d.getMonth()+1)+'월 '+d.getDate()+'일';
+}
 
 // Monday of the week containing `d`
 function monOfWeek(d){
@@ -3554,6 +3569,9 @@ function switchTaskTab(view, btn){
   if(view==='calendar') renderCal();
   if(view==='weekly') renderWeeklyView();
   if(view==='projects') renderProjs();
+  // URL hash 업데이트
+  const newHash = '#task:' + view;
+  if(location.hash !== newHash) history.pushState(null,'', newHash);
 }
 
 // Archive 통합 탭 전환
@@ -3567,6 +3585,9 @@ function switchArchiveTab(tab, btn){
   if(tab==='note') renderArchivingInTab();
   if(tab==='memo') renderMemoPad();
   if(tab==='minutes') renderMinutesInTab();
+  // URL hash 업데이트
+  const newHash = '#archive:' + tab;
+  if(location.hash !== newHash) history.pushState(null,'', newHash);
 }
 
 // Note 탭 렌더 (archiving 콘텐츠를 archive-tab-note에 동적 삽입)
@@ -3575,7 +3596,7 @@ function renderArchivingInTab(){
   if(!wrap) return;
   if(!wrap.dataset.init){
     wrap.innerHTML = `
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+      <div id="ac-toolbar" style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
         <div id="ac-type-toggle" style="display:flex;border:1.5px solid var(--rose-light);border-radius:var(--rs);overflow:hidden;flex-shrink:0;">
           <button class="ac-toggle-btn on" data-at="all">전체</button>
           <button class="ac-toggle-btn" data-at="work">💼 업무</button>
@@ -3596,8 +3617,8 @@ function renderArchivingInTab(){
           <option value="date-asc">오래된순</option>
           <option value="title">제목순</option>
         </select>
-        <div style="flex:1;"></div>
-        <button class="btn btn-p" onclick="openArchivingModal()" style="flex-shrink:0;"><i class="fa-solid fa-plus"></i> 새 노트</button>
+        <input type="text" id="ac-search" class="fi" placeholder="🔍 노트 검색..." style="flex:1;min-width:120px;font-size:12px;" oninput="renderArchivingPage()">
+        <button id="ac-new-btn" class="btn btn-p" onclick="openArchivingModal()" style="flex-shrink:0;"><i class="fa-solid fa-plus"></i> 새 노트</button>
       </div>
       <div style="display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start;">
         <div id="ac-list" style="display:flex;flex-direction:column;gap:8px;"></div>
@@ -3644,28 +3665,40 @@ function renderMinutesInTab(){
 }
 
 // 페이지 전환 함수 (hash 동기화 포함)
+// hash 형식: #page 또는 #page:subtab
 function navigateTo(pg){
-  // 하위 탭 별칭 처리
+  // subtab 파싱 (예: "task:projects", "archive:minutes", "weeklyrpt:periodic")
+  let subtab = null;
+  if(pg && pg.includes(':')){
+    const parts = pg.split(':');
+    pg = parts[0];
+    subtab = parts[1];
+  }
+
+  // 하위 탭 별칭 처리 (subtab 없이 단독으로 올 때)
   const aliasMap = { calendar: 'task', projects: 'task', weekly: 'task', minutes: 'archive', archiving: 'archive' };
   const validPages = ['dashboard','task','archive','weeklyrpt'];
-  const navPg = aliasMap[pg] || pg;
-  if(!validPages.includes(navPg)) { pg = 'dashboard'; }
-  const finalPg = aliasMap[pg] || pg;
+  if(!subtab && aliasMap[pg]){
+    subtab = pg; // e.g. pg='projects' → subtab='projects', pg='task'
+    pg = aliasMap[pg];
+  }
+  if(!validPages.includes(pg)) { pg = 'dashboard'; subtab = null; }
 
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.page').forEach(p=>{ if(p.id !== 'p-archiving') p.classList.remove('active'); });
-  const btn = document.querySelector(`.nav-btn[data-page="${finalPg}"]`);
+  const btn = document.querySelector(`.nav-btn[data-page="${pg}"]`);
   if(btn) btn.classList.add('active');
-  const pageEl = document.getElementById('p-'+finalPg);
+  const pageEl = document.getElementById('p-'+pg);
   if(pageEl) pageEl.classList.add('active');
   const topTitle = document.getElementById('topbar-title');
-  if(topTitle) topTitle.textContent = PAGE_TITLES[finalPg] || finalPg;
+  if(topTitle) topTitle.textContent = PAGE_TITLES[pg] || pg;
 
-  if(finalPg==='dashboard') renderDash();
-  if(finalPg==='task'){
+  if(pg==='dashboard') renderDash();
+  if(pg==='task'){
     // task 하위 탭 결정
-    if(pg==='projects') switchTaskTab('projects', document.getElementById('task-tab-proj'));
-    else if(pg==='weekly') switchTaskTab('weekly', document.getElementById('task-tab-weekly'));
+    if(subtab==='projects') switchTaskTab('projects', document.getElementById('task-tab-proj'));
+    else if(subtab==='weekly') switchTaskTab('weekly', document.getElementById('task-tab-weekly'));
+    else if(subtab==='calendar') switchTaskTab('calendar', document.getElementById('task-tab-cal'));
     else {
       // 기본 탭: 480px 이하 폰만 위클리, 아이패드/데스크탑은 캘린더
       const isMobilePhone = window.innerWidth <= 480;
@@ -3676,13 +3709,20 @@ function navigateTo(pg){
       switchTaskTab(defaultTab, defaultBtn);
     }
   }
-  if(finalPg==='archive'){
-    if(pg==='archiving') switchArchiveTab('note', document.querySelector('[data-atab="note"]'));
-    else if(pg==='minutes') switchArchiveTab('minutes', document.querySelector('[data-atab="minutes"]'));
+  if(pg==='archive'){
+    if(subtab==='note' || subtab==='archiving') switchArchiveTab('note', document.querySelector('[data-atab="note"]'));
+    else if(subtab==='minutes') switchArchiveTab('minutes', document.querySelector('[data-atab="minutes"]'));
+    else if(subtab==='system') switchArchiveTab('system', document.querySelector('[data-atab="system"]'));
+    else if(subtab==='contacts') switchArchiveTab('contacts', document.querySelector('[data-atab="contacts"]'));
     else switchArchiveTab('memo', document.querySelector('[data-atab="memo"]'));
   }
-  if(finalPg==='weeklyrpt'){
+  if(pg==='weeklyrpt'){
     renderWeeklyRptPage(); renderGoalList(); applySymSettings();
+    if(subtab==='periodic') {
+      setTimeout(()=>switchRptTab('periodic', document.querySelector('#p-weeklyrpt .arch-tab:nth-child(2)')), 50);
+    } else if(subtab==='weekly') {
+      setTimeout(()=>switchRptTab('weekly', document.querySelector('#p-weeklyrpt .arch-tab:nth-child(1)')), 50);
+    }
   }
   // AI 버튼: 항상 표시 (CSS 미디어쿼리로 제어, inline style 초기화만)
   const mobileAiBtn = document.getElementById('mobile-ai-btn');
@@ -3690,7 +3730,8 @@ function navigateTo(pg){
   if(mobileAiBtn) mobileAiBtn.style.display = '';
   if(mobileKeyBtn) mobileKeyBtn.style.display = 'none';
   // hash 업데이트 (popstate 루프 방지)
-  if(location.hash !== '#'+pg) history.pushState(null,'','#'+pg);
+  const newHash = '#' + pg + (subtab ? ':'+subtab : '');
+  if(location.hash !== newHash) history.pushState(null,'', newHash);
 }
 
 document.querySelectorAll('.nav-btn').forEach(btn=>{
@@ -3916,7 +3957,7 @@ function setStatusWv(key,idx,st){
   if(!D.items[key]||!D.items[key][idx]) return;
   const it=D.items[key][idx];
   it.status = it.status===st?'active':st;
-  if(it.status==='done') it.doneAt=new Date().toISOString();
+  if(it.status==='done') it.doneAt=Date.now();
   save(); renderWeeklyView(); renderDash();
 }
 
@@ -4247,7 +4288,7 @@ function setStatus(key,idx,st){
   if(!D.items[key]||!D.items[key][idx]) return;
   const it=D.items[key][idx];
   it.status= it.status===st?'active':st;
-  if(it.status==='done') it.doneAt=new Date().toISOString();
+  if(it.status==='done') it.doneAt=Date.now();
   save(); renderCal(); renderWeeklyView(); renderDash();
 }
 
@@ -6787,6 +6828,9 @@ function switchRptTab(tab, btn){
   if(btn) btn.classList.add('on');
   if(tab==='periodic'){ renderGoalList(); applySymSettings(); }
   if(tab==='weekly'){ renderWeeklyRptPage(); renderGoalList(); applySymSettings(); }
+  // URL hash 업데이트
+  const newHash = '#weeklyrpt:' + tab;
+  if(location.hash !== newHash) history.pushState(null,'', newHash);
 }
 
 // ══ 기호 설정 ══
@@ -7172,7 +7216,7 @@ function saveManualRpt(){
     label,
     thisText: document.getElementById('mrpt-this').value.trim(),
     nextText: document.getElementById('mrpt-next').value.trim(),
-    savedAt: new Date().toISOString(),
+    savedAt: Date.now(),
     manual: true
   };
   D.weeklyReports.push(snap);
@@ -7204,7 +7248,7 @@ function saveWeeklySnapshot(){
     label:`${month}월 ${wn}주차`,
     thisText: buildReportText(thisMon,'이번 주'),
     nextText: buildReportText(nextMon,'다음 주'),
-    savedAt: new Date().toISOString()
+    savedAt: Date.now()
   };
   D.weeklyReports.unshift(snap);
   save();
@@ -7222,9 +7266,8 @@ function renderWeeklyRptPage(){
     D.weeklyReports.forEach(r=>{
       const item=document.createElement('div');
       item.className='rpt-week-item'+(r.id===selRptId?' sel':'');
-      const saved=new Date(r.savedAt);
       item.innerHTML=`
-        <span>${r.label}${r.manual?` <span style="font-size:9px;background:#EDE5D8;color:#8A6A40;padding:1px 5px;border-radius:3px;">수기</span>`:''} <span style="font-size:10px;opacity:.7">${saved.getMonth()+1}/${saved.getDate()} 저장</span></span>
+        <span>${r.label}${r.manual?` <span style="font-size:9px;background:#EDE5D8;color:#8A6A40;padding:1px 5px;border-radius:3px;">수기</span>`:''}</span>
         <button class="rpt-del" onclick="event.stopPropagation();delRpt('${r.id}')" title="삭제"><i class="fa-solid fa-xmark"></i></button>
       `;
       item.onclick=()=>{ selRptId=r.id; renderWeeklyRptPage(); showRptDetail(r.id); };
@@ -7266,7 +7309,7 @@ function showRptDetail(id){
         return `<div class="rpt-task-row"><span class="rpt-dash">-</span><span class="rpt-task-name">${name}</span>${dateStr}</div>`;
       }
       if(!line.trim()) return '<div style="height:8px"></div>';
-      return `<div style="font-size:12px;font-weight:700;color:var(--rose-mid);margin-bottom:6px;margin-top:2px">${line}</div>`;
+      return `<div style="font-size:12px;font-weight:700;color:var(--ink-mid);margin-bottom:6px;margin-top:2px">${line}</div>`;
     }).join('');
   }
 
@@ -7276,27 +7319,58 @@ function showRptDetail(id){
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div>
         <div class="page-title" style="font-size:20px">${r.label} 업무 보고서</div>
-        <div class="page-sub">${saved.toLocaleDateString('ko-KR',{year:'numeric',month:'long',day:'numeric'})} 저장</div>
       </div>
       <button class="cal-btn" onclick="copyRpt('${id}')"><i class="fa-regular fa-copy"></i> 복사</button>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
-      <div class="report-card">
-        <div class="report-card-head">
+      <div class="report-card" id="rpt-card-this">
+        <div class="report-card-head" style="cursor:pointer;" onclick="startEditRptCard('${id}','this')" title="클릭하여 수정">
           <div class="report-card-week">${r.thisText.split('\n')[0]}</div>
-          <div class="report-card-label">This Week</div>
+          <div class="report-card-label">This Week <i class="fa-solid fa-pen" style="font-size:9px;opacity:.5;margin-left:4px;"></i></div>
         </div>
-        <div class="report-card-body">${textToHtml(r.thisText.split('\n').slice(1).join('\n'))}</div>
+        <div class="report-card-body" id="rpt-body-this" style="cursor:pointer;" onclick="startEditRptCard('${id}','this')" title="클릭하여 수정">${textToHtml(r.thisText.split('\n').slice(1).join('\n'))}</div>
       </div>
-      <div class="report-card">
-        <div class="report-card-head">
+      <div class="report-card" id="rpt-card-next">
+        <div class="report-card-head" style="cursor:pointer;" onclick="startEditRptCard('${id}','next')" title="클릭하여 수정">
           <div class="report-card-week">${r.nextText.split('\n')[0]}</div>
-          <div class="report-card-label">Next</div>
+          <div class="report-card-label">Next <i class="fa-solid fa-pen" style="font-size:9px;opacity:.5;margin-left:4px;"></i></div>
         </div>
-        <div class="report-card-body">${textToHtml(r.nextText.split('\n').slice(1).join('\n'))}</div>
+        <div class="report-card-body" id="rpt-body-next" style="cursor:pointer;" onclick="startEditRptCard('${id}','next')" title="클릭하여 수정">${textToHtml(r.nextText.split('\n').slice(1).join('\n'))}</div>
       </div>
     </div>
   `;
+}
+
+function startEditRptCard(id, which){
+  const r=D.weeklyReports.find(x=>x.id===id); if(!r) return;
+  const cardId='rpt-card-'+which;
+  const card=document.getElementById(cardId); if(!card) return;
+  const currentText = which==='this' ? r.thisText : r.nextText;
+  card.innerHTML=`
+    <div style="padding:12px 14px 10px;">
+      <textarea id="rpt-edit-ta-${which}" style="width:100%;min-height:200px;font-size:12.5px;line-height:1.75;font-family:inherit;border:1.5px solid var(--rose-light);border-radius:var(--rs);padding:10px 12px;resize:vertical;outline:none;color:var(--ink);" spellcheck="false">${escHtml(currentText)}</textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;justify-content:flex-end;">
+        <button onclick="cancelEditRptCard('${id}')" style="padding:6px 14px;border:1.5px solid var(--gray);border-radius:8px;background:var(--white);font-size:11px;font-weight:600;color:var(--ink-mid);cursor:pointer;font-family:inherit;">취소</button>
+        <button onclick="saveEditRptCard('${id}','${which}')" style="padding:6px 14px;border:none;border-radius:8px;background:var(--rose-mid);color:white;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;"><i class='fa-solid fa-check'></i> 저장</button>
+      </div>
+    </div>`;
+  const ta = document.getElementById('rpt-edit-ta-'+which);
+  if(ta){ ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); }
+}
+
+function saveEditRptCard(id, which){
+  const r=D.weeklyReports.find(x=>x.id===id); if(!r) return;
+  const ta=document.getElementById('rpt-edit-ta-'+which); if(!ta) return;
+  const newText=ta.value;
+  if(which==='this') r.thisText=newText;
+  else r.nextText=newText;
+  r.savedAt=Date.now();
+  save();
+  showRptDetail(id);
+}
+
+function cancelEditRptCard(id){
+  showRptDetail(id);
 }
 
 function copyRpt(id){
@@ -7917,6 +7991,7 @@ function makePlannerDrag(block, it){
       if(idx>-1){
         D.items[key][idx].startTime=minsToTm(newSm);
         D.items[key][idx].endTime=minsToTm(newSm+dur);
+        D.items[key][idx].allDay=false; // 타임라인 배치 시 allDay 해제
         save(); renderPlanner(); renderCal();
       }
       document.removeEventListener('mousemove',onMove);
@@ -9416,7 +9491,7 @@ function saveArchiving(){
     memo: document.getElementById('ac-memo').value.trim(),
     links: getAcLinks(),
     images: acImgFiles,
-    createdAt: existing?.createdAt || new Date().toISOString()
+    createdAt: existing?.createdAt || Date.now()
   };
   if(!D.archiving) D.archiving=[];
   if(editAcId){ const i=D.archiving.findIndex(x=>x.id===editAcId); if(i>-1) D.archiving[i]=obj; else D.archiving.unshift(obj); }
@@ -9435,6 +9510,8 @@ function getFilteredAc(){
   let list=(D.archiving||[]).slice();
   if(acTypeFilter!=='all') list=list.filter(ac=>ac.type===acTypeFilter);
   if(acProjFilter) list=list.filter(ac=>ac.project===acProjFilter);
+  const q=(document.getElementById('ac-search')?.value||'').trim().toLowerCase();
+  if(q) list=list.filter(ac=>(ac.title||'').toLowerCase().includes(q)||(ac.memo||'').toLowerCase().includes(q));
   const sort=document.getElementById('ac-sort')?.value||'date-desc';
   if(sort==='date-desc') list.sort((a,b)=>(b.date||b.createdAt).localeCompare(a.date||a.createdAt));
   else if(sort==='date-asc') list.sort((a,b)=>(a.date||a.createdAt).localeCompare(b.date||b.createdAt));
@@ -9479,16 +9556,15 @@ function renderArchivingPage(){
 function showAcDetail(id){
   const ac=(D.archiving||[]).find(x=>x.id===id);
   if(!ac) return;
-  // ac-empty / ac-detail 은 p-archiving 또는 archive-tab-note 어디에든 있을 수 있음
   ['ac-empty'].forEach(eid=>{ const el=document.getElementById(eid); if(el) el.style.display='none'; });
   const det=document.getElementById('ac-detail');
   if(!det) return;
   det.style.display='block';
-  // 모바일: 목록 숨기고 상세 표시 (p-archiving + archive-tab-note 모두 처리)
   document.getElementById('p-archiving')?.classList.add('detail-open');
   document.getElementById('archive-tab-note')?.classList.add('detail-open');
   const d=new Date(ac.date||ac.createdAt);
   const dateStr=`${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
+  const TYPE_LBL = {work:'💼 업무',personal:'🌿 개인',study:'📚 스터디',idea:'💡 아이디어'};
   const linksHtml=(ac.links||[]).filter(lk=>lk.url).map(lk=>`
     <a class="ac-link-btn" href="${escHtml(lk.url)}" target="_blank" rel="noopener">
       <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px;"></i> ${escHtml(lk.label||lk.url.slice(0,24)+'…')}
@@ -9505,24 +9581,31 @@ function showAcDetail(id){
           </div>
         </div>
         <div class="ac-detail-meta">
-          <span><i class="fa-regular fa-calendar" style="color:var(--rose);"></i> ${dateStr}</span>
-          <span>${{work:'💼 업무',personal:'🌿 개인',study:'📚 스터디',idea:'💡 아이디어'}[ac.type]||'💼 업무'}</span>
-          ${ac.project?`<span><i class="fa-solid fa-folder" style="color:var(--rose);"></i> ${escHtml(ac.project)}</span>`:''}
+          <span><i class="fa-regular fa-calendar" style="color:var(--rose);font-size:10px;"></i> ${dateStr}</span>
+          <span>${TYPE_LBL[ac.type]||'💼 업무'}</span>
+          ${ac.project?`<span><i class="fa-solid fa-folder" style="color:var(--rose);font-size:10px;"></i> ${escHtml(ac.project)}</span>`:''}
         </div>
       </div>
-      ${ac.memo?`<div class="ac-detail-memo">${escHtml(ac.memo)}</div>`:'<div style="font-size:12px;color:var(--ink-soft);margin-bottom:16px;">메모 없음</div>'}
-      ${(ac.images&&ac.images.length)?`
-      <div style="margin-bottom:16px;">
-        <div style="font-size:10px;font-weight:700;color:var(--ink-soft);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">이미지 (${ac.images.length})</div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          ${ac.images.map(src=>`<div class="min-img-thumb"><img src="${src}" onclick="openImgFull('${src}')"></div>`).join('')}
+      <div class="ac-detail-body">
+        ${ac.memo?`<div class="ac-detail-memo">${escHtml(ac.memo)}</div>`:'<div style="font-size:12px;color:var(--ink-soft);">메모 없음</div>'}
+        ${(ac.images&&ac.images.length)?`
+        <div style="margin-top:18px;">
+          <div class="min-section-title"><i class="fa-regular fa-image"></i> 이미지 (${ac.images.length})</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            ${ac.images.map(src=>`<div class="min-img-thumb"><img src="${src}" onclick="openImgFull('${src}')"></div>`).join('')}
+          </div>
+        </div>`:''}
+        ${linksHtml?`
+        <div style="margin-top:18px;">
+          <div class="min-section-title"><i class="fa-solid fa-link"></i> 링크</div>
+          <div class="ac-links">${linksHtml}</div>
+        </div>`:''}
+        <div class="min-detail-actions" style="padding:14px 0 0;border-top:1px solid #EFEFEF;margin-top:18px;">
+          <button class="btn btn-g" onclick="openArchivingModal('${ac.id}')"><i class="fa-solid fa-pen"></i> 수정</button>
         </div>
-      </div>`:''}
-      ${linksHtml?`<div><div style="font-size:10px;font-weight:700;color:var(--ink-soft);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">링크</div><div class="ac-links">${linksHtml}</div></div>`:''}
-      <div style="margin-top:18px;display:flex;justify-content:flex-end;">
-        <button class="btn btn-g" onclick="openArchivingModal('${ac.id}')"><i class="fa-solid fa-pen"></i> 수정</button>
       </div>
     </div>`;
+}
 }
 
 function closeAcDetail(){
