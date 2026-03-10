@@ -1362,6 +1362,33 @@ main.main{display:block;}
 .ac-tag.study{background:#E8EEF5;color:#8FA8C0;}
 .ac-tag.idea{background:#F5EEE0;color:#C0A070;}
 .ac-tag.proj{background:#EBF0F5;color:#8FA8C0;}
+/* 노트 폴더 뷰 */
+.ac-folder-row{
+  padding:11px 14px;border-radius:var(--rs);border:1.5px solid var(--rose-light);
+  background:var(--white);cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;gap:10px;
+}
+.ac-folder-row:hover{border-color:var(--rose);background:var(--rose-pale);}
+.ac-folder-row.open{border-color:var(--rose-mid);background:var(--rose-pale);}
+.ac-folder-name{font-size:13px;font-weight:700;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ac-folder-count{font-size:10px;font-weight:600;color:var(--rose-mid);background:var(--rose-pale);padding:2px 7px;border-radius:50px;flex-shrink:0;}
+.ac-folder-children{display:flex;flex-direction:column;gap:4px;margin-top:5px;padding-left:14px;border-left:2px solid var(--rose-light);}
+.ac-folder-child{
+  padding:8px 12px;border-radius:var(--rs);border:1px solid var(--gray);
+  background:#FAFAFA;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;gap:8px;
+}
+.ac-folder-child:hover{border-color:var(--rose-light);background:var(--rose-pale);}
+.ac-folder-child.sel{border-color:var(--rose);background:var(--rose-pale);border-left:3px solid var(--rose-mid);}
+.ac-folder-child-title{font-size:12px;font-weight:600;color:var(--ink);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ac-folder-child-date{font-size:9px;color:var(--ink-soft);flex-shrink:0;}
+/* 필터 모드 노트 행 (폴더 없는 뷰) */
+.ac-no-folder-row{
+  padding:9px 13px;border-radius:var(--rs);border:1px solid var(--gray);
+  background:#FAFAFA;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:3px;
+}
+.ac-no-folder-row:hover{border-color:var(--rose-light);background:var(--rose-pale);}
+.ac-no-folder-row.sel{border-color:var(--rose);background:var(--rose-pale);border-left:3px solid var(--rose-mid);}
 /* 상세 패널 — 미팅과 동일 구조 */
 .ac-detail-card{
   background:var(--white);border:1px solid #EFEFEF;border-radius:14px;
@@ -3811,6 +3838,7 @@ function renderArchivingInTab(){
         b.classList.add('on');
         acTypeFilter = b.dataset.at || 'all';
         acProjFilter = '';
+        selFolderProj = null;
         const projLabel = document.getElementById('ac-proj-label');
         if(projLabel) projLabel.textContent = '전체 보기';
         renderAcProjDrop();
@@ -9743,6 +9771,7 @@ document.getElementById('ac-type-toggle').querySelectorAll('.ac-toggle-btn').for
     btn.classList.add('on');
     acTypeFilter = btn.dataset.at;
     acProjFilter = '';
+    selFolderProj = null;
     renderAcProjDrop();
     renderArchivingPage();
   };
@@ -9762,13 +9791,13 @@ function renderAcProjDrop(){
   drop.innerHTML='';
   const allOpt=document.createElement('div'); allOpt.className='ac-proj-opt';
   allOpt.innerHTML=`<i class="fa-solid fa-layer-group" style="color:var(--rose-mid);font-size:10px;"></i> 전체 보기`;
-  allOpt.onclick=()=>{ acProjFilter=''; document.getElementById('ac-proj-label').textContent='전체 보기'; drop.style.display='none'; renderArchivingPage(); };
+  allOpt.onclick=()=>{ acProjFilter=''; selFolderProj=null; document.getElementById('ac-proj-label').textContent='전체 보기'; drop.style.display='none'; renderArchivingPage(); };
   drop.appendChild(allOpt);
   if(projs.length){ const dv=document.createElement('div'); dv.style.cssText='height:1px;background:var(--gray);margin:2px 0;'; drop.appendChild(dv); }
   projs.forEach(p=>{
     const opt=document.createElement('div'); opt.className='ac-proj-opt';
     opt.innerHTML=`<i class="fa-solid fa-folder" style="color:var(--rose-mid);font-size:10px;"></i> ${escHtml(p)}`;
-    opt.onclick=()=>{ acProjFilter=p; document.getElementById('ac-proj-label').textContent=p; drop.style.display='none'; renderArchivingPage(); };
+    opt.onclick=()=>{ acProjFilter=p; selFolderProj=p; document.getElementById('ac-proj-label').textContent=p; drop.style.display='none'; renderArchivingPage(); };
     drop.appendChild(opt);
   });
 }
@@ -9968,6 +9997,8 @@ function saveArchiving(){
   if(!D.archiving) D.archiving=[];
   if(editAcId){ const i=D.archiving.findIndex(x=>x.id===editAcId); if(i>-1) D.archiving[i]=obj; else D.archiving.unshift(obj); }
   else { D.archiving.unshift(obj); selAcId=obj.id; }
+  // 저장한 노트의 프로젝트 폴더 자동 열기
+  if(obj.project){ selFolderProj=obj.project; acProjFilter=''; acTypeFilter='all'; }
   save(); closeArchivingModal(); renderArchivingPage(); showAcDetail(obj.id);
 }
 
@@ -9991,37 +10022,132 @@ function getFilteredAc(){
   return list;
 }
 
+let selFolderProj = null; // 현재 열린 폴더 프로젝트명 (null = 모두 접힘)
+
 function renderArchivingPage(){
-  const listEl=document.getElementById('ac-list');
+  const listEl = document.getElementById('ac-list');
   if(!listEl) return;
   renderAcProjDrop();
-  const list=getFilteredAc();
-  listEl.innerHTML='';
-  if(!list.length){
-    listEl.innerHTML='<div class="empty-state" style="padding:24px"><i class="fa-regular fa-note-sticky"></i>노트가 없습니다</div>';
+  listEl.innerHTML = '';
+
+  const AC_TYPE_LBL = {work:'💼 업무', personal:'🌿 개인', study:'📚 스터디', idea:'💡 아이디어'};
+  const typeIcon = {work:'📁', personal:'🌿', study:'📚', idea:'💡'};
+
+  // 필터 상태: 타입 필터나 프로젝트 직접 선택이 있으면 → 목록 직접 표시 (폴더 없음)
+  const isFiltered = (acTypeFilter && acTypeFilter !== 'all') || !!acProjFilter;
+
+  if(isFiltered){
+    // ── 필터 모드: 해당 조건 노트를 목록으로 바로 표시 ──
+    const list = getFilteredAc();
+    if(!list.length){
+      listEl.innerHTML = '<div class="empty-state" style="padding:24px"><i class="fa-regular fa-note-sticky"></i>노트가 없습니다</div>';
+      return;
+    }
+    list.forEach(ac=>{
+      const d = new Date(ac.date||ac.createdAt);
+      const dateStr = `${d.getMonth()+1}.${String(d.getDate()).padStart(2,'0')}`;
+      const row = document.createElement('div');
+      row.className = 'ac-no-folder-row' + (ac.id===selAcId?' sel':'');
+      row.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+          <span style="font-size:12px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">${escHtml(ac.title)}</span>
+          <span style="font-size:9px;color:var(--ink-soft);flex-shrink:0;">${dateStr}</span>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;">
+          <span class="ac-tag ${ac.type||'work'}">${AC_TYPE_LBL[ac.type]||'💼 업무'}</span>
+          ${ac.project?`<span class="ac-tag proj"><i class="fa-solid fa-folder" style="font-size:7px;"></i> ${escHtml(ac.project)}</span>`:''}
+        </div>`;
+      row.onclick = ()=>{ selAcId=ac.id; renderArchivingPage(); showAcDetail(ac.id); };
+      listEl.appendChild(row);
+    });
+    if(selAcId) showAcDetail(selAcId);
     return;
   }
-  const AC_TYPE_LBL = {work:'💼 업무', personal:'🌿 개인', study:'📚 스터디', idea:'💡 아이디어'};
-  const AC_TYPE_CLS = {work:'work', personal:'personal', study:'study', idea:'idea'};
-  list.forEach(ac=>{
-    const d=new Date(ac.date||ac.createdAt);
-    const dateStr=`${d.getMonth()+1}.${String(d.getDate()).padStart(2,'0')}`;
-    const row=document.createElement('div');
-    row.className='ac-row'+(ac.id===selAcId?' sel':'');
-    const typeLbl = AC_TYPE_LBL[ac.type]||'💼 업무';
-    row.innerHTML=`
-      <div class="ac-row-top">
-        <span class="ac-row-title">${escHtml(ac.title)}</span>
-        <span class="ac-row-date">${dateStr}</span>
-      </div>
-      <div class="ac-row-bottom">
-        <span class="ac-tag ${ac.type||'work'}">${typeLbl}</span>
-        ${ac.project?`<span class="ac-tag proj"><i class="fa-solid fa-folder" style="font-size:8px;"></i> ${escHtml(ac.project)}</span>`:''}
-        ${(ac.links||[]).filter(l=>l.url).length?`<span class="ac-tag" style="background:#EEF0F5;color:#8090A8;"><i class="fa-solid fa-link" style="font-size:8px;"></i> 링크 ${(ac.links||[]).filter(l=>l.url).length}</span>`:''}
-      </div>`;
-    row.onclick=()=>{ selAcId=ac.id; renderArchivingPage(); showAcDetail(ac.id); };
-    listEl.appendChild(row);
+
+  // ── 폴더 모드: 프로젝트별 폴더 + 프로젝트 없는 노트 ──
+  const all = getFilteredAc(); // 전체 (필터 없음이므로 전부)
+  if(!all.length){
+    listEl.innerHTML = '<div class="empty-state" style="padding:24px"><i class="fa-regular fa-note-sticky"></i>노트가 없습니다</div>';
+    return;
+  }
+
+  // 프로젝트 있는 것 → 폴더로 묶기
+  const folderMap = new Map(); // projName → [ac...]
+  const noProj = [];
+  all.forEach(ac=>{
+    if(ac.project){
+      if(!folderMap.has(ac.project)) folderMap.set(ac.project, []);
+      folderMap.get(ac.project).push(ac);
+    } else {
+      noProj.push(ac);
+    }
   });
+
+  // 폴더 렌더
+  folderMap.forEach((notes, projName)=>{
+    const isOpen = selFolderProj === projName;
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'display:flex;flex-direction:column;gap:0;';
+
+    const folderRow = document.createElement('div');
+    folderRow.className = 'ac-folder-row' + (isOpen?' open':'');
+    folderRow.innerHTML = `
+      <span style="font-size:15px;">${isOpen?'📂':'📁'}</span>
+      <span class="ac-folder-name">${escHtml(projName)}</span>
+      <span class="ac-folder-count">${notes.length}</span>
+      <i class="fa-solid fa-chevron-${isOpen?'up':'down'}" style="font-size:9px;color:var(--ink-soft);flex-shrink:0;"></i>`;
+    folderRow.onclick = ()=>{
+      selFolderProj = isOpen ? null : projName;
+      renderArchivingPage();
+    };
+    wrapper.appendChild(folderRow);
+
+    if(isOpen){
+      const children = document.createElement('div');
+      children.className = 'ac-folder-children';
+      notes.forEach(ac=>{
+        const d = new Date(ac.date||ac.createdAt);
+        const dateStr = `${d.getMonth()+1}.${String(d.getDate()).padStart(2,'0')}`;
+        const child = document.createElement('div');
+        child.className = 'ac-folder-child' + (ac.id===selAcId?' sel':'');
+        child.innerHTML = `
+          <span class="ac-tag ${ac.type||'work'}" style="flex-shrink:0;">${typeIcon[ac.type]||'📋'}</span>
+          <span class="ac-folder-child-title">${escHtml(ac.title)}</span>
+          <span class="ac-folder-child-date">${dateStr}</span>`;
+        child.onclick = e=>{ e.stopPropagation(); selAcId=ac.id; renderArchivingPage(); showAcDetail(ac.id); };
+        children.appendChild(child);
+      });
+      wrapper.appendChild(children);
+    }
+    listEl.appendChild(wrapper);
+  });
+
+  // 프로젝트 없는 노트 (폴더 없음 섹션)
+  if(noProj.length){
+    if(folderMap.size > 0){
+      const sep = document.createElement('div');
+      sep.style.cssText = 'font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);padding:10px 2px 4px;';
+      sep.textContent = '📄 분류 없음';
+      listEl.appendChild(sep);
+    }
+    noProj.forEach(ac=>{
+      const d = new Date(ac.date||ac.createdAt);
+      const dateStr = `${d.getMonth()+1}.${String(d.getDate()).padStart(2,'0')}`;
+      const row = document.createElement('div');
+      row.className = 'ac-no-folder-row' + (ac.id===selAcId?' sel':'');
+      row.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:6px;">
+          <span style="font-size:12px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;">${escHtml(ac.title)}</span>
+          <span style="font-size:9px;color:var(--ink-soft);flex-shrink:0;">${dateStr}</span>
+        </div>
+        <div style="display:flex;gap:4px;margin-top:2px;">
+          <span class="ac-tag ${ac.type||'work'}">${AC_TYPE_LBL[ac.type]||'💼 업무'}</span>
+        </div>`;
+      row.onclick = ()=>{ selAcId=ac.id; renderArchivingPage(); showAcDetail(ac.id); };
+      listEl.appendChild(row);
+    });
+  }
+
   if(selAcId) showAcDetail(selAcId);
 }
 
