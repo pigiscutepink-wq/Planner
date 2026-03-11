@@ -3838,7 +3838,6 @@ function renderArchivingInTab(){
         b.classList.add('on');
         acTypeFilter = b.dataset.at || 'all';
         acProjFilter = '';
-        selFolderProj = null;
         const projLabel = document.getElementById('ac-proj-label');
         if(projLabel) projLabel.textContent = '전체 보기';
         renderAcProjDrop();
@@ -9771,7 +9770,6 @@ document.getElementById('ac-type-toggle').querySelectorAll('.ac-toggle-btn').for
     btn.classList.add('on');
     acTypeFilter = btn.dataset.at;
     acProjFilter = '';
-    selFolderProj = null;
     renderAcProjDrop();
     renderArchivingPage();
   };
@@ -10031,18 +10029,24 @@ function renderArchivingPage(){
   listEl.innerHTML = '';
 
   const AC_TYPE_LBL = {work:'💼 업무', personal:'🌿 개인', study:'📚 스터디', idea:'💡 아이디어'};
-  const typeIcon = {work:'📁', personal:'🌿', study:'📚', idea:'💡'};
+  const typeIcon = {work:'💼', personal:'🌿', study:'📚', idea:'💡'};
 
-  // 필터 상태: 타입 필터나 프로젝트 직접 선택이 있으면 → 목록 직접 표시 (폴더 없음)
-  const isFiltered = (acTypeFilter && acTypeFilter !== 'all') || !!acProjFilter;
+  // 프로젝트 직접 선택 시에만 → 해당 노트 목록 직접 표시 (폴더 없음)
+  // 타입 필터는 폴더 모드 유지 (해당 타입 노트들의 프로젝트 폴더로 표시)
+  const isProjFiltered = !!acProjFilter;
 
-  if(isFiltered){
-    // ── 필터 모드: 해당 조건 노트를 목록으로 바로 표시 ──
+  if(isProjFiltered){
+    // ── 프로젝트 직접 선택: 해당 프로젝트 노트만 목록으로 표시 ──
     const list = getFilteredAc();
     if(!list.length){
       listEl.innerHTML = '<div class="empty-state" style="padding:24px"><i class="fa-regular fa-note-sticky"></i>노트가 없습니다</div>';
       return;
     }
+    // 섹션 헤더
+    const hdr = document.createElement('div');
+    hdr.style.cssText = 'font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);padding:0 2px 8px;display:flex;align-items:center;gap:6px;';
+    hdr.innerHTML = `<i class="fa-solid fa-folder-open" style="color:var(--rose-mid);font-size:11px;"></i> ${escHtml(acProjFilter)}`;
+    listEl.appendChild(hdr);
     list.forEach(ac=>{
       const d = new Date(ac.date||ac.createdAt);
       const dateStr = `${d.getMonth()+1}.${String(d.getDate()).padStart(2,'0')}`;
@@ -10055,7 +10059,6 @@ function renderArchivingPage(){
         </div>
         <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;">
           <span class="ac-tag ${ac.type||'work'}">${AC_TYPE_LBL[ac.type]||'💼 업무'}</span>
-          ${ac.project?`<span class="ac-tag proj"><i class="fa-solid fa-folder" style="font-size:7px;"></i> ${escHtml(ac.project)}</span>`:''}
         </div>`;
       row.onclick = ()=>{ selAcId=ac.id; renderArchivingPage(); showAcDetail(ac.id); };
       listEl.appendChild(row);
@@ -10064,8 +10067,8 @@ function renderArchivingPage(){
     return;
   }
 
-  // ── 폴더 모드: 프로젝트별 폴더 + 프로젝트 없는 노트 ──
-  const all = getFilteredAc(); // 전체 (필터 없음이므로 전부)
+  // ── 폴더 모드: 타입 필터 적용된 노트를 프로젝트별 폴더로 표시 ──
+  const all = getFilteredAc(); // 타입 필터 적용 (프로젝트 필터는 위에서 처리됨)
   if(!all.length){
     listEl.innerHTML = '<div class="empty-state" style="padding:24px"><i class="fa-regular fa-note-sticky"></i>노트가 없습니다</div>';
     return;
@@ -10089,10 +10092,16 @@ function renderArchivingPage(){
     const wrapper = document.createElement('div');
     wrapper.style.cssText = 'display:flex;flex-direction:column;gap:0;';
 
+    // 프로젝트 내 가장 많은 타입 아이콘 사용
+    const typeCounts = {};
+    notes.forEach(ac=>{ const t=ac.type||'work'; typeCounts[t]=(typeCounts[t]||0)+1; });
+    const dominantType = Object.entries(typeCounts).sort((a,b)=>b[1]-a[1])[0]?.[0]||'work';
+    const folderTypeIcon = typeIcon[dominantType]||'💼';
+
     const folderRow = document.createElement('div');
     folderRow.className = 'ac-folder-row' + (isOpen?' open':'');
     folderRow.innerHTML = `
-      <span style="font-size:15px;">${isOpen?'📂':'📁'}</span>
+      <span style="font-size:15px;">${folderTypeIcon}</span>
       <span class="ac-folder-name">${escHtml(projName)}</span>
       <span class="ac-folder-count">${notes.length}</span>
       <i class="fa-solid fa-chevron-${isOpen?'up':'down'}" style="font-size:9px;color:var(--ink-soft);flex-shrink:0;"></i>`;
