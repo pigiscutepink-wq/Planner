@@ -768,8 +768,8 @@ main.main{display:block;}
   background:var(--white);border:1px solid var(--gray);border-radius:var(--r);
   padding:15px 17px;cursor:pointer;transition:all .18s;box-shadow:0 2px 8px var(--shadow);
 }
-.proj-card:hover{border-color:var(--rose);transform:translateX(3px);}
-.proj-card.sel{border-color:var(--rose);box-shadow:0 4px 18px rgba(222,192,194,.4);}
+.proj-card:hover{border-color:var(--rose);transform:translateX(3px);background:var(--rose-pale);}
+.proj-card.sel{border-color:var(--rose);background:var(--rose-pale);box-shadow:0 4px 18px rgba(222,192,194,.4);transform:translateX(3px);}
 .proj-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
 .proj-name{font-size:14px;font-weight:700;color:var(--rose-mid);}
 .badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;}
@@ -1389,15 +1389,22 @@ main.main{display:block;}
 }
 .ac-no-folder-row:hover{border-color:var(--rose-light);background:var(--rose-pale);}
 .ac-no-folder-row.sel{border-color:var(--rose);background:var(--rose-pale);border-left:3px solid var(--rose-mid);}
-/* 상세 패널 — 미팅과 동일 구조 */
+/* 프로젝트 연결 노트 아코디언 */
+.proj-note-row{border-radius:var(--rs);border:1px solid var(--gray);overflow:hidden;background:var(--white);}
+.proj-note-header{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;transition:background .15s;}
+.proj-note-header:hover{background:var(--rose-pale);}
+.proj-note-title{font-size:12px;font-weight:600;color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.proj-note-date{font-size:9px;color:var(--ink-soft);flex-shrink:0;}
+.proj-note-body{padding:0 12px 10px;font-size:12px;color:var(--ink-mid);line-height:1.6;border-top:1px solid var(--gray);padding-top:8px;white-space:pre-wrap;word-break:break-all;}
+.proj-note-links{padding:6px 12px 10px;display:flex;flex-wrap:wrap;gap:5px;border-top:1px dashed var(--gray);}
 .ac-detail-card{
-  background:var(--white);border:1px solid #EFEFEF;border-radius:14px;
-  box-shadow:0 2px 14px var(--shadow);overflow:hidden;
+  background:var(--white);border:2px solid #fff;border-radius:14px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.08), 0 0 0 1px #E8E0E0;overflow:hidden;
 }
 .ac-detail-head{
   padding:20px 24px 16px;
-  background:linear-gradient(135deg,#FAF5F5,#F3ECEC);
-  border-bottom:1px solid #EFEFEF;
+  background:linear-gradient(135deg,#FAF5F5,#F0E8E8);
+  border-bottom:2px solid #fff;
 }
 .ac-detail-title{font-size:18px;font-weight:700;color:var(--ink);margin-bottom:10px;line-height:1.35;}
 .ac-detail-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--ink-mid);}
@@ -2146,6 +2153,16 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
   <div class="splash-spinner"></div>
   <div class="splash-sub">데이터 불러오는 중...</div>
 </div>
+<script>
+// 스플래시 최대 3초 — 절대 무한로딩 없음
+(function(){
+  var s = document.getElementById('app-splash');
+  if(!s) return;
+  var hide = function(){ s.classList.add('hidden'); setTimeout(function(){ s.style.display='none'; }, 450); };
+  setTimeout(hide, 3000);
+  window._hideSplash = hide;
+})();
+</script>
 
 <!-- PWA: iOS 홈화면 추가 배너 -->
 <div id="pwa-ios-banner">
@@ -3234,8 +3251,18 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
     <!-- 주제 + 프로젝트 -->
     <div class="fg"><label class="fl">주제 *</label><input type="text" class="fi" id="ac-title" placeholder="노트 주제를 입력하세요"></div>
     <div class="fg" id="ac-proj-field">
-      <label class="fl">프로젝트 (선택)</label>
-      <input type="text" class="fi" id="ac-project" placeholder="예) 비건레더 개발, 인테리어필름...">
+      <label class="fl" style="font-size:10px;font-weight:700;letter-spacing:.04em;">테마 <span style="font-weight:400;color:var(--ink-soft);">(폴더 분류)</span></label>
+      <input type="text" class="fi" id="ac-project" placeholder="예) 신규사업, 26년 채용..." oninput="filterAcThemeSuggestions(this.value)">
+      <div id="ac-theme-suggestions" style="display:none;flex-direction:column;gap:2px;margin-top:4px;background:#fff;border:1px solid var(--rose-light);border-radius:var(--rs);overflow:hidden;box-shadow:0 4px 12px var(--shadow);max-height:140px;overflow-y:auto;"></div>
+    </div>
+    <div class="fg" id="ac-linked-proj-field">
+      <label class="fl" style="font-size:10px;font-weight:700;letter-spacing:.04em;">연결 프로젝트 <span style="font-weight:400;color:var(--ink-soft);">(Task의 프로젝트)</span></label>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <select class="fs" id="ac-linked-proj" style="height:38px;flex:1;">
+          <option value="">연결 안 함</option>
+        </select>
+        <button type="button" onclick="quickAddProjFromNote()" title="새 프로젝트 등록" style="height:38px;padding:0 12px;border:1.5px solid var(--rose-light);border-radius:var(--rs);background:var(--rose-pale);color:var(--rose-mid);font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;font-family:inherit;">+ 신규</button>
+      </div>
     </div>
     <!-- 메모 -->
     <div class="fg"><label class="fl">메모</label><textarea class="ft" id="ac-memo" placeholder="내용을 기록하세요..." style="min-height:110px;"></textarea></div>
@@ -3651,10 +3678,14 @@ function save(){
 async function load(){
   setSyncStatus('loading');
   try{
+    const controller = new AbortController();
+    const fetchTimeout = setTimeout(()=>controller.abort(), 8000); // 8초 타임아웃
     const res = await fetch(GS_URL + '?t=' + Date.now(), {
       method: 'GET',
       redirect: 'follow',
+      signal: controller.signal,
     });
+    clearTimeout(fetchTimeout);
     if(!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
     if(json.ok && json.data){
@@ -5395,12 +5426,61 @@ function renderProjDetail(id){
       <div class="det-sec-lbl">프로젝트 메모</div>
       <textarea class="pmemo" oninput="saveProjMemo('${id}',this.value)">${p.memo||''}</textarea>
     </div>
+
+    <div id="proj-notes-section-${id}" style="margin-top:18px;">
+      ${renderProjNotesHtml(id)}
+    </div>
   `;
 }
 
-// ════════════════════════════════════════
-//  완료 프로젝트 — 업무 매뉴얼 상세뷰
-// ════════════════════════════════════════
+// ─── 프로젝트에 연결된 노트 목록 (아코디언) ───
+const _openProjNotes = new Set(); // 열린 노트 id 추적
+
+function renderProjNotesHtml(projId){
+  const notes = (D.archiving||[]).filter(ac=>ac.linkedProjId===projId);
+  if(!notes.length) return '';
+  const TYPE_LBL = {work:'💼',personal:'🌿',study:'📚',idea:'💡'};
+
+  const rows = notes.map(ac=>{
+    const d = new Date(ac.date||ac.createdAt);
+    const dateStr = `${d.getMonth()+1}.${String(d.getDate()).padStart(2,'0')}`;
+    const isOpen = _openProjNotes.has(ac.id);
+    const memoPreview = (ac.memo||'').replace(/</g,'&lt;').replace(/\n/g,'<br>');
+    return `
+      <div class="proj-note-row" id="pnrow-${ac.id}">
+        <div class="proj-note-header" onclick="toggleProjNote('${ac.id}','${projId}')">
+          <span style="font-size:12px;">${TYPE_LBL[ac.type]||'📋'}</span>
+          <span class="proj-note-title">${escHtml(ac.title)}</span>
+          <span class="proj-note-date">${dateStr}</span>
+          <i class="fa-solid fa-chevron-${isOpen?'up':'down'}" style="font-size:9px;color:var(--ink-soft);flex-shrink:0;"></i>
+        </div>
+        ${isOpen && ac.memo ? `<div class="proj-note-body">${memoPreview}</div>` : ''}
+        ${isOpen && (ac.links||[]).filter(l=>l.url).length ? `
+          <div class="proj-note-links">
+            ${(ac.links||[]).filter(l=>l.url).map(lk=>`
+              <a class="ac-link-btn" href="${escHtml(lk.url)}" target="_blank" rel="noopener" style="font-size:10px;">
+                <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:8px;"></i> ${escHtml(lk.label||lk.url.slice(0,20)+'…')}
+              </a>`).join('')}
+          </div>` : ''}
+      </div>`;
+  }).join('');
+
+  return `
+    <div class="det-sec-lbl" style="display:flex;align-items:center;justify-content:space-between;">
+      <span><i class="fa-regular fa-note-sticky" style="margin-right:5px;"></i>연결된 노트 <span style="font-size:10px;font-weight:400;color:var(--ink-soft);">(${notes.length})</span></span>
+      <button onclick="openArchivingModal()" style="font-size:10px;color:var(--rose-mid);background:none;border:none;cursor:pointer;font-family:inherit;padding:0;font-weight:600;">+ 노트 추가</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:5px;">${rows}</div>`;
+}
+
+function toggleProjNote(noteId, projId){
+  if(_openProjNotes.has(noteId)) _openProjNotes.delete(noteId);
+  else _openProjNotes.add(noteId);
+  const sec = document.getElementById('proj-notes-section-'+projId);
+  if(sec) sec.innerHTML = renderProjNotesHtml(projId);
+}
+
+
 function renderDoneDetail(p, id, pct, d, t, allTasksHtml){
   const manual = p.aiManual;
 
@@ -5510,8 +5590,8 @@ function renderDoneDetail(p, id, pct, d, t, allTasksHtml){
       <div>
         <div class="det-sec-lbl">프로젝트 메모</div>
         <textarea class="pmemo" oninput="saveProjMemo('${id}',this.value)">${p.memo||''}</textarea>
-      </div>`;
-  } else {
+      </div>
+      <div id="proj-notes-section-${id}" style="margin-top:18px;">${renderProjNotesHtml(id)}</div>`;
     // 매뉴얼 없음 = 자동 생성 중
     return `
       ${headerHtml}
@@ -5532,9 +5612,8 @@ function renderDoneDetail(p, id, pct, d, t, allTasksHtml){
       <div>
         <div class="det-sec-lbl">프로젝트 메모</div>
         <textarea class="pmemo" oninput="saveProjMemo('${id}',this.value)">${p.memo||''}</textarea>
-      </div>`;
-  }
-}
+      </div>
+      <div id="proj-notes-section-${id}" style="margin-top:18px;">${renderProjNotesHtml(id)}</div>`;
 
 function toggleManualStep(projId, stepIdx){
   const body = document.getElementById(`mstep-body-${projId}-${stepIdx}`);
@@ -6187,10 +6266,8 @@ function renderRoutineDetail(p, det){
       <div class="det-sec-lbl">메모</div>
       <textarea class="pmemo" oninput="saveProjMemo('${id}',this.value)">${p.memo||''}</textarea>
     </div>
+    <div id="proj-notes-section-${id}" style="margin-top:18px;">${renderProjNotesHtml(id)}</div>
   `;
-}
-
-function setRoutineTab(projId, tab){
   const p=D.projects.find(x=>x.id===projId); if(!p) return;
   p._routineTab = tab;
   renderProjDetail(projId);
@@ -9825,15 +9902,67 @@ function openArchivingModal(id){
   document.getElementById('ac-project').value = ac?.project||'';
   document.getElementById('ac-memo').value  = ac?.memo||'';
   document.getElementById('ac-del-btn').style.display = ac ? 'inline-flex' : 'none';
+  document.getElementById('ac-theme-suggestions').style.display = 'none';
   renderAcLinkRows(ac?.links?.length ? ac.links : [{label:'',url:''}]);
   // 이미지 초기화
   acImgFiles = ac?.images ? [...ac.images] : [];
   renderAcImgPreview();
   // 스케치 히스토리 초기화
   acSketchHistory=[]; acSketchHistoryIdx=-1;
+  // 연결 프로젝트 드롭다운 채우기
+  const lpSel = document.getElementById('ac-linked-proj');
+  lpSel.innerHTML = '<option value="">연결 안 함</option>';
+  (D.projects||[]).filter(p=>p.status!=='routine').forEach(p=>{
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = p.name;
+    if(ac?.linkedProjId === p.id) opt.selected = true;
+    lpSel.appendChild(opt);
+  });
   document.getElementById('archiving-modal').classList.add('open');
   setTimeout(()=>document.getElementById('ac-title').focus(), 80);
 }
+
+// 테마 자동완성 (기존 테마 목록)
+function filterAcThemeSuggestions(q){
+  const box = document.getElementById('ac-theme-suggestions');
+  const existingThemes = [...new Set((D.archiving||[]).map(a=>a.project).filter(Boolean))].sort();
+  const filtered = q ? existingThemes.filter(t=>t.toLowerCase().includes(q.toLowerCase())) : existingThemes;
+  if(!filtered.length){ box.style.display='none'; return; }
+  box.innerHTML = '';
+  box.style.display = 'flex';
+  filtered.forEach(t=>{
+    const opt = document.createElement('div');
+    opt.style.cssText = 'padding:7px 12px;cursor:pointer;font-size:12px;color:var(--ink);transition:background .1s;';
+    opt.textContent = t;
+    opt.onmouseenter = ()=>opt.style.background='var(--rose-pale)';
+    opt.onmouseleave = ()=>opt.style.background='';
+    opt.onmousedown = e=>{ e.preventDefault(); document.getElementById('ac-project').value=t; box.style.display='none'; };
+    box.appendChild(opt);
+  });
+}
+
+// 노트 모달에서 신규 Task 프로젝트 빠른 등록
+function quickAddProjFromNote(){
+  const name = prompt('새 프로젝트 이름을 입력하세요');
+  if(!name?.trim()) return;
+  if(!D.projects) D.projects=[];
+  const newP = {id:uid(), name:name.trim(), status:'upcoming', tasks:[], memo:'', createdAt:Date.now()};
+  D.projects.unshift(newP);
+  save();
+  // 드롭다운에 추가 후 선택
+  const lpSel = document.getElementById('ac-linked-proj');
+  const opt = document.createElement('option');
+  opt.value = newP.id;
+  opt.textContent = newP.name;
+  opt.selected = true;
+  lpSel.insertBefore(opt, lpSel.children[1]);
+}
+document.addEventListener('click', e=>{
+  const box = document.getElementById('ac-theme-suggestions');
+  const inp = document.getElementById('ac-project');
+  if(box && inp && !box.contains(e.target) && e.target!==inp) box.style.display='none';
+});
 function closeArchivingModal(){
   document.getElementById('archiving-modal').classList.remove('open');
 }
@@ -9987,6 +10116,7 @@ function saveArchiving(){
     date: document.getElementById('ac-date').value || new Date().toISOString().slice(0,10),
     title,
     project: document.getElementById('ac-project').value.trim(),
+    linkedProjId: document.getElementById('ac-linked-proj').value || null,
     memo: document.getElementById('ac-memo').value.trim(),
     links: getAcLinks(),
     images: acImgFiles,
@@ -10176,6 +10306,14 @@ function showAcDetail(id){
     <a class="ac-link-btn" href="${escHtml(lk.url)}" target="_blank" rel="noopener">
       <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px;"></i> ${escHtml(lk.label||lk.url.slice(0,24)+'…')}
     </a>`).join('');
+  // 연결 프로젝트
+  const linkedProj = ac.linkedProjId ? (D.projects||[]).find(p=>p.id===ac.linkedProjId) : null;
+  const linkedProjHtml = linkedProj ? `
+    <div style="margin-top:14px;padding:10px 14px;background:var(--rose-pale);border-radius:var(--rs);border:1px solid var(--rose-light);display:flex;align-items:center;gap:8px;">
+      <i class="fa-solid fa-diagram-project" style="color:var(--rose-mid);font-size:11px;"></i>
+      <span style="font-size:11px;font-weight:600;color:var(--ink);flex:1;">${escHtml(linkedProj.name)}</span>
+      <button onclick="goToLinkedProj('${linkedProj.id}')" style="border:none;background:var(--rose);color:#fff;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700;cursor:pointer;font-family:inherit;">프로젝트 보러가기 →</button>
+    </div>` : '';
   det.innerHTML=`
     <button class="mobile-detail-back" onclick="closeAcDetail()"><i class="fa-solid fa-chevron-left"></i> 목록으로</button>
     <div class="ac-detail-card">
@@ -10192,6 +10330,7 @@ function showAcDetail(id){
           <span>${TYPE_LBL[ac.type]||'💼 업무'}</span>
           ${ac.project?`<span><i class="fa-solid fa-folder" style="color:var(--rose);font-size:10px;"></i> ${escHtml(ac.project)}</span>`:''}
         </div>
+        ${linkedProjHtml}
       </div>
       <div class="ac-detail-body">
         ${ac.memo?`<div class="ac-detail-memo">${escHtml(ac.memo)}</div>`:'<div style="font-size:12px;color:var(--ink-soft);">메모 없음</div>'}
@@ -10212,6 +10351,12 @@ function showAcDetail(id){
         </div>
       </div>
     </div>`;
+}
+
+function goToLinkedProj(projId){
+  selProjId = projId;
+  navigateTo('projects');
+  setTimeout(()=>{ renderProjs(); renderProjDetail(projId); }, 100);
 }
 
 function closeAcDetail(){
@@ -10276,16 +10421,8 @@ function backToProjList(){
 
 // ── 초기 로드 (구글 시트 → 화면 렌더) ──
 (async ()=>{
-  const splash = document.getElementById('app-splash');
-  if(splash){
-    splash.querySelector('.splash-sub').textContent = '데이터 불러오는 중...';
-  }
-  // 최대 10초 후 강제로 스플래시 숨기기 (안전장치)
-  const splashTimeout = setTimeout(()=>{
-    if(splash){ splash.classList.add('hidden'); setTimeout(()=>{ splash.style.display='none'; }, 450); }
-    renderAll();
-  }, 10000);
-
+  // 스플래시는 위쪽 인라인 스크립트에서 최대 3초 후 자동 숨김
+  // 여기선 데이터 로드 후 바로 숨기기
   try {
     await load();
     try { initSampleMinutes(); } catch(e){ console.warn('initSampleMinutes 오류:', e); }
@@ -10293,17 +10430,10 @@ function backToProjList(){
     console.warn('load 오류:', e);
   }
 
-  clearTimeout(splashTimeout);
-
-  // hash가 있으면 해당 페이지로, 없으면 dashboard
   const initPage = (location.hash||'').replace('#','') || 'dashboard';
   try { navigateTo(initPage); } catch(e){ console.warn('navigateTo 오류:', e); }
 
-  // 스플래시 숨기기
-  if(splash){
-    splash.classList.add('hidden');
-    setTimeout(()=>{ splash.style.display='none'; }, 450);
-  }
+  if(window._hideSplash) window._hideSplash();
 })();
 </script>
 
