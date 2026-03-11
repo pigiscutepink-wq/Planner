@@ -2148,27 +2148,7 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
 </div>
 
 <!-- 초기 로딩 스플래시 -->
-<div id="app-splash">
-  <div class="splash-logo">B</div>
-  <div class="splash-title">보닥데코 업무 스케줄러</div>
-  <div class="splash-spinner"></div>
-  <div class="splash-sub">데이터 불러오는 중...</div>
-</div>
-<script>
-// 스플래시 최대 3초 — 절대 무한로딩 없음
-(function(){
-  var s = document.getElementById('app-splash');
-  if(!s) return;
-  var hide = function(){
-    s.style.transition = 'none';
-    s.style.opacity = '0';
-    s.style.display = 'none';
-    s.style.pointerEvents = 'none';
-  };
-  setTimeout(hide, 3000);
-  window._hideSplash = hide;
-})();
-</script>
+<div id="app-splash" style="display:none!important;"></div>
 
 <!-- PWA: iOS 홈화면 추가 배너 -->
 <div id="pwa-ios-banner">
@@ -5636,6 +5616,8 @@ function renderDoneDetail(p, id, pct, d, t, allTasksHtml){
         <textarea class="pmemo" oninput="saveProjMemo('${id}',this.value)">${p.memo||''}</textarea>
       </div>
       <div id="proj-notes-section-${id}" style="margin-top:18px;">${renderProjNotesHtml(id)}</div>`;
+  }
+}
 
 function toggleManualStep(projId, stepIdx){
   const body = document.getElementById(`mstep-body-${projId}-${stepIdx}`);
@@ -6290,6 +6272,9 @@ function renderRoutineDetail(p, det){
     </div>
     <div id="proj-notes-section-${id}" style="margin-top:18px;">${renderProjNotesHtml(id)}</div>
   `;
+}
+
+function setRoutineTab(projId, tab){
   const p=D.projects.find(x=>x.id===projId); if(!p) return;
   p._routineTab = tab;
   renderProjDetail(projId);
