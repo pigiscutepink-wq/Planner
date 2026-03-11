@@ -2111,6 +2111,7 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
 #app-splash.hidden {
   opacity: 0;
   pointer-events: none;
+  display: none !important;
 }
 .splash-logo {
   width: 72px; height: 72px;
@@ -2158,7 +2159,12 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
 (function(){
   var s = document.getElementById('app-splash');
   if(!s) return;
-  var hide = function(){ s.classList.add('hidden'); setTimeout(function(){ s.style.display='none'; }, 450); };
+  var hide = function(){
+    s.style.transition = 'none';
+    s.style.opacity = '0';
+    s.style.display = 'none';
+    s.style.pointerEvents = 'none';
+  };
   setTimeout(hide, 3000);
   window._hideSplash = hide;
 })();
@@ -4979,7 +4985,7 @@ function renderDash(){
   const lunchItems = todayItems.filter(it=>it.type==='ev-lunch');
   const dinnerItems = todayItems.filter(it=>it.type==='ev-dinner');
 
-  function mealItemsHtml(items, fallbackPlace, fallbackMemo){
+  const mealItemsHtml = (items, fallbackPlace, fallbackMemo) => {
     if(items.length){
       return items.map(it=>`
         <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
@@ -4991,7 +4997,7 @@ function renderDash(){
     }
     if(fallbackPlace) return `<div style="font-size:12px;margin-bottom:3px">${fallbackPlace}</div><div style="font-size:11px;color:var(--ink-soft)">${fallbackMemo||''}</div>`;
     return `<span style="color:var(--ink-soft);font-size:12px;">미정</span>`;
-  }
+  };
 
   document.getElementById('dash-meals-today').innerHTML=`
     <div style="display:flex;flex-direction:column;gap:8px;">
