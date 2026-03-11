@@ -4958,12 +4958,13 @@ function renderDash(){
     </div>
   `;
 
-  // today list
+  // today list (점심·저녁약속 제외)
   const tl=document.getElementById('dash-today-list');
-  if(!todayItems.length){
+  const scheduleItems = todayItems.filter(it=>it.type!=='ev-lunch'&&it.type!=='ev-dinner');
+  if(!scheduleItems.length){
     tl.innerHTML='<div class="empty-state" style="padding:20px"><i class="fa-regular fa-calendar"></i>오늘 등록된 일정이 없습니다</div>';
   } else {
-    tl.innerHTML=todayItems.map(it=>`
+    tl.innerHTML=scheduleItems.map(it=>`
       <div class="today-task-chip ${it.status==='done'?'done':''}">
         <span style="font-size:12px">${typeEmoji(it.type)}</span>
         <span class="ttname" style="flex:1;font-size:12px">${it.name}</span>
@@ -4973,19 +4974,34 @@ function renderDash(){
     `).join('');
   }
 
-  // meals
+  // meals — D.meals 데이터 + todayItems의 ev-lunch/ev-dinner 합산
   const meal=D.meals[key]||{};
+  const lunchItems = todayItems.filter(it=>it.type==='ev-lunch');
+  const dinnerItems = todayItems.filter(it=>it.type==='ev-dinner');
+
+  function mealItemsHtml(items, fallbackPlace, fallbackMemo){
+    if(items.length){
+      return items.map(it=>`
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">
+          <span style="font-size:12px;font-weight:600;color:var(--ink);flex:1;">${it.name}</span>
+          ${it.partner?`<span style="font-size:10px;color:var(--ink-soft);">👤 ${it.partner}</span>`:''}
+        </div>
+        ${it.startTime?`<div style="font-size:10px;color:var(--ink-soft);">🕐 ${it.startTime}${it.endTime?' ~ '+it.endTime:''}</div>`:''}
+      `).join('');
+    }
+    if(fallbackPlace) return `<div style="font-size:12px;margin-bottom:3px">${fallbackPlace}</div><div style="font-size:11px;color:var(--ink-soft)">${fallbackMemo||''}</div>`;
+    return `<span style="color:var(--ink-soft);font-size:12px;">미정</span>`;
+  }
+
   document.getElementById('dash-meals-today').innerHTML=`
     <div style="display:flex;flex-direction:column;gap:8px;">
       <div class="meal-box">
         <div class="meal-type-lbl">🍱 LUNCH</div>
-        <div style="font-size:12px;margin-bottom:3px">${meal.lp||'<span style="color:var(--ink-soft)">미정</span>'}</div>
-        <div style="font-size:11px;color:var(--ink-soft)">${meal.lm||''}</div>
+        ${mealItemsHtml(lunchItems, meal.lp, meal.lm)}
       </div>
       <div class="meal-box">
         <div class="meal-type-lbl">🌙 DINNER</div>
-        <div style="font-size:12px;margin-bottom:3px">${meal.dp||'<span style="color:var(--ink-soft)">미정</span>'}</div>
-        <div style="font-size:11px;color:var(--ink-soft)">${meal.dm||''}</div>
+        ${mealItemsHtml(dinnerItems, meal.dp, meal.dm)}
       </div>
     </div>
   `;
