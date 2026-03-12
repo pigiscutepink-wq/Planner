@@ -3745,14 +3745,13 @@ async function load(){
   const MAX_RETRY = 2;
   for(let attempt = 0; attempt <= MAX_RETRY; attempt++){
     try{
-      const controller = new AbortController();
-      const fetchTimeout = setTimeout(()=>controller.abort(), 25000); // 25초 타임아웃 (GAS 콜드스타트 대응)
-      const res = await fetch(GS_URL + '?t=' + Date.now(), {
+      // AbortController를 서비스워커에 넘기면 postMessage 에러 발생 → Promise.race로 타임아웃 처리
+      const fetchPromise = fetch(GS_URL + '?t=' + Date.now(), {
         method: 'GET',
         redirect: 'follow',
-        signal: controller.signal,
       });
-      clearTimeout(fetchTimeout);
+      const timeoutPromise = new Promise((_,reject)=>setTimeout(()=>reject(new Error('timeout')), 25000));
+      const res = await Promise.race([fetchPromise, timeoutPromise]);
       if(!res.ok) throw new Error('HTTP ' + res.status);
       const json = await res.json();
       if(json.ok && json.data){
@@ -3768,7 +3767,7 @@ async function load(){
     } catch(e){
       console.warn(`GS load error (attempt ${attempt+1}):`, e.message);
       if(attempt < MAX_RETRY){
-        await new Promise(r=>setTimeout(r, 2000)); // 2초 후 재시도
+        await new Promise(r=>setTimeout(r, 2000));
         continue;
       }
       setSyncStatus('error');
@@ -3788,6 +3787,8 @@ function renderAll(){
   }
   const curPage = (location.hash||'').replace('#','') || 'dashboard';
   try{ navigateTo(curPage); } catch(e){ console.warn('navigateTo 오류:', e); }
+  // 아이패드 레이아웃 재적용
+  if(typeof applyTabletClass === 'function') setTimeout(applyTabletClass, 0);
 }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
 
@@ -5140,6 +5141,8 @@ function renderDash(){
   }
 
   renderWeeklyReport();
+  // 아이패드 레이아웃 강제 재적용
+  if(typeof applyTabletClass === 'function') applyTabletClass();
 }
 
 function typeEmoji(t){
@@ -5157,7 +5160,12 @@ function typeLabel(t){
 let activeFilters=new Set(['ongoing']); // 기본: 진행중만
 let projStatusFilter = 'ongoing'; // 하위호환
 
-// ── 터치기기 감지: 첫 터치 시 html에 touch-device 클래스 추가 ──
+// ── 터치기기 감지: 터치기기면 즉시 touch-device 클래스 추가 ──
+(function(){
+  if('ontouchstart' in window || navigator.maxTouchPoints > 0){
+    document.documentElement.classList.add('touch-device');
+  }
+})();
 window.addEventListener('touchstart', function onFirstTouch(){
   document.documentElement.classList.add('touch-device');
   window.removeEventListener('touchstart', onFirstTouch);
@@ -5166,14 +5174,30 @@ window.addEventListener('touchstart', function onFirstTouch(){
 // ── 아이패드/태블릿 감지: 768px 이상 터치기기는 tablet 클래스 ──
 function applyTabletClass(){
   const w = window.innerWidth;
-  if(w >= 768 && ('ontouchstart' in window || navigator.maxTouchPoints > 0)){
+  const isTablet = w >= 768 && w <= 950 && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  if(isTablet){
     document.documentElement.classList.add('is-tablet');
+    // CSS !important가 안 먹힐 경우를 대비해 JS로 직접 인라인 스타일 강제 적용
+    document.querySelectorAll('.dash-grid-wide').forEach(el=>{
+      el.style.setProperty('grid-template-columns','2fr 1fr','important');
+      el.style.setProperty('display','grid','important');
+    });
+    document.querySelectorAll('.dash-grid:not(#weekly-report-grid)').forEach(el=>{
+      el.style.setProperty('grid-template-columns','1fr 1fr','important');
+    });
   } else {
     document.documentElement.classList.remove('is-tablet');
+    // 모바일(767px 이하)이면 1컬럼으로
+    if(w < 768){
+      document.querySelectorAll('.dash-grid-wide').forEach(el=>{ el.style.removeProperty('grid-template-columns'); });
+      document.querySelectorAll('.dash-grid:not(#weekly-report-grid)').forEach(el=>{ el.style.removeProperty('grid-template-columns'); });
+    }
   }
 }
 applyTabletClass();
 window.addEventListener('resize', applyTabletClass);
+// 렌더링 후에도 재적용 (동적 DOM 생성 대비)
+document.addEventListener('DOMContentLoaded', applyTabletClass);
 
 document.addEventListener('DOMContentLoaded', ()=>{
   document.querySelectorAll('#proj-status-toggle .ac-toggle-btn').forEach(btn=>{
