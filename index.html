@@ -2406,8 +2406,6 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
       <!-- 새 프로젝트 — 오른쪽 끝 -->
       <button class="btn btn-p" id="btn-new-proj" style="flex-shrink:0;"><i class="fa-solid fa-plus"></i> 새 프로젝트</button>
     </div>
-      <button class="btn btn-p" id="btn-new-proj" style="height:44px;box-sizing:border-box;padding:0 18px;flex-shrink:0;"><i class="fa-solid fa-plus"></i> 새 프로젝트</button>
-    </div>
     <div class="proj-layout">
       <div style="display:flex;flex-direction:column;gap:0;overflow-y:auto;max-height:calc(100vh - 200px);">
         <div class="proj-list" id="proj-list"></div>
@@ -3483,7 +3481,7 @@ let D = {
   routines: []      // [{id, title, icon, startTime, endTime, color, repeat, repeatEnd}]
 };
 
-const GS_URL = 'https://script.google.com/macros/s/AKfycbwqIYRltedCyYTk6Axfo1AmIHNhbNY3vkK-4T7VS83JCvKzvFNxJNg7D7xozRkSXjg6oQ/exec';
+const GS_URL = 'https://script.google.com/macros/s/AKfycbxE5cpCgTDOF74nNjNhc1USBeZ3D3rLErxNdxXWbBG46ij5QQwGAhZP6A9YgUgPeubEIA/exec';
 
 // GS 항상 활성화
 function isGsEnabled(){ return true; }
@@ -3727,32 +3725,40 @@ function save(){
 // ── 구글 시트에서 불러오기 ──
 async function load(){
   setSyncStatus('loading');
-  try{
-    const controller = new AbortController();
-    const fetchTimeout = setTimeout(()=>controller.abort(), 8000); // 8초 타임아웃
-    const res = await fetch(GS_URL + '?t=' + Date.now(), {
-      method: 'GET',
-      redirect: 'follow',
-      signal: controller.signal,
-    });
-    clearTimeout(fetchTimeout);
-    if(!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
-    if(json.ok && json.data){
-      applyGSData(json.data);
-      setSyncStatus('saved');
-    } else {
-      console.warn('GS load 실패:', json.error||'unknown');
+  const MAX_RETRY = 2;
+  for(let attempt = 0; attempt <= MAX_RETRY; attempt++){
+    try{
+      const controller = new AbortController();
+      const fetchTimeout = setTimeout(()=>controller.abort(), 25000); // 25초 타임아웃 (GAS 콜드스타트 대응)
+      const res = await fetch(GS_URL + '?t=' + Date.now(), {
+        method: 'GET',
+        redirect: 'follow',
+        signal: controller.signal,
+      });
+      clearTimeout(fetchTimeout);
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      const json = await res.json();
+      if(json.ok && json.data){
+        applyGSData(json.data);
+        setSyncStatus('saved');
+        renderAll();
+        return;
+      } else {
+        console.warn('GS load 실패:', json.error||'unknown');
+        setSyncStatus('error');
+        break;
+      }
+    } catch(e){
+      console.warn(`GS load error (attempt ${attempt+1}):`, e.message);
+      if(attempt < MAX_RETRY){
+        await new Promise(r=>setTimeout(r, 2000)); // 2초 후 재시도
+        continue;
+      }
       setSyncStatus('error');
+      _dataLoaded = true;
     }
-  } catch(e){
-    setSyncStatus('error');
-    console.warn('GS load error:', e);
-    _dataLoaded = true; // 로드 실패해도 사용자 입력은 저장 허용
-  } finally {
-    // 성공/실패 관계없이 항상 화면은 렌더
-    renderAll();
   }
+  renderAll();
 }
 
 function renderAll(){
