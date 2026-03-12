@@ -1858,14 +1858,13 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
   display: none !important;
 }
 /* 터치기기: chip-acts는 기본 숨김 — 탭 시 JS로 토글 */
-@media (hover:none){
-  .chip .chip-acts { opacity: 0; pointer-events:none; transition:opacity .15s; }
-  .chip.acts-open .chip-acts { opacity: 1 !important; pointer-events:auto; }
-  .chip.acts-open .ca.done {
-    width: 18px; height: 18px;
-    background: rgba(255,255,255,0.9);
-    border: 1px solid rgba(0,0,0,0.08);
-  }
+/* .touch-device 클래스는 JS에서 첫 터치 시 html에 추가 */
+.touch-device .chip .chip-acts { opacity: 0 !important; pointer-events:none; transition:opacity .15s; }
+.touch-device .chip.acts-open .chip-acts { opacity: 1 !important; pointer-events:auto; }
+.touch-device .chip.acts-open .ca.done {
+  width: 18px; height: 18px;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid rgba(0,0,0,0.08);
 }
 /* cn 텍스트 최대한 보이도록 */
 .cal-sec-schedule .chip .cn,
@@ -5140,6 +5139,12 @@ function typeLabel(t){
 // ════════════════════════════════════════
 let activeFilters=new Set(['ongoing']); // 기본: 진행중만
 let projStatusFilter = 'ongoing'; // 하위호환
+
+// ── 터치기기 감지: 첫 터치 시 html에 touch-device 클래스 추가 ──
+window.addEventListener('touchstart', function onFirstTouch(){
+  document.documentElement.classList.add('touch-device');
+  window.removeEventListener('touchstart', onFirstTouch);
+}, {passive:true});
 
 document.addEventListener('DOMContentLoaded', ()=>{
   document.querySelectorAll('#proj-status-toggle .ac-toggle-btn').forEach(btn=>{
