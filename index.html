@@ -62,6 +62,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+<!-- 터치기기 즉시 감지 — CSS 로드 전에 클래스 추가해야 chip-acts 숨김 적용 -->
+<script>
+(function(){
+  if('ontouchstart' in window || navigator.maxTouchPoints > 0){
+    document.documentElement.classList.add('touch-device');
+  }
+})();
+</script>
 <style>
 :root {
   --rose:       #DEC0C2;
@@ -1863,10 +1871,9 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
 .cal-sec-task .chip .ca.delay {
   display: none !important;
 }
-/* 터치기기: chip-acts는 기본 숨김 — 탭 시 JS로 토글 */
-/* .touch-device 클래스는 JS에서 첫 터치 시 html에 추가 */
-.touch-device .chip .chip-acts { opacity: 0 !important; pointer-events:none; transition:opacity .15s; }
-.touch-device .chip.acts-open .chip-acts { opacity: 1 !important; pointer-events:auto; }
+/* 터치기기: chip-acts는 기본 완전 숨김 */
+.touch-device .chip .chip-acts { display: none !important; }
+.touch-device .chip.acts-open .chip-acts { display: flex !important; opacity: 1 !important; pointer-events:auto; }
 .touch-device .chip.acts-open .ca.done {
   width: 18px; height: 18px;
   background: rgba(255,255,255,0.9);
@@ -3498,7 +3505,7 @@ let D = {
   routines: []      // [{id, title, icon, startTime, endTime, color, repeat, repeatEnd}]
 };
 
-const GS_URL = 'https://script.google.com/macros/s/AKfycbxE5cpCgTDOF74nNjNhc1USBeZ3D3rLErxNdxXWbBG46ij5QQwGAhZP6A9YgUgPeubEIA/exec';
+const GS_URL = 'https://script.google.com/macros/s/AKfycbwaS_zhSXBTjmrlQgVAB-bkgJ2RmWoif6VhW3JlCtmE0oSVOYRDwj2mDnrpacGL8kxWhg/exec';
 
 // GS 항상 활성화
 function isGsEnabled(){ return true; }
