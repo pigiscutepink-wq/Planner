@@ -3598,6 +3598,7 @@ function applyGSData(d){
   if(m.memos)             D.memos             = m.memos;
   if(m.weekMemos)         D.weekMemos         = m.weekMemos;
   if(m.routines)          D.routines          = m.routines;
+  _dataLoaded = true; // 데이터 로드 완료 — 이제 save() 허용
 }
 
 // ── 저장 페이로드 생성 ──
@@ -3629,6 +3630,7 @@ function buildPayload(){
 
 // ── 즉시 저장 (백그라운드 진입 시 호출) ──
 function saveNow(){
+  if(!_dataLoaded) return; // 로드 전 저장 차단
   gsSaveAll(buildPayload().data)
     .then(()=> setSyncStatus('saved'))
     .catch(()=> setSyncStatus('error'));
@@ -3642,11 +3644,15 @@ document.addEventListener('visibilitychange', ()=>{
   }
 });
 
+// ── 데이터 로드 완료 플래그 (로드 전 빈 데이터 저장 방지) ──
+let _dataLoaded = false;
+
 // ── 저장 (디바운스 800ms) ──
 // gsSaveAll이 시트별 분리 전송 후 마지막 응답에 최신 데이터 포함
 // → 별도 GET 없이 응답 데이터로 화면 반영
 let _saveTimer = null;
 function save(){
+  if(!_dataLoaded) return; // 로드 전 저장 차단
   setSyncStatus('saving');
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(async ()=>{
@@ -3684,6 +3690,7 @@ async function load(){
   } catch(e){
     setSyncStatus('error');
     console.warn('GS load error:', e);
+    _dataLoaded = true; // 로드 실패해도 사용자 입력은 저장 허용
   } finally {
     // 성공/실패 관계없이 항상 화면은 렌더
     renderAll();
@@ -5234,10 +5241,67 @@ function groupTasksByName(allTasks){
   });
 }
 
+// ── 진행중/진행예정 프로젝트 AI 현황 분석 ──
+async function runProjAiAnalysis(id){
+  const p = D.projects.find(x=>x.id===id); if(!p) return;
+  if(!_dataLoaded) return;
+
+  const sec = document.getElementById('proj-ai-section-'+id);
+  if(sec) sec.innerHTML = `
+    <div style="background:var(--rose-pale);border:1.5px solid var(--rose-light);border-radius:12px;padding:16px;text-align:center;">
+      <div style="font-size:12px;color:var(--rose-mid);font-weight:600;margin-bottom:8px;"><i class="fa-solid fa-wand-magic-sparkles" style="margin-right:5px;"></i>AI 분석 중...</div>
+      <div style="display:flex;justify-content:center;gap:5px;">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--rose-mid);display:inline-block;animation:dotPulse 1.2s ease-in-out infinite;"></span>
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--rose-mid);display:inline-block;animation:dotPulse 1.2s ease-in-out .4s infinite;"></span>
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--rose-mid);display:inline-block;animation:dotPulse 1.2s ease-in-out .8s infinite;"></span>
+      </div>
+    </div>`;
+
+  // 업무 수집
+  const linked = [];
+  Object.entries(D.items||{}).forEach(([date, arr])=>{
+    (arr||[]).forEach(it=>{ if(it.project===id && !it.isSpan) linked.push({date, name:it.name, type:it.type, status:it.status, src:'cal'}); });
+  });
+  (p.tasks||[]).forEach(tk=>{
+    linked.push({date:tk.date||'', name:tk.name, status:tk.done?'done':'active', src:'task'});
+  });
+  linked.sort((a,b)=>(a.date||'9999').localeCompare(b.date||'9999'));
+
+  if(!linked.length){
+    if(sec) sec.innerHTML = `<div style="font-size:12px;color:var(--ink-soft);text-align:center;padding:10px;border:1.5px dashed var(--rose-light);border-radius:12px;">등록된 업무가 없어요.</div>`;
+    return;
+  }
+
+  const today = dk(TODAY);
+  const taskList = linked.map((l,i)=>{
+    const status = l.status==='done' ? '✅완료' : (l.date && l.date < today ? '⚠️지연' : '⬜진행중');
+    const dateLabel = l.date || '날짜미정';
+    return `${i+1}. [${dateLabel}] [${status}] ${l.name}`;
+  }).join('\n');
+
+  try{
+    const sys = `당신은 프로젝트 관리 전문가입니다. 업무 목록을 보고 현황을 분석해서 3~5줄로 요약해주세요.
+포함할 내용: 완료율, 지연 여부, 다음에 집중해야 할 업무, 전반적인 진행 상황.
+친근하고 실용적인 한국어로, 불필요한 서론 없이 바로 핵심만.`;
+    const usr = `프로젝트: ${p.name}\n상태: ${p.status==='ongoing'?'진행중':'진행예정'}\n오늘: ${today}\n\n업무 목록:\n${taskList}`;
+    const result = await callGemini(sys, usr, 500);
+    if(!_dataLoaded) return;
+    p.aiAnalysis = result;
+    save();
+    renderProjDetail(id);
+  } catch(e){
+    if(sec) sec.innerHTML = `
+      <div style="background:var(--rose-pale);border:1.5px dashed var(--rose-light);border-radius:12px;padding:12px;text-align:center;">
+        <div style="font-size:12px;color:#C07878;margin-bottom:8px;"><i class="fa-solid fa-triangle-exclamation" style="margin-right:4px;"></i>${escHtml(e.message)}</div>
+        <button onclick="runProjAiAnalysis('${id}')" style="font-size:11px;color:var(--rose-mid);background:white;border:1.5px solid var(--rose-light);border-radius:20px;padding:4px 14px;cursor:pointer;font-family:inherit;">다시 시도</button>
+      </div>`;
+  }
+}
+
 async function analyzeProject(id){
   const p = D.projects.find(x=>x.id===id); if(!p) return;
 
-  // 캘린더 연결 업무 + 프로젝트 자체 tasks 모두 수집 (인덱스 포함)
+  // 캘린더 연결 업무 + 프로젝트 자체 tasks 모두 수집
   const linked = [];
   Object.entries(D.items||{}).forEach(([date, arr])=>{
     (arr||[]).forEach(it=>{ if(it.project===id && !it.isSpan) linked.push({date, name:it.name, type:it.type, itemId:it.id, src:'cal'}); });
@@ -5246,6 +5310,15 @@ async function analyzeProject(id){
     linked.push({date: tk.date||'9999-99-99', name: tk.name, itemId:tk.id, src:'task'});
   });
   linked.sort((a,b)=>a.date.localeCompare(b.date));
+
+  // 업무 없으면 AI 호출 안 함
+  if(!linked.length){
+    const wrap = document.getElementById('ai-manual-wrap-'+id);
+    if(wrap) wrap.innerHTML = `<div style="font-size:12px;color:var(--ink-soft);text-align:center;padding:12px 0;">
+      <i class="fa-solid fa-circle-info" style="margin-right:5px;color:var(--rose-mid);"></i>등록된 업무가 없어 매뉴얼을 생성할 수 없어요.
+    </div>`;
+    return;
+  }
 
   // 번호 붙여서 AI에게 전달
   const taskListForAI = linked.map((l,i)=>{
@@ -5292,6 +5365,7 @@ async function analyzeProject(id){
 
     // taskIndices → 실제 업무 객체 매핑 저장
     parsed._taskMap = linked; // 원본 업무 순서 저장
+    if(!_dataLoaded) return; // 안전장치: 로드 전이면 저장 안 함
     p.aiManual = parsed;
     delete p.aiSummary;
     save();
@@ -5404,6 +5478,30 @@ function renderProjDetail(id){
     <div class="prog-bg" style="height:8px;margin-bottom:6px"><div class="prog-fill" style="width:${pct}%"></div></div>
     <div style="font-size:12px;color:var(--ink-mid);margin-bottom:18px">${pct}% 완료 · ${d}/${t} 업무</div>
 
+    <!-- AI 업무 분석 섹션 -->
+    <div id="proj-ai-section-${id}" style="margin-bottom:16px;">
+      ${p.aiAnalysis ? `
+        <div style="background:var(--rose-pale);border:1.5px solid var(--rose-light);border-radius:12px;padding:14px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div style="font-size:10px;font-weight:700;color:var(--rose-mid);letter-spacing:.08em;display:flex;align-items:center;gap:5px;">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> AI 업무 분석
+            </div>
+            <button onclick="runProjAiAnalysis('${id}')" style="font-size:10px;color:var(--rose-mid);background:none;border:none;cursor:pointer;font-family:inherit;">
+              <i class="fa-solid fa-rotate" style="font-size:9px;"></i> 재분석
+            </button>
+          </div>
+          <div style="font-size:12px;color:var(--ink);line-height:1.7;white-space:pre-wrap;">${escHtml(p.aiAnalysis)}</div>
+        </div>
+      ` : `
+        <button onclick="runProjAiAnalysis('${id}')"
+          style="width:100%;padding:10px 14px;border:1.5px dashed var(--rose-light);border-radius:12px;background:var(--rose-pale);font-size:12px;font-weight:600;color:var(--rose-mid);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .15s;"
+          onmouseover="this.style.background='var(--rose)';this.style.color='white';this.style.borderColor='var(--rose)'"
+          onmouseout="this.style.background='var(--rose-pale)';this.style.color='var(--rose-mid)';this.style.borderColor='var(--rose-light)'">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> AI로 업무 현황 분석하기
+        </button>
+      `}
+    </div>
+
     <div style="margin-bottom:16px">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
         <div class="det-sec-lbl" style="margin-bottom:0;">업무 리스트</div>
@@ -5499,11 +5597,11 @@ function renderDoneDetail(p, id, pct, d, t, allTasksHtml){
 
   const headerHtml = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
-      <div>
-        <div class="det-title" onclick="editProjName('${p.id}',this)" title="클릭해서 이름 수정">${escHtml(p.name)}</div>
-        <div style="font-size:11px;color:var(--rose-mid);font-weight:600;margin-top:2px;">
-          <i class="fa-solid fa-circle-check" style="margin-right:4px;"></i>완료 · ${d}건 업무
+      <div class="det-title" onclick="editProjName('${p.id}',this)" title="클릭해서 이름 수정">${escHtml(p.name)}</div>
       ${headerControls}
+    </div>
+    <div style="font-size:11px;color:var(--rose-mid);font-weight:600;margin-bottom:10px;">
+      <i class="fa-solid fa-circle-check" style="margin-right:4px;"></i>완료 · ${d}건 업무
     </div>
     ${p.desc ? `<div style="font-size:12px;color:var(--ink-soft);margin-bottom:14px;padding:8px 12px;background:var(--rose-pale);border-radius:var(--rs);">${escHtml(p.desc)}</div>` : ''}`;
 
@@ -5594,6 +5692,7 @@ function renderDoneDetail(p, id, pct, d, t, allTasksHtml){
         <textarea class="pmemo" oninput="saveProjMemo('${id}',this.value)">${p.memo||''}</textarea>
       </div>
       <div id="proj-notes-section-${id}" style="margin-top:18px;">${renderProjNotesHtml(id)}</div>`;
+  } else {
     // 매뉴얼 없음 = 자동 생성 중
     return `
       ${headerHtml}
@@ -5646,17 +5745,30 @@ async function callGemini(systemPrompt, userPrompt, maxTokens){
   maxTokens = maxTokens || 3000;
   const GEMINI_KEY = _geminiApiKey;
   if(!GEMINI_KEY){ showApiKeyModal(); throw new Error('API 키를 먼저 입력해주세요.'); }
-  const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+GEMINI_KEY,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({
-      contents:[{ role:'user', parts:[{ text: systemPrompt + '\n\n' + userPrompt }] }],
-      generationConfig:{ maxOutputTokens: maxTokens, temperature:0.1 }
-    })
-  });
-  const data = await res.json();
-  if(data.error) throw new Error(data.error.message);
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+  // 15초 타임아웃
+  const controller = new AbortController();
+  const timeout = setTimeout(()=>controller.abort(), 15000);
+
+  try{
+    const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+GEMINI_KEY,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      signal: controller.signal,
+      body: JSON.stringify({
+        contents:[{ role:'user', parts:[{ text: systemPrompt + '\n\n' + userPrompt }] }],
+        generationConfig:{ maxOutputTokens: maxTokens, temperature:0.1 }
+      })
+    });
+    clearTimeout(timeout);
+    const data = await res.json();
+    if(data.error) throw new Error(data.error.message);
+    return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  } catch(e){
+    clearTimeout(timeout);
+    if(e.name === 'AbortError') throw new Error('AI 응답 시간 초과 (15초). 다시 시도해주세요.');
+    throw e;
+  }
 }
 
 // ════════════════════════════════════════
@@ -5921,6 +6033,7 @@ function closeAiPreview(){
 }
 
 function confirmAiQuick(isMobile){
+  if(!_dataLoaded || !_aiQuickParsed.length) return; // 안전장치
   _aiQuickParsed.forEach(it=>{
     const key = it.date;
     if(!key||!/^\d{4}-\d{2}-\d{2}$/.test(key)) return;
@@ -6424,18 +6537,24 @@ function editProjName(id, el){
 
 function chProjStatus(id,st){
   const p=D.projects.find(x=>x.id===id);
-  if(p){
-    const wasNotDone = p.status !== 'done';
-    p.status=st;
-    if(st!=='done'){
-      delete p.aiSummary;
-      delete p.aiManual; // 완료 아닌 상태로 복귀 시 매뉴얼 삭제
-    }
-    save(); renderProjs(); renderProjDetail(id);
-    // 완료로 바뀔 때 자동 AI 매뉴얼 생성
-    if(st==='done' && wasNotDone){
-      analyzeProject(id);
-    }
+  if(!p) return;
+  const wasNotDone = p.status !== 'done';
+  p.status = st;
+  if(st !== 'done'){
+    delete p.aiSummary;
+    delete p.aiManual;
+  }
+  if(st === 'done'){
+    delete p.aiAnalysis; // 완료되면 분석 삭제 (매뉴얼로 대체)
+  }
+  save();
+  renderProjs();
+  renderProjDetail(id); // 먼저 렌더링 (매뉴얼 없는 상태로)
+  // 완료로 바뀔 때 업무 있으면 자동 AI 매뉴얼 생성
+  if(st === 'done' && wasNotDone){
+    const hasItems = Object.values(D.items||{}).some(arr=>arr.some(it=>it.project===id));
+    const hasTasks = (p.tasks||[]).length > 0;
+    if(hasItems || hasTasks) analyzeProject(id);
   }
 }
 // 캘린더 연결 업무 완료 토글
