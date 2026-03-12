@@ -1541,7 +1541,6 @@ main.main{display:block;}
   .proj-layout.detail-open #routine-section{ display:none !important; }
   /* 보고서 그리드 */
   #report-this-week,#report-next-week{ width:100%; }
-  .dash-grid[style*="1fr 1fr"]:not(#weekly-report-grid){ grid-template-columns:1fr!important; }
   /* 카드 */
   .card{ padding:14px; border-radius:10px; }
   /* 모달 */
@@ -1682,6 +1681,12 @@ main.main{display:block;}
     bottom: 18px;
     right: 20px;
   }
+}
+
+/* ── 아이패드(768px+): 대시보드 항상 2컬럼 유지 (세로/가로 모두) ── */
+@media (min-width:768px) and (max-width:950px){
+  .dash-grid{ grid-template-columns:1fr 1fr !important; gap:14px !important; }
+  .dash-grid-wide{ grid-template-columns:2fr 1fr !important; }
 }
 
 /* ── iPad AI/검색 플로팅 버튼 (768px ~ 950px) ── */
@@ -3469,7 +3474,7 @@ async function gsGet(payload){
 // 모든 시트를 병렬로 전송해 속도 개선
 async function gsSaveAll(data){
   const SHEETS = ['items','projects','minutes','archiving','plannerMeta','misc'];
-  const sends = [];
+  const sends = []; // lazy functions, not promises
 
   for(const field of SHEETS){
     const val = data[field];
@@ -3477,7 +3482,6 @@ async function gsSaveAll(data){
     if(Array.isArray(val) && val.length === 0 && field !== 'misc' && field !== 'minutes') continue;
     if(field === 'plannerMeta' && typeof val === 'object' && !Object.keys(val).length) continue;
 
-    // items: 날짜 키 단위로 분할
     if(field === 'items' && typeof val === 'object'){
       const keys = Object.keys(val);
       let batches = [];
@@ -3493,18 +3497,15 @@ async function gsSaveAll(data){
         }
       }
       if(Object.keys(batch).length > 0) batches.push(batch);
-      // 각 배치를 병렬 전송 (단, 첫 배치만 _isFirst:true)
       batches.forEach((b, i) => {
-        sends.push(gsSend({ action:'save', _isFirst: i===0, data:{ items: b }}));
+        sends.push(()=>gsSend({ action:'save', _isFirst: i===0, data:{ items: b }}));
       });
       continue;
     }
 
-    // minutes: 건 단위로 분할 (빈 배열도 반드시 전송)
     if(field === 'minutes' && Array.isArray(val)){
       if(val.length === 0){
-        // 빈 배열: 전체 삭제 — 반드시 전송
-        sends.push(gsSend({ action:'save', _isFirst: true, data:{ minutes: [] }}));
+        sends.push(()=>gsSend({ action:'save', _isFirst: true, data:{ minutes: [] }}));
         continue;
       }
       let batches = [];
@@ -3521,19 +3522,19 @@ async function gsSaveAll(data){
       }
       if(batch.length > 0) batches.push(batch);
       batches.forEach((b, i) => {
-        sends.push(gsSend({ action:'save', _isFirst: i===0, data:{ minutes: b }}));
+        sends.push(()=>gsSend({ action:'save', _isFirst: i===0, data:{ minutes: b }}));
       });
       continue;
     }
 
-    // 그 외 시트: 단일 전송
-    sends.push(gsSend({ action:'save', _isFirst: true, data:{ [field]: val }}));
+    sends.push(()=>gsSend({ action:'save', _isFirst: true, data:{ [field]: val }}));
   }
 
-  // 모든 전송을 병렬로 실행, 마지막 성공 응답 반환
-  const results = await Promise.allSettled(sends);
-  const lastOk = results.filter(r=>r.status==='fulfilled').map(r=>r.value).pop();
-  return lastOk || { ok: true };
+  // 순차 전송 — 병렬 시 clearContents race condition으로 데이터 유실
+  for(const fn of sends){
+    try{ await fn(); } catch(e){ console.warn('[Sync] 배치 전송 실패:', e); }
+  }
+  return { ok: true };
 }
 
 // ── 동기화 상태 표시 ──
