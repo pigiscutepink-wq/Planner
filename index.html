@@ -1690,7 +1690,13 @@ main.main{display:block;}
 @media (min-width:768px) and (max-width:950px){
   .dash-grid{ grid-template-columns:1fr 1fr !important; gap:14px !important; }
   .dash-grid-wide{ grid-template-columns:2fr 1fr !important; }
+  #weekly-report-grid{ grid-template-columns:1fr 1fr !important; }
 }
+
+/* ── JS 감지 태블릿: dash-grid 항상 2열, dash-grid-wide 2열 ── */
+html.is-tablet .dash-grid{ grid-template-columns:1fr 1fr !important; gap:14px !important; }
+html.is-tablet .dash-grid-wide{ grid-template-columns:2fr 1fr !important; }
+html.is-tablet #weekly-report-grid{ grid-template-columns:1fr 1fr !important; }
 
 /* ── iPad AI/검색 플로팅 버튼 (768px ~ 950px) ── */
 @media (min-width:768px) and (max-width:950px){
@@ -2065,6 +2071,17 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
   align-items: center; justify-content: center; gap: 8px;
   box-shadow: 0 6px 24px rgba(222,192,194,0.5);
   animation: slideUp .3s ease;
+}
+/* ══════════════════════════════════════════
+   최종 아이패드 대시보드 레이아웃 오버라이드
+   (모든 규칙보다 뒤에 위치 → 항상 우선 적용)
+   ══════════════════════════════════════════ */
+@media (min-width:768px) and (max-width:950px){
+  .dash-grid-wide{ grid-template-columns:2fr 1fr !important; display:grid !important; }
+  .dash-grid:not(#weekly-report-grid){ grid-template-columns:1fr 1fr !important; }
+}
+@media (min-width:768px) and (max-width:950px) and (orientation:portrait){
+  .dash-grid-wide{ grid-template-columns:2fr 1fr !important; display:grid !important; }
 }
 
 </style>
@@ -5145,6 +5162,18 @@ window.addEventListener('touchstart', function onFirstTouch(){
   document.documentElement.classList.add('touch-device');
   window.removeEventListener('touchstart', onFirstTouch);
 }, {passive:true});
+
+// ── 아이패드/태블릿 감지: 768px 이상 터치기기는 tablet 클래스 ──
+function applyTabletClass(){
+  const w = window.innerWidth;
+  if(w >= 768 && ('ontouchstart' in window || navigator.maxTouchPoints > 0)){
+    document.documentElement.classList.add('is-tablet');
+  } else {
+    document.documentElement.classList.remove('is-tablet');
+  }
+}
+applyTabletClass();
+window.addEventListener('resize', applyTabletClass);
 
 document.addEventListener('DOMContentLoaded', ()=>{
   document.querySelectorAll('#proj-status-toggle .ac-toggle-btn').forEach(btn=>{
