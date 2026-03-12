@@ -4,7 +4,7 @@
 //  - 외부 API 요청은 캐시 안 함 (항상 네트워크)
 // ════════════════════════════════════════
 
-const CACHE_NAME = 'bodak-v6'; // ← 버전 변경 시 여기만 올리기
+const CACHE_NAME = 'bodak-v7'; // ← 버전 변경 시 여기만 올리기
 
 // 캐싱할 앱 파일들
 const APP_ASSETS = [
