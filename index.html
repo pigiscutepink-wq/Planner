@@ -1847,10 +1847,21 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
 .cal-sec-task .chip-proj {
   display: none !important;
 }
-/* 칩 담당자 아이콘도 숨겨서 텍스트 최대화 */
-.cal-sec-schedule .chip .ca,
-.cal-sec-task .chip .ca {
+/* 칩 액션버튼: 완료 버튼은 hover시 보이도록 유지, 나머지(삭제/지연)만 숨김 */
+.cal-sec-schedule .chip .ca.del,
+.cal-sec-schedule .chip .ca.delay,
+.cal-sec-task .chip .ca.del,
+.cal-sec-task .chip .ca.delay {
   display: none !important;
+}
+/* 터치기기: 완료버튼 항상 표시 (hover 없으므로) */
+@media (hover:none){
+  .chip .chip-acts { opacity: 1 !important; }
+  .chip .ca.done {
+    width: 18px; height: 18px;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(0,0,0,0.08);
+  }
 }
 /* cn 텍스트 최대한 보이도록 */
 .cal-sec-schedule .chip .cn,
@@ -5424,7 +5435,6 @@ function renderProjDetail(id){
         onclick="toggleTaskDone('${id}','${it._dateKey}','${it.id}')"></i>
       <span class="ptask-name${it.status==='done'?' done':''}">${escHtml(it.name)}</span>
       <span class="ptask-date-btn set">${mo}/${dy}${timeStr}</span>
-      <span style="font-size:9px;color:var(--ink-soft);background:var(--gray);border-radius:10px;padding:1px 6px;">캘린더</span>
     </div>`;
   }
 
@@ -5437,7 +5447,7 @@ function renderProjDetail(id){
         ondblclick="editProjTaskName('${id}','${tk.id}',this)">${escHtml(tk.name)}</span>
       ${dateLabel
         ? `<span class="ptask-date-btn set" onclick="editProjTaskDate('${id}','${tk.id}',this)">${dateLabel}</span>`
-        : `<button class="ptask-date-btn" onclick="editProjTaskDate('${id}','${tk.id}',this)">+ 날짜</button>`
+        : `<span class="ptask-date-btn" onclick="editProjTaskDate('${id}','${tk.id}',this)" style="color:var(--ink-soft);background:var(--gray);border-color:transparent;">미지정</span>`
       }
       <button class="ptask-del" onclick="delProjTask('${id}','${tk.id}')"><i class="fa-solid fa-xmark"></i></button>
     </div>`;
@@ -6273,19 +6283,23 @@ function renderRoutineDetail(p, det){
         onclick="toggleTaskDone('${id}','${it._dateKey}','${it.id}')"></i>
       <span class="ptask-name${st==='done'?' done':''}">${escHtml(it.name)}</span>
       <span class="ptask-date-btn set">${mo}/${dy}${timeStr}</span>
-      <span style="font-size:9px;color:var(--ink-soft);background:var(--gray);border-radius:10px;padding:1px 6px;">캘린더</span>
     </div>`;
   }
 
   function taskRow(tk){
     const st = tk.taskStatus||'upcoming';
+    const dateLabel = tk.date ? (()=>{const d=fromDk(tk.date);return `${d.getMonth()+1}/${d.getDate()}`;})() : null;
     return `<div class="ptask-row" id="ptask-${tk.id}" style="align-items:center;">
       <i class="ptask-check fa-solid fa-${st==='done'?'circle-check':'circle'}${st==='done'?' done':''}"
         onclick="toggleRoutineTask('${id}','${tk.id}')"></i>
       <span class="ptask-name${st==='done'?' done':''}"
         ondblclick="editProjTaskName('${id}','${tk.id}',this)">${escHtml(tk.name)}</span>
+      ${dateLabel
+        ? `<span class="ptask-date-btn set" style="margin-left:auto;">${dateLabel}</span>`
+        : `<span class="ptask-date-btn" style="margin-left:auto;color:var(--ink-soft);background:var(--gray);border-color:transparent;">미지정</span>`
+      }
       <select onchange="setRoutineTaskStatus('${id}','${tk.id}',this.value)"
-        style="font-size:10px;padding:2px 6px;border-radius:10px;border:1px solid ${tsBg[st]};background:${tsBg[st]};color:${tsCls[st]};cursor:pointer;outline:none;font-weight:600;margin-left:auto;flex-shrink:0;">
+        style="font-size:10px;padding:2px 6px;border-radius:10px;border:1px solid ${tsBg[st]};background:${tsBg[st]};color:${tsCls[st]};cursor:pointer;outline:none;font-weight:600;flex-shrink:0;">
         <option value="upcoming" ${st==='upcoming'?'selected':''}>진행예정</option>
         <option value="ongoing"  ${st==='ongoing' ?'selected':''}>진행중</option>
         <option value="done"     ${st==='done'    ?'selected':''}>완료</option>
@@ -6347,9 +6361,10 @@ function renderRoutineDetail(p, det){
 
   det.innerHTML=`
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
-      <div>
-        <div class="det-title" onclick="editProjName('${id}',this)" title="클릭해서 이름 수정">${escHtml(p.name)}</div>
-        <span class="badge badge-rt" style="margin-top:4px;display:inline-block;">루틴</span>
+      <div class="det-title" onclick="editProjName('${id}',this)" title="클릭해서 이름 수정">${escHtml(p.name)}</div>
+      <div style="display:flex;gap:6px;align-items:center;flex-shrink:0;">
+        <span class="badge badge-rt">루틴</span>
+        <select onchange="chProjStatus('${id}',this.value)" class="fs" style="font-size:11px;padding:4px 8px">
           <option value="upcoming">진행예정</option>
           <option value="ongoing">진행중</option>
           <option value="done">완료</option>
