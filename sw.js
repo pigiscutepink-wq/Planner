@@ -4,7 +4,7 @@
 //  - 외부 API 요청은 캐시 안 함 (항상 네트워크)
 // ════════════════════════════════════════
 
-const CACHE_NAME = 'bodak-v7'; // ← 버전 변경 시 여기만 올리기
+const CACHE_NAME = 'bodak-v8'; // ← 버전 변경 시 여기만 올리기
 
 // 캐싱할 앱 파일들
 const APP_ASSETS = [
@@ -21,8 +21,8 @@ const BYPASS_ORIGINS = [
   'script.google.com',
   'script.googleusercontent.com',
   'sheets.googleapis.com',
-  'api.anthropic.com', // ← 추가: AI 기능 fetch 오류 방지
-  'generativelanguage.googleapis.com', // ← Gemini API
+  'api.anthropic.com',
+  'generativelanguage.googleapis.com',
 ];
 
 // ── 설치: 앱 파일 캐싱 ──

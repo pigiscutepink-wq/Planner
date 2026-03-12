@@ -749,6 +749,13 @@ main.main{display:block;}
   /* 카드뷰는 기본 표시, 비활성 시 숨김 */
   #planner-card-view { display:none; }
   #planner-card-view.prv-card-active { display:block !important; }
+  /* 프로젝트 레이아웃 모바일 전용 */
+  .proj-layout{ grid-template-columns:1fr; }
+  #proj-detail-wrap{ display:none; }
+  .proj-layout.detail-open #proj-list{ display:none; }
+  .proj-layout.detail-open #proj-detail-wrap{ display:block; }
+  .proj-layout.detail-open #proj-back-btn{ display:inline-flex!important;margin-bottom:12px; }
+  .proj-layout.detail-open #routine-section{ display:none !important; }
 }
 /* ── DASH GRID ── */
 .dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;}
@@ -1544,12 +1551,7 @@ main.main{display:block;}
   .dash-grid{ grid-template-columns:1fr;gap:12px; }
   .dash-grid-wide{ grid-template-columns:1fr; }
   .arch-grid{ grid-template-columns:1fr; }
-  .proj-layout{ grid-template-columns:1fr; }
-  #proj-detail-wrap{ display:none; } /* 모바일: 목록만 먼저 */
-  .proj-layout.detail-open #proj-list{ display:none; }
-  .proj-layout.detail-open #proj-detail-wrap{ display:block; }
-  .proj-layout.detail-open #proj-back-btn{ display:inline-flex!important;margin-bottom:12px; }
-  .proj-layout.detail-open #routine-section{ display:none !important; }
+  /* proj-layout은 743px 이하(진짜 모바일)에서만 1컬럼 */
   /* 보고서 그리드 */
   #report-this-week,#report-next-week{ width:100%; }
   /* 카드 */
@@ -5376,7 +5378,7 @@ function renderProjs(){
       card.onclick=(e)=>{
         if(e.target.classList.contains('proj-drag-handle')) return;
         selProjId=p.id;renderProjs();renderProjDetail(p.id);
-        if(window.innerWidth<=767)document.querySelector('.proj-layout')?.classList.add('detail-open');
+        if(window.innerWidth<=743)document.querySelector('.proj-layout')?.classList.add('detail-open');
       };
       // Drag-drop events
       card.addEventListener('dragstart',e=>{
@@ -5446,11 +5448,11 @@ function renderProjs(){
             ${doneC?`<span style="color:#7B3FA0;">✓ ${doneC}</span>`:''}
             ${!total?`<span style="color:var(--ink-soft);">업무 없음</span>`:''}
           </div>
-          <button onclick="event.stopPropagation();selProjId='${p.id}';renderProjs();renderProjDetail('${p.id}');if(window.innerWidth<=767)document.querySelector('.proj-layout')?.classList.add('detail-open');"
+          <button onclick="event.stopPropagation();selProjId='${p.id}';renderProjs();renderProjDetail('${p.id}');if(window.innerWidth<=743)document.querySelector('.proj-layout')?.classList.add('detail-open');"
             style="font-size:10px;padding:3px 10px;border-radius:10px;border:1px solid #C49BDC;background:#F3ECFA;color:#7B3FA0;cursor:pointer;font-weight:600;white-space:nowrap;">더보기</button>
         </div>
       `;
-      card.onclick=()=>{selProjId=p.id;renderProjs();renderProjDetail(p.id);if(window.innerWidth<=767)document.querySelector('.proj-layout')?.classList.add('detail-open');};
+      card.onclick=()=>{selProjId=p.id;renderProjs();renderProjDetail(p.id);if(window.innerWidth<=743)document.querySelector('.proj-layout')?.classList.add('detail-open');};
       routineList.appendChild(card);
     });
   }
@@ -10194,8 +10196,10 @@ document.getElementById('min-modal').onclick=e=>{
   document.addEventListener('click', e=>{
     const wrap = document.getElementById('sidebar-search-panel');
     const btn  = document.getElementById('sidebar-search-btn');
-    if(!wrap.contains(e.target) && e.target!==btn) {
+    if(!wrap.contains(e.target) && !btn.contains(e.target)) {
       document.getElementById('global-search-results').classList.remove('open');
+      wrap.classList.remove('open');
+      document.getElementById('global-search-input').value='';
     }
   });
 })();
@@ -10793,7 +10797,7 @@ function handleMobileSearch(q){
 //  MOBILE: 프로젝트 상세 ↔ 목록 토글
 // ════════════════════════════════════════
 function openProjDetailMobile(id){
-  if(window.innerWidth<=767){
+  if(window.innerWidth<=743){
     document.querySelector('.proj-layout')?.classList.add('detail-open');
   }
 }
