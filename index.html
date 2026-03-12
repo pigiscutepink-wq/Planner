@@ -1697,7 +1697,7 @@ main.main{display:block;}
 }
 
 /* ── 아이패드(768px+): 대시보드 항상 2컬럼 유지 (세로/가로 모두) ── */
-@media (min-width:768px) and (max-width:1180px){
+@media (min-width:744px) and (max-width:1180px){
   .dash-grid{ grid-template-columns:1fr 1fr !important; gap:14px !important; }
   .dash-grid-wide{ grid-template-columns:2fr 1fr !important; }
   #weekly-report-grid{ grid-template-columns:1fr 1fr !important; }
@@ -1709,7 +1709,7 @@ html.is-tablet .dash-grid-wide{ grid-template-columns:2fr 1fr !important; }
 html.is-tablet #weekly-report-grid{ grid-template-columns:1fr 1fr !important; }
 
 /* ── iPad AI/검색 플로팅 버튼 (768px ~ 1180px) ── */
-@media (min-width:768px) and (max-width:1180px){
+@media (min-width:744px) and (max-width:1180px){
   /* sidebar의 AI/검색 버튼 숨김 (≤950px에서 이미 숨김) */
   #sidebar-search-btn{ display:none!important; }
   #sidebar-ai-btn{ display:none!important; }
@@ -2085,11 +2085,11 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
    최종 아이패드 대시보드 레이아웃 오버라이드
    (모든 규칙보다 뒤에 위치 → 항상 우선 적용)
    ══════════════════════════════════════════ */
-@media (min-width:768px) and (max-width:1180px){
+@media (min-width:744px) and (max-width:1180px){
   .dash-grid-wide{ grid-template-columns:2fr 1fr !important; display:grid !important; }
   .dash-grid:not(#weekly-report-grid){ grid-template-columns:1fr 1fr !important; }
 }
-@media (min-width:768px) and (max-width:1180px) and (orientation:portrait){
+@media (min-width:744px) and (max-width:1180px) and (orientation:portrait){
   .dash-grid-wide{ grid-template-columns:2fr 1fr !important; display:grid !important; }
 }
 
@@ -5204,7 +5204,17 @@ function applyTabletClass(){
   }
 }
 applyTabletClass();
-window.addEventListener('resize', applyTabletClass);
+window.addEventListener('resize', ()=>{
+  applyTabletClass();
+  // 창 크기 바뀌면 열려있는 검색창 모두 닫기
+  if(typeof closeMobileSearch==='function') closeMobileSearch();
+  const sp = document.getElementById('sidebar-search-panel');
+  const gi = document.getElementById('global-search-input');
+  const gr = document.getElementById('global-search-results');
+  if(sp) sp.classList.remove('open');
+  if(gi) gi.value='';
+  if(gr) gr.classList.remove('open');
+});
 // 렌더링 후에도 재적용 (동적 DOM 생성 대비)
 document.addEventListener('DOMContentLoaded', applyTabletClass);
 
@@ -10194,12 +10204,20 @@ document.getElementById('min-modal').onclick=e=>{
     if(e.key==='Escape') closeSearch();
   });
   document.addEventListener('click', e=>{
+    // sidebar 검색패널 닫기
     const wrap = document.getElementById('sidebar-search-panel');
     const btn  = document.getElementById('sidebar-search-btn');
-    if(!wrap.contains(e.target) && !btn.contains(e.target)) {
+    if(wrap && btn && !wrap.contains(e.target) && !btn.contains(e.target)) {
       document.getElementById('global-search-results').classList.remove('open');
       wrap.classList.remove('open');
       document.getElementById('global-search-input').value='';
+    }
+    // mobile 검색패널 닫기
+    const mWrap = document.getElementById('mobile-search-panel');
+    const mBtn  = document.getElementById('mobile-search-btn');
+    if(mWrap && mBtn && mWrap.classList.contains('open') &&
+       !mWrap.contains(e.target) && !mBtn.contains(e.target)) {
+      if(typeof closeMobileSearch==='function') closeMobileSearch();
     }
   });
 })();
