@@ -1857,10 +1857,11 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
 .cal-sec-task .chip .ca.delay {
   display: none !important;
 }
-/* 터치기기: 완료버튼 항상 표시 (hover 없으므로) */
+/* 터치기기: chip-acts는 기본 숨김 — 탭 시 JS로 토글 */
 @media (hover:none){
-  .chip .chip-acts { opacity: 1 !important; }
-  .chip .ca.done {
+  .chip .chip-acts { opacity: 0; pointer-events:none; transition:opacity .15s; }
+  .chip.acts-open .chip-acts { opacity: 1 !important; pointer-events:auto; }
+  .chip.acts-open .ca.done {
     width: 18px; height: 18px;
     background: rgba(255,255,255,0.9);
     border: 1px solid rgba(0,0,0,0.08);
@@ -4642,6 +4643,22 @@ function makeChip(it,key,idx){
       <button class="ca done" onclick="setStatusById('${it.id}','done')" title="완료"><i class="fa-solid fa-check"></i></button>
     </div>
   `;
+  // 터치기기: 칩 탭 시 chip-acts 토글 (PC는 CSS hover로 처리)
+  div.addEventListener('touchstart', function(e){
+    if(e.target.closest('.chip-acts')||e.target.closest('.cn')||e.target.closest('.chip-proj')) return;
+    e.preventDefault();
+    const isOpen = div.classList.contains('acts-open');
+    // 다른 열린 칩 모두 닫기
+    document.querySelectorAll('.chip.acts-open').forEach(c=>c.classList.remove('acts-open'));
+    if(!isOpen) div.classList.add('acts-open');
+  }, {passive:false});
+  // 다른 곳 터치 시 닫기
+  document.addEventListener('touchstart', function handler(e){
+    if(!div.contains(e.target)){
+      div.classList.remove('acts-open');
+      document.removeEventListener('touchstart', handler);
+    }
+  }, {passive:true});
   return div;
 }
 
