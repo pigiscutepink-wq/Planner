@@ -608,6 +608,7 @@ main.main{display:block;}
   width:100%;padding:10px 13px;border:1.5px solid var(--rose-light);
   border-radius:var(--rs);font-size:13px;font-family:inherit;
   background:var(--rose-pale);color:var(--ink);outline:none;transition:border .14s,background .14s;
+  box-sizing:border-box;
 }
 .fi:focus,.fs:focus,.ft:focus{border-color:var(--rose);background:white;}
 
@@ -1054,11 +1055,30 @@ main.main{display:block;}
 .memo-editor strong{font-weight:700;color:var(--ink);}
 .memo-editor .mk-pink{color:var(--rose);font-weight:600;}
 .memo-pad-resize{
-  position:absolute;bottom:2px;right:2px;width:24px;height:24px;cursor:se-resize;
+  position:absolute;bottom:2px;right:2px;width:32px;height:32px;cursor:se-resize;
   color:#D0C0C0;font-size:10px;display:flex;align-items:center;justify-content:center;
-  opacity:.5;
+  opacity:.5;touch-action:none;
 }
 .memo-pad-resize:hover{opacity:1;}
+/* 아이패드: 메모 wrap을 스크롤 가능하게, 메모 크기 자유롭게 */
+@media (max-width:1180px) and (pointer: fine), (max-width:1180px) and (pointer: coarse) {
+  #memo-pad-wrap {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 14px !important;
+    align-items: flex-start !important;
+    overflow-y: auto;
+  }
+  .memo-pad {
+    touch-action: pan-x pan-y; /* 스크롤은 허용, 리사이즈 핸들에서만 none */
+  }
+  .memo-pad-resize {
+    touch-action: none; /* 리사이즈 핸들만 touch-action:none */
+    width: 36px;
+    height: 36px;
+    opacity: 0.7;
+  }
+}
 
 /* ── WEEKLY REPORT CARD ── */
 .report-card{
@@ -1882,6 +1902,12 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
   width: 18px; height: 18px;
   background: rgba(255,255,255,0.9);
   border: 1px solid rgba(0,0,0,0.08);
+}
+/* 아이패드: pointer:fine 지원 기기는 hover로 체크박스 표시 (PC와 동일하게) */
+@media (pointer: fine) {
+  .touch-device .chip .chip-acts { display: none !important; }
+  .touch-device .chip:hover .chip-acts { display: flex !important; opacity: 1 !important; pointer-events:auto; }
+  .touch-device .chip.acts-open .chip-acts { display: flex !important; opacity: 1 !important; pointer-events:auto; }
 }
 /* cn 텍스트 최대한 보이도록 */
 .cal-sec-schedule .chip .cn,
@@ -3297,17 +3323,17 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
   <div class="modal" style="width:540px;max-height:88vh;overflow-y:auto;">
     <div class="modal-title" id="archiving-modal-title">새 노트</div>
     <!-- 업무/개인 + 날짜 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <div style="display:grid;grid-template-columns:1fr 140px;gap:10px;">
       <div class="fg">
         <label class="fl">구분</label>
         <div style="display:flex;border:1.5px solid var(--rose-light);border-radius:var(--rs);overflow:hidden;">
           <button class="ac-toggle-btn on" id="ac-modal-work"     onclick="setAcType('work')"     style="flex:1;font-size:10.5px;">💼 업무</button>
           <button class="ac-toggle-btn"    id="ac-modal-personal" onclick="setAcType('personal')" style="flex:1;font-size:10.5px;">🌿 개인</button>
           <button class="ac-toggle-btn"    id="ac-modal-study"    onclick="setAcType('study')"    style="flex:1;font-size:10.5px;">📚 스터디</button>
-          <button class="ac-toggle-btn"    id="ac-modal-idea"     onclick="setAcType('idea')"     style="flex:1;font-size:10.5px;">💡 아이디어</button>
+          <button class="ac-toggle-btn"    id="ac-modal-idea"     onclick="setAcType('idea')"     style="flex:1.3;font-size:10px;white-space:nowrap;padding:0 4px;">💡 아이디어</button>
         </div>
       </div>
-      <div class="fg"><label class="fl">날짜</label><input type="date" class="fi" id="ac-date"></div>
+      <div class="fg"><label class="fl">날짜</label><input type="date" class="fi" id="ac-date" style="width:100%;box-sizing:border-box;"></div>
     </div>
     <!-- 주제 + 프로젝트 -->
     <div class="fg"><label class="fl">주제 *</label><input type="text" class="fi" id="ac-title" placeholder="노트 주제를 입력하세요"></div>
@@ -3509,7 +3535,7 @@ let D = {
   routines: []      // [{id, title, icon, startTime, endTime, color, repeat, repeatEnd}]
 };
 
-const GS_URL = 'https://script.google.com/macros/s/AKfycbyl4ZqT333R7fxv8OXtEIbAc8DC8DAbn6UnF1Yn_ttvSCQqH6JzrYalIrclAVNona80Xw/exec';
+const GS_URL = 'https://script.google.com/macros/s/AKfycbxCdIEdvZa2VY1GBuxhSW4QMbz8ppW94tvl0v7-dhY895lpUsTwDgZmwJ1eeTdTcNcSjw/exec';
 
 // GS 항상 활성화
 function isGsEnabled(){ return true; }
@@ -4672,8 +4698,23 @@ function makeChip(it,key,idx){
     </div>
   `;
   // 터치기기: 칩 탭 시 chip-acts 토글 (PC는 CSS hover로 처리)
+  // pointer:fine(아이패드 미니 등) 이면 pointerenter/leave로 hover처럼 동작
+  const hasFinePointer = window.matchMedia && window.matchMedia('(pointer: fine)').matches;
+  if(document.documentElement.classList.contains('touch-device') && hasFinePointer){
+    // 아이패드 + Apple Pencil / 트랙패드: hover처럼 보이도록
+    div.addEventListener('pointerenter', function(e){
+      if(e.pointerType==='touch') return; // 손가락 터치 시는 제외
+      document.querySelectorAll('.chip.acts-open').forEach(c=>c.classList.remove('acts-open'));
+      div.classList.add('acts-open');
+    });
+    div.addEventListener('pointerleave', function(e){
+      if(e.pointerType==='touch') return;
+      div.classList.remove('acts-open');
+    });
+  }
   div.addEventListener('touchstart', function(e){
     if(e.target.closest('.chip-acts')||e.target.closest('.cn')||e.target.closest('.chip-proj')) return;
+    if(hasFinePointer) return; // fine pointer 기기는 위의 pointerenter로 처리
     e.preventDefault();
     const isOpen = div.classList.contains('acts-open');
     // 다른 열린 칩 모두 닫기
@@ -5427,6 +5468,58 @@ function renderProjs(){
         D.projects.filter(x=>(x.category||'work')===activeProjCat&&x.status!=='routine').forEach(x=>{x.order=ord++;});
         save(); renderProjs(); projDragSrcId=null;
       });
+      // ── 터치 드래그 (아이패드) ──
+      (()=>{
+        const handle=card.querySelector('.proj-drag-handle');
+        if(!handle) return;
+        handle.addEventListener('touchstart',e=>{
+          e.stopPropagation();
+          const touch=e.touches[0];
+          let touchMoved=false;
+          projDragSrcId=p.id;
+          card.style.opacity='0.5';
+          const ghost=card.cloneNode(true);
+          ghost.style.cssText=`position:fixed;left:${card.getBoundingClientRect().left}px;top:${touch.clientY-20}px;width:${card.offsetWidth}px;opacity:0.85;z-index:9999;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.18);border-radius:12px;`;
+          document.body.appendChild(ghost);
+          function onTM(ev){
+            ev.preventDefault(); touchMoved=true;
+            const t=ev.touches[0];
+            ghost.style.top=(t.clientY-20)+'px';
+            const els=document.elementsFromPoint(t.clientX,t.clientY);
+            list.querySelectorAll('.proj-card').forEach(c=>c.classList.remove('drag-over-top','drag-over-bot'));
+            const tgt=els.find(el=>el.classList.contains('proj-card')&&el!==card&&el!==ghost);
+            if(tgt){const r=tgt.getBoundingClientRect();tgt.classList.add(t.clientY<r.top+r.height/2?'drag-over-top':'drag-over-bot');}
+          }
+          function onTE(ev){
+            document.removeEventListener('touchmove',onTM);
+            document.removeEventListener('touchend',onTE);
+            ghost.remove(); card.style.opacity='';
+            if(!touchMoved){projDragSrcId=null;return;}
+            const t=ev.changedTouches[0];
+            const els=document.elementsFromPoint(t.clientX,t.clientY);
+            list.querySelectorAll('.proj-card').forEach(c=>c.classList.remove('drag-over-top','drag-over-bot'));
+            const tgt=els.find(el=>el.classList.contains('proj-card')&&el!==card);
+            if(tgt&&projDragSrcId&&projDragSrcId!==tgt.dataset.pid){
+              const r=tgt.getBoundingClientRect();
+              const insertBefore=t.clientY<r.top+r.height/2;
+              const srcIdx=D.projects.findIndex(x=>x.id===projDragSrcId);
+              const tgtId=tgt.dataset.pid;
+              const newTgtIdx=D.projects.findIndex(x=>x.id===tgtId);
+              if(srcIdx>=0&&newTgtIdx>=0){
+                const [moved]=D.projects.splice(srcIdx,1);
+                const finalIdx=D.projects.findIndex(x=>x.id===tgtId);
+                D.projects.splice(insertBefore?finalIdx:finalIdx+1,0,moved);
+                let ord=0;
+                D.projects.filter(x=>(x.category||'work')===activeProjCat&&x.status!=='routine').forEach(x=>{x.order=ord++;});
+                save(); renderProjs();
+              }
+            }
+            projDragSrcId=null;
+          }
+          document.addEventListener('touchmove',onTM,{passive:false});
+          document.addEventListener('touchend',onTE,{passive:false});
+        },{passive:true});
+      })();
       list.appendChild(card);
     });
   }
@@ -6999,11 +7092,13 @@ function startResizeMemo(e,id){
   function getXY(ev){ return ev.touches ? ev.touches[0] : ev; }
 
   function onMove(ev){
+    ev.preventDefault();
     const p=getXY(ev);
     const newW=Math.max(180, startW+(p.clientX-startX));
     const newH=Math.max(120, startH+(p.clientY-startY));
     pad.style.width=newW+'px';
     pad.style.height=newH+'px';
+    pad.style.minHeight=newH+'px';
     const m=D.memos.find(x=>x.id===id);
     if(m){m.w=newW;m.h=newH;}
   }
@@ -7548,7 +7643,14 @@ function buildReportText(mon, label){
   const range=weekRangeLabel(mon);
   const days=getWeekDays(mon);
   const groups=groupItemsByProj(days);
-  const keys=Object.keys(groups);
+  // Sort keys by project order (same as buildReportCardInner)
+  const keys=Object.keys(groups).sort((a,b)=>{
+    if(a==='__none__') return 1;
+    if(b==='__none__') return -1;
+    const pa=D.projects.find(p=>p.id===a);
+    const pb=D.projects.find(p=>p.id===b);
+    return (pa?.order??9999)-(pb?.order??9999);
+  });
   let lines=[`${range}`];
   if(!keys.length){ lines.push('등록된 업무 없음'); }
   else {
@@ -10318,7 +10420,10 @@ function openArchivingModal(id){
   // 연결 프로젝트 드롭다운 채우기
   const lpSel = document.getElementById('ac-linked-proj');
   lpSel.innerHTML = '<option value="">연결 안 함</option>';
-  (D.projects||[]).filter(p=>p.status!=='routine').forEach(p=>{
+  (D.projects||[]).filter(p=>p.status==='ongoing'||p.status==='upcoming'||p.status==='routine').sort((a,b)=>{
+    const order={ongoing:0,upcoming:1,routine:2};
+    return (order[a.status]||0)-(order[b.status]||0)||(a.order||0)-(b.order||0);
+  }).forEach(p=>{
     const opt = document.createElement('option');
     opt.value = p.id;
     opt.textContent = p.name;
