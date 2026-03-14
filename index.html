@@ -750,13 +750,43 @@ main.main{display:block;}
   /* 카드뷰는 기본 표시, 비활성 시 숨김 */
   #planner-card-view { display:none; }
   #planner-card-view.prv-card-active { display:block !important; }
-  /* 프로젝트 레이아웃 모바일 전용 */
+  /* 프로젝트 레이아웃 모바일 전용 — 목록만 표시 */
   .proj-layout{ grid-template-columns:1fr; }
+
+  /* 상세패널: 기본 숨김 */
   #proj-detail-wrap{ display:none; }
-  .proj-layout.detail-open #proj-list{ display:none; }
-  .proj-layout.detail-open #proj-detail-wrap{ display:block; }
-  .proj-layout.detail-open #proj-back-btn{ display:inline-flex!important;margin-bottom:12px; }
+
+  /* detail-open 시: 목록 숨기고 상세를 전체화면 오버레이로 */
+  .proj-layout.detail-open #proj-list-col{ display:none !important; }
   .proj-layout.detail-open #routine-section{ display:none !important; }
+  .proj-layout.detail-open #proj-detail-wrap{
+    display:block !important;
+    position:fixed !important;
+    inset:0 !important;
+    z-index:500 !important;
+    background:#F9F4F4 !important;
+    overflow-y:auto !important;
+    padding:0 !important;
+  }
+  /* 뒤로가기 버튼 — 전체화면 상단에 표시 */
+  .proj-layout.detail-open #proj-back-btn{
+    display:inline-flex!important;
+    position:sticky;
+    top:0;
+    z-index:10;
+    width:100%;
+    border-radius:0 !important;
+    border-bottom:1px solid var(--rose-light) !important;
+    background:white !important;
+    margin-bottom:0 !important;
+    padding:14px 16px !important;
+    font-size:13px !important;
+    box-sizing:border-box;
+  }
+  /* 상세 내용 패딩 */
+  .proj-layout.detail-open #proj-detail-body{
+    padding:16px 14px !important;
+  }
 }
 /* ── DASH GRID ── */
 .dash-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;}
@@ -2461,7 +2491,7 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
       <button class="btn btn-p" id="btn-new-proj" style="flex-shrink:0;"><i class="fa-solid fa-plus"></i> 새 프로젝트</button>
     </div>
     <div class="proj-layout">
-      <div style="display:flex;flex-direction:column;gap:0;overflow-y:auto;max-height:calc(100vh - 200px);">
+      <div id="proj-list-col" style="display:flex;flex-direction:column;gap:0;overflow-y:auto;overflow-x:hidden;max-height:calc(100vh - 200px);min-width:0;">
         <div class="proj-list" id="proj-list"></div>
         <!-- 루틴 섹션 -->
         <div id="routine-section" style="margin-top:12px;">
@@ -2475,8 +2505,10 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
       </div>
       <div id="proj-detail-wrap">
         <button onclick="backToProjList()" style="display:none;" id="proj-back-btn" class="btn btn-g" style="margin-bottom:12px;font-size:12px;"><i class="fa-solid fa-chevron-left"></i> 목록으로</button>
+        <div id="proj-detail-body" style="padding:0;">
         <div class="empty-state" id="proj-det-empty"><i class="fa-regular fa-folder-open"></i>프로젝트를 클릭하면<br>상세 내용이 표시됩니다</div>
         <div class="proj-detail" id="proj-detail" style="display:none;"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -10928,6 +10960,9 @@ function openProjDetailMobile(id){
 }
 function backToProjList(){
   document.querySelector('.proj-layout')?.classList.remove('detail-open');
+  // 모바일: 목록 컬럼 스크롤 상단으로 복원
+  const listCol = document.getElementById('proj-list-col');
+  if(listCol) listCol.scrollTop = 0;
 }
 
 // ── 초기 로드 (구글 시트 → 화면 렌더) ──
