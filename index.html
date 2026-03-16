@@ -4749,11 +4749,11 @@ function renderItems(key){
   items.forEach((it,idx)=>{
     if(it.isSpan) return; // 멀티데이 span은 overlay로 처리
     const chip=makeChip(it,key,idx);
-    // 일정존: 회의/외근출장/중요/기타 (멀티데이 아닌 것만)
-    if(['ev-meet','ev-out','ev-imp','ev-etc'].includes(it.type)){
+    // 일정존: 회의/외근출장/중요/기타/연차 (멀티데이 아닌 것만)
+    if(['ev-meet','ev-out','ev-imp','ev-etc','ev-dayoff'].includes(it.type)){
       if(!it.endDate || it.endDate<=key) evEl.appendChild(chip);
     } else {
-      // task, ev-lunch, ev-dinner, ev-personal, ev-exercise, ev-hobby, ev-dayoff → 업무존
+      // task, ev-lunch, ev-dinner, ev-personal, ev-exercise, ev-hobby → 업무존
       tsEl.appendChild(chip);
     }
   });
@@ -4855,15 +4855,53 @@ function initSortable(){
         const fromKey=evt.from.dataset.key, toKey=evt.to.dataset.key;
         const fromZone=evt.from.dataset.zone, toZone=evt.to.dataset.zone;
         if(!D.items[fromKey]) return;
-        const moved=D.items[fromKey].splice(evt.oldDraggableIndex,1)[0];
-        if(!moved) return;
-        // change type if moving between zones
-        if(fromZone!==toZone){
-          moved.type= toZone==='ts'?'task':moved.type;
+
+        // DOM index와 D.items 배열 index 불일치 문제:
+        // ev존/ts존이 분리 렌더링되므로 반드시 ID로 탐색
+        const draggedId = evt.item.dataset.id;
+        let fromIdx = draggedId
+          ? D.items[fromKey].findIndex(it=>it.id===draggedId)
+          : -1;
+
+        // ID 매칭 실패 시 해당 존의 visible 아이템 순서로 fallback
+        if(fromIdx === -1){
+          const EV_TYPES = ['ev-meet','ev-out','ev-imp','ev-etc','ev-dayoff'];
+          const zoneItems = D.items[fromKey].filter(it=>{
+            if(it.isSpan) return false;
+            return fromZone==='ev' ? EV_TYPES.includes(it.type) : !EV_TYPES.includes(it.type);
+          });
+          const hit = zoneItems[evt.oldDraggableIndex];
+          if(hit) fromIdx = D.items[fromKey].findIndex(it=>it.id===hit.id);
         }
-        if(!D.items[toKey]) D.items[toKey]=[];
-        D.items[toKey].splice(evt.newDraggableIndex,0,moved);
-        if(!D.items[fromKey].length) delete D.items[fromKey];
+        if(fromIdx === -1) return;
+
+        const moved = D.items[fromKey].splice(fromIdx, 1)[0];
+        if(!moved) return;
+
+        // 존 간 이동 시 타입 보정
+        if(fromZone !== toZone){
+          const EV_TYPES = ['ev-meet','ev-out','ev-imp','ev-etc','ev-dayoff'];
+          if(toZone==='ts') moved.type = 'task';
+          else if(toZone==='ev' && !EV_TYPES.includes(moved.type)) moved.type = 'ev-meet';
+        }
+
+        if(!D.items[toKey]) D.items[toKey] = [];
+
+        // 목적지 존의 visible 아이템 순서로 삽입 위치 결정
+        const EV_TYPES2 = ['ev-meet','ev-out','ev-imp','ev-etc','ev-dayoff'];
+        const toZoneItems = D.items[toKey].filter(it=>{
+          if(it.isSpan) return false;
+          return toZone==='ev' ? EV_TYPES2.includes(it.type) : !EV_TYPES2.includes(it.type);
+        });
+        const insertBefore = toZoneItems[evt.newDraggableIndex];
+        if(insertBefore){
+          const pos = D.items[toKey].findIndex(it=>it.id===insertBefore.id);
+          D.items[toKey].splice(pos, 0, moved);
+        } else {
+          D.items[toKey].push(moved);
+        }
+
+        if(D.items[fromKey] && !D.items[fromKey].length) delete D.items[fromKey];
         save(); renderCal(); renderDash();
       }
     });
