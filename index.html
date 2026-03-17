@@ -298,6 +298,185 @@ main.main{display:block;}
 .cal-week-memo::placeholder{color:#DDD0D0;}
 .cal-week-memo:focus{color:var(--ink-mid);}
 
+/* ══════════════════════════════════════════
+   TO-DO 플로팅 패널 + FAB 버튼
+   투두는 .page 레이아웃과 완전 분리 (position:fixed)
+   캘린더는 Archive/Report와 동일한 .page 기본값 사용
+══════════════════════════════════════════ */
+
+/* p-task: Archive/Report와 완전 동일 — 별도 override 없음 */
+/* task-tab-bar도 .page padding 상속 */
+#task-tab-bar{ margin-bottom:0; }
+
+/* 캘린더뷰 task-view-calendar: 기존 .page 구조 그대로 */
+#task-view-calendar{ width:100%; }
+
+/* ── 캘린더 헤더 sticky ── */
+.cal-page-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 0 22px 0;
+  position:sticky; top:0; z-index:15; background:transparent;
+}
+@media(max-width:1180px){ .cal-page-head{ padding:12px 0 16px 0; } }
+@media(max-width:950px){  .cal-page-head{ padding:10px 0 14px 0; } }
+
+#cal-grid-wrap{ padding-bottom:40px; }
+
+/* ══ TO-DO FAB 버튼 (저장중과 동일 스타일, 좌측 하단) ══ */
+/* ══════════════════════════════════════════
+   TO-DO — 캘린더뷰 전용, 좌측 하단 pill 버튼 + 팝업 패널
+   저장중 알림과 동일한 위치/스타일
+══════════════════════════════════════════ */
+
+/* ── FAB pill 버튼 (저장중과 동일 스타일) ── */
+#todo-fab-btn{
+  position:fixed;
+  bottom: calc(14px + var(--safe-bottom, 0px));
+  left: 16px;
+  z-index:500;
+  display:none; /* JS 제어: 캘린더뷰에서만 표시 */
+  align-items:center; gap:5px;
+  background:rgba(255,255,255,0.92);
+  border:1px solid var(--rose-light);
+  border-radius:50px;
+  padding:5px 12px;
+  font-size:11px; font-weight:600; color:var(--ink-soft);
+  box-shadow:0 2px 10px var(--shadow);
+  backdrop-filter:blur(8px);
+  cursor:pointer; white-space:nowrap;
+  transition:background .18s, box-shadow .18s;
+  user-select:none;
+}
+#todo-fab-btn:hover{ background:var(--rose-pale); color:var(--rose-mid); }
+#todo-fab-btn.todo-open{ background:var(--rose-pale); border-color:var(--rose-mid); color:var(--rose-mid); }
+.todo-fab-label{ font-size:11px; font-weight:600; }
+#todo-fab-btn .todo-bookmark-count{
+  width:15px; height:15px; border-radius:50%;
+  background:var(--rose); color:white; font-size:8px; font-weight:700;
+  display:none; align-items:center; justify-content:center; flex-shrink:0;
+}
+#todo-fab-btn .todo-bookmark-count.visible{ display:flex; }
+
+/* 모바일: 탭바 위 */
+@media(max-width:950px){
+  #todo-fab-btn{
+    bottom: calc(64px + var(--safe-bottom, 0px));
+  }
+}
+
+/* ── 팝업 패널 ── */
+#todo-panel-wrap{
+  position:fixed;
+  bottom: calc(46px + var(--safe-bottom, 0px));
+  left: 16px;
+  width:300px;
+  max-height:calc(100vh - 120px);
+  z-index:501;
+  display:none;
+  flex-direction:column;
+  background:#FFFFFF;
+  border:1px solid #E8E8E8;
+  border-radius:16px;
+  overflow:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,0.12);
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity .2s, transform .2s;
+}
+#todo-panel-wrap.todo-open{
+  opacity:1;
+  transform:translateY(0);
+}
+
+/* 모바일: 탭바 위 */
+@media(max-width:950px){
+  #todo-panel-wrap{
+    bottom: calc(110px + var(--safe-bottom, 0px));
+    left:12px; right:12px;
+    width:auto;
+    max-height:calc(100vh - 200px);
+  }
+}
+
+/* ── 패널 내부 ── */
+#todo-panel-inner{ display:flex; flex-direction:column; flex:1; overflow:hidden; min-height:0; }
+.todo-panel-header{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 14px 8px;
+  background:#FFFFFF; border-bottom:1px solid #E8E8E8; flex-shrink:0;
+}
+.todo-panel-header::before{ display:none; } /* 핸들 pill 없음 */
+.todo-panel-title{
+  font-size:11px; font-weight:800; color:var(--rose);
+  letter-spacing:.1em; text-transform:uppercase;
+}
+.todo-toggle-btn{
+  width:20px; height:20px; border-radius:50%; border:none;
+  background:var(--rose-pale); color:var(--rose-mid); cursor:pointer; font-size:10px;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .15s; flex-shrink:0;
+}
+.todo-toggle-btn:hover{ background:var(--rose-light); }
+.todo-add-row{
+  display:flex; align-items:center; gap:8px; padding:6px 12px;
+  border-bottom:1px solid #EBEBEB; flex-shrink:0; background:#FAFAFA;
+}
+.todo-add-btn{
+  width:22px; height:22px; border-radius:6px; border:none;
+  background:var(--rose); color:white; cursor:pointer; font-size:12px;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0; transition:background .15s;
+}
+.todo-add-btn:hover{ background:var(--rose-mid); }
+.todo-add-label{ font-size:11px; color:var(--ink-soft); white-space:nowrap; }
+.todo-list-wrap{ flex:1; overflow-y:auto; overflow-x:hidden; padding:0; min-height:0; }
+.todo-list-wrap::-webkit-scrollbar{ width:3px; }
+.todo-list-wrap::-webkit-scrollbar-thumb{ background:var(--rose-light); border-radius:2px; }
+.todo-section-label{
+  font-size:8px; font-weight:800; color:var(--rose);
+  letter-spacing:.1em; text-transform:uppercase;
+  padding:7px 10px 3px; display:flex; align-items:center; gap:4px;
+}
+.todo-item{
+  display:flex; align-items:flex-start; gap:6px;
+  padding:5px 10px; border-bottom:1px solid #F7F0F0;
+  cursor:grab; transition:background .12s;
+}
+.todo-item:last-child{ border-bottom:none; }
+.todo-item:hover{ background:var(--rose-pale); }
+.todo-item.todo-done .todo-name{ text-decoration:line-through; opacity:.45; }
+.todo-check{
+  width:13px; height:13px; border-radius:3px;
+  border:1.5px solid var(--rose-light); background:white; cursor:pointer; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; margin-top:2px; transition:all .13s;
+}
+.todo-check.checked{ background:var(--rose); border-color:var(--rose); }
+.todo-check.checked::after{ content:'✓'; color:white; font-size:7px; font-weight:700; }
+.todo-name{
+  flex:1; font-size:11px; color:var(--ink); font-weight:500;
+  line-height:1.5; min-width:0; word-break:break-word; cursor:pointer;
+}
+.todo-proj-badge{
+  font-size:7.5px; font-weight:700; padding:1px 4px; border-radius:3px;
+  background:var(--rose); color:white; flex-shrink:0;
+  max-width:44px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:3px;
+}
+.todo-drag-ghost{
+  position:fixed; z-index:9999; pointer-events:none;
+  background:var(--white); border:2px solid var(--rose-mid);
+  border-radius:8px; padding:5px 10px; font-size:11px; font-weight:700; color:var(--ink);
+  box-shadow:0 4px 16px rgba(0,0,0,.18); opacity:.88;
+  white-space:nowrap; transform:translate(-50%,-50%); display:none;
+}
+.cal-day.todo-drop-target{
+  background:#FFF0F8 !important;
+  box-shadow:inset 0 0 0 2px var(--rose-mid) !important;
+}
+
+/* 데스크탑 닫힘 원형버튼: 더 이상 사용 안 함 */
+#todo-collapsed-btn{ display:none !important; }
+
+
 /* 평일/주말 행 묶음 — 가로 나란히, 바 오버레이용 relative */
 .cal-week-rows{
   display:flex;
@@ -1633,8 +1812,8 @@ main.main{display:block;}
   #p-archive .page-head,
   #p-weeklyrpt > .page-head{ display:none; }
   /* 캘린더뷰 page-head는 항상 표시 (월타이틀 + 이전/다음 버튼) */
-  #p-calendar .page-head{ display:flex !important; margin-bottom:12px; padding: 0 14px 10px; border-bottom:1px solid var(--gray); align-items:center; }
-  #p-calendar .cal-month-title{ font-size:18px; margin-bottom:0; }
+  .cal-page-head{ display:flex !important; padding:14px 0 16px 0; align-items:center; }
+  .cal-page-head .cal-month-title{ font-size:18px; margin-bottom:0; }
   /* 대시보드 page-head: 데스크탑 타이틀/버튼 숨기고 날짜만 심플하게 */
   #dash-page-head{
     border-bottom:none !important;
@@ -2479,38 +2658,40 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
 
   <!-- ── 캘린더뷰 ── -->
   <div id="task-view-calendar">
-  <div class="page" id="p-calendar" style="display:block;padding:0;max-width:none;margin:0;">
 
-    <div class="page-head">
-      <div style="position:relative;display:inline-block;">
-        <div class="cal-month-title" id="cal-month-title" title="더블클릭해서 날짜 이동">2026. 03</div>
-        <div id="cal-jump-picker">
-          <div class="cjp-title">📅 날짜로 이동</div>
-          <div class="cjp-row">
-            <input type="number" id="cjp-year" min="2000" max="2099" placeholder="년도" style="width:76px;">
-            <select id="cjp-month">
-              <option value="1">1월</option><option value="2">2월</option>
-              <option value="3">3월</option><option value="4">4월</option>
-              <option value="5">5월</option><option value="6">6월</option>
-              <option value="7">7월</option><option value="8">8월</option>
-              <option value="9">9월</option><option value="10">10월</option>
-              <option value="11">11월</option><option value="12">12월</option>
-            </select>
-          </div>
-          <div class="cjp-btns">
-            <button class="cjp-go" onclick="doCalJump()">이동</button>
-            <button class="cjp-cancel" onclick="closeCalJump()">취소</button>
+      <!-- 2026.03 + Today 헤더 — sticky -->
+      <div class="cal-page-head" id="cal-page-head">
+        <div style="position:relative;display:inline-block;">
+          <div class="cal-month-title" id="cal-month-title" title="더블클릭해서 날짜 이동">2026. 03</div>
+          <div id="cal-jump-picker">
+            <div class="cjp-title">📅 날짜로 이동</div>
+            <div class="cjp-row">
+              <input type="number" id="cjp-year" min="2000" max="2099" placeholder="년도" style="width:76px;">
+              <select id="cjp-month">
+                <option value="1">1월</option><option value="2">2월</option>
+                <option value="3">3월</option><option value="4">4월</option>
+                <option value="5">5월</option><option value="6">6월</option>
+                <option value="7">7월</option><option value="8">8월</option>
+                <option value="9">9월</option><option value="10">10월</option>
+                <option value="11">11월</option><option value="12">12월</option>
+              </select>
+            </div>
+            <div class="cjp-btns">
+              <button class="cjp-go" onclick="doCalJump()">이동</button>
+              <button class="cjp-cancel" onclick="closeCalJump()">취소</button>
+            </div>
           </div>
         </div>
+        <div class="cal-nav">
+          <button class="cal-btn cal-arrow-btn" id="btn-up"><i class="fa-solid fa-chevron-left"></i></button>
+          <button class="cal-btn today" id="btn-today"><i class="fa-solid fa-rotate-left"></i> Today</button>
+          <button class="cal-btn cal-arrow-btn" id="btn-down"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
       </div>
-      <div class="cal-nav">
-        <button class="cal-btn cal-arrow-btn" id="btn-up"><i class="fa-solid fa-chevron-left"></i></button>
-        <button class="cal-btn today" id="btn-today"><i class="fa-solid fa-rotate-left"></i> Today</button>
-        <button class="cal-btn cal-arrow-btn" id="btn-down"><i class="fa-solid fa-chevron-right"></i></button>
-      </div>
-    </div>
-    <div id="cal-grid-wrap"></div>
-  </div>
+
+      <!-- 캘린더 그리드 -->
+      <div id="cal-grid-wrap"></div>
+
   </div><!-- /task-view-calendar -->
 
   <!-- ── 위클리뷰 ── -->
@@ -2520,16 +2701,12 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
 
   <!-- ── 프로젝트뷰 ── -->
   <div id="task-view-projects" style="display:none;">
-  <div class="page" id="p-projects" style="display:block;padding:0;max-width:none;margin:0;">
   <div class="mobile-page-header" style="display:none;">
     <div class="mobile-page-title">Projects</div>
   </div>
-    <div class="page-head">
-      <div class="page-title">프로젝트 관리</div>
-    </div>
-    <!-- 업무/개인 · 상태필터 · 새프로젝트 -->
-    <div style="display:flex;align-items:stretch;justify-content:space-between;gap:8px;margin-bottom:10px;">
-      <div style="display:flex;align-items:stretch;gap:8px;">
+    <!-- 필터 + 새 프로젝트 — cal-page-head와 동일한 패딩/높이로 맞춤 -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0 22px 0;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
         <!-- 업무 / 개인 -->
         <div style="display:flex;border:1.5px solid var(--rose-light);border-radius:var(--rs);overflow:hidden;flex-shrink:0;">
           <button class="proj-cat-btn ac-toggle-btn on" data-cat="work" onclick="switchProjCat('work',this)">업무</button>
@@ -2566,8 +2743,6 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
         </div>
       </div>
     </div>
-  </div>
-  </div><!-- /p-projects -->
   </div><!-- /task-view-projects -->
   </div><!-- /p-task -->
 
@@ -2968,6 +3143,11 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
         <button class="type-pill" data-v="ev-etc">📌 기타</button>
         <button class="type-pill" data-v="ev-dayoff">🌸 연차</button>
       </div>
+    </div>
+    <!-- 날짜 (투두에서 열 때만 표시 — id="item-date-field") -->
+    <div class="fg" id="item-date-field" style="display:none;">
+      <label class="fl">날짜 <span style="font-weight:400;color:var(--ink-soft);">· 비워두면 To-Do에 유지</span></label>
+      <input type="date" class="fi" id="item-date">
     </div>
     <!-- meal fields (shown only for lunch/dinner) -->
     <div id="meal-fields" style="display:none;">
@@ -3628,14 +3808,20 @@ const GS_URL = 'https://script.google.com/macros/s/AKfycbxCdIEdvZa2VY1GBuxhSW4QM
 function isGsEnabled(){ return true; }
 
 // ════════════════════════════════════════
-//  GS 통신 — 최종 설계 v8
-//  전략: 시트별 분리 전송 + _isFirst 플래그로 clear/append 제어
-//  → 중복 없음 + 405 없음 + 저장 응답에 최신 데이터 포함 → GET 추가 불필요
+//  GS 통신 — 설계 v9
+//  전략: dirty 필드 추적 → 변경된 시트만 전송
+//       misc는 write-confirm 방식으로 clear→write 실패 감지
+//       visibilitychange race condition 방지용 saveInProgress 플래그
 // ════════════════════════════════════════
 
-const GS_BODY_LIMIT = 100_000; // 100KB per chunk (GAS POST body 안전 범위)
+const GS_BODY_LIMIT = 100_000; // 100KB per chunk
 
-// 단일 POST 전송
+// ── Dirty 추적 ──
+// 변경된 최상위 필드만 저장 대상으로 삼아 불필요한 전송 제거
+const _dirty = new Set();
+function markDirty(...fields){ fields.forEach(f => _dirty.add(f)); }
+
+// ── 단일 POST 전송 ──
 async function gsSend(payload){
   const res = await fetch(GS_URL, {
     method: 'POST',
@@ -3653,13 +3839,18 @@ async function gsGet(payload){
   return gsSend(payload);
 }
 
-// 저장 전용: 시트별 분리 + _isFirst 플래그
-// 모든 시트를 병렬로 전송해 속도 개선
-async function gsSaveAll(data){
+// ── 저장 전용: dirty 필드만 시트별 분리 전송 ──
+// misc는 GAS 쪽에서 write-confirm(_writeConfirm:true) 응답을 받아야만 성공 처리
+async function gsSaveAll(data, dirtySnapshot){
+  // dirtySnapshot 없으면 전체 필드 저장 (초기 강제 저장 등)
   const SHEETS = ['items','projects','minutes','archiving','plannerMeta','misc'];
-  const sends = []; // lazy functions, not promises
+  const fieldsToSave = dirtySnapshot
+    ? SHEETS.filter(f => dirtySnapshot.has(f))
+    : SHEETS;
 
-  for(const field of SHEETS){
+  const sends = []; // { fn, field, batchIdx, totalBatches }
+
+  for(const field of fieldsToSave){
     const val = data[field];
     if(val === undefined || val === null) continue;
     if(Array.isArray(val) && val.length === 0 && field !== 'misc' && field !== 'minutes') continue;
@@ -3681,14 +3872,14 @@ async function gsSaveAll(data){
       }
       if(Object.keys(batch).length > 0) batches.push(batch);
       batches.forEach((b, i) => {
-        sends.push(()=>gsSend({ action:'save', _isFirst: i===0, data:{ items: b }}));
+        sends.push({ fn: ()=>gsSend({ action:'save', _isFirst: i===0, data:{ items: b }}), field });
       });
       continue;
     }
 
     if(field === 'minutes' && Array.isArray(val)){
       if(val.length === 0){
-        sends.push(()=>gsSend({ action:'save', _isFirst: true, data:{ minutes: [] }}));
+        sends.push({ fn: ()=>gsSend({ action:'save', _isFirst: true, data:{ minutes: [] }}), field });
         continue;
       }
       let batches = [];
@@ -3705,17 +3896,40 @@ async function gsSaveAll(data){
       }
       if(batch.length > 0) batches.push(batch);
       batches.forEach((b, i) => {
-        sends.push(()=>gsSend({ action:'save', _isFirst: i===0, data:{ minutes: b }}));
+        sends.push({ fn: ()=>gsSend({ action:'save', _isFirst: i===0, data:{ minutes: b }}), field });
       });
       continue;
     }
 
-    sends.push(()=>gsSend({ action:'save', _isFirst: true, data:{ [field]: val }}));
+    // misc: write-confirm 플래그 추가 → GAS가 성공 시 writeConfirmed:true 반환
+    if(field === 'misc'){
+      sends.push({ fn: ()=>gsSend({ action:'save', _isFirst: true, _writeConfirm: true, data:{ misc: val }}), field });
+      continue;
+    }
+
+    sends.push({ fn: ()=>gsSend({ action:'save', _isFirst: true, data:{ [field]: val }}), field });
   }
 
   // 순차 전송 — 병렬 시 clearContents race condition으로 데이터 유실
-  for(const fn of sends){
-    try{ await fn(); } catch(e){ console.warn('[Sync] 배치 전송 실패:', e); }
+  const failedFields = new Set();
+  for(const task of sends){
+    try{
+      const res = await task.fn();
+      // misc write-confirm 체크: GAS가 writeConfirmed를 반환하지 않으면 실패로 처리
+      if(task.field === 'misc' && res && res.writeConfirmed === false){
+        console.warn('[Sync] misc write-confirm 실패 — GAS 측 기록 미완료');
+        failedFields.add('misc');
+      }
+    } catch(e){
+      console.warn(`[Sync] ${task.field} 전송 실패:`, e);
+      failedFields.add(task.field);
+    }
+  }
+
+  if(failedFields.size > 0){
+    // 실패한 필드를 다시 dirty로 복원 → 다음 save() 때 재시도
+    failedFields.forEach(f => _dirty.add(f));
+    throw new Error('일부 필드 저장 실패: ' + [...failedFields].join(', '));
   }
   return { ok: true };
 }
@@ -3825,40 +4039,70 @@ function buildPayload(){
   };
 }
 
-// ── 즉시 저장 (백그라운드 진입 시 호출) ──
-function saveNow(){
-  if(!_dataLoaded) return; // 로드 전 저장 차단
-  gsSaveAll(buildPayload().data)
-    .then(()=> setSyncStatus('saved'))
-    .catch(()=> setSyncStatus('error'));
-}
-
-// ── visibilitychange: 백그라운드 진입 시 즉시 저장 ──
-document.addEventListener('visibilitychange', ()=>{
-  if(document.visibilityState === 'hidden'){
-    clearTimeout(_saveTimer);
-    saveNow();
-  }
-});
-
 // ── 데이터 로드 완료 플래그 (로드 전 빈 데이터 저장 방지) ──
 let _dataLoaded = false;
 
-// ── 저장 (디바운스 800ms) ──
-// gsSaveAll이 시트별 분리 전송 후 마지막 응답에 최신 데이터 포함
-// → 별도 GET 없이 응답 데이터로 화면 반영
+// ── 진행 중인 저장 Promise 추적 (race condition 방지) ──
+let _saveInProgress = null;
+
+// ── 즉시 저장 (백그라운드 진입 시 호출) ──
+// 진행 중인 저장이 있으면 그것이 완료된 후 dirty가 남아있는 경우에만 추가 저장
+async function saveNow(){
+  if(!_dataLoaded) return;
+  if(_dirty.size === 0) return; // dirty 없으면 불필요한 전송 생략
+  const snapshot = new Set(_dirty);
+  _dirty.clear();
+  setSyncStatus('saving');
+  try{
+    await gsSaveAll(buildPayload().data, snapshot);
+    setSyncStatus('saved');
+  } catch(e){
+    // gsSaveAll 내부에서 실패 필드는 이미 _dirty에 복원됨
+    console.warn('[Sync] saveNow 실패:', e);
+    setSyncStatus('error');
+  }
+}
+
+// ── visibilitychange: 백그라운드 진입 시 즉시 저장 ──
+// 진행 중인 저장을 기다린 후 남은 dirty가 있으면 추가 저장
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState === 'hidden'){
+    clearTimeout(_saveTimer);
+    if(_saveInProgress){
+      // 현재 저장이 끝난 뒤 dirty 잔여분 처리
+      _saveInProgress.finally(()=>{ if(_dirty.size > 0) saveNow(); });
+    } else {
+      saveNow();
+    }
+  }
+});
+
+// ── 저장 (디바운스 300ms + dirty 추적) ──
 let _saveTimer = null;
-function save(){
-  if(!_dataLoaded) return; // 로드 전 저장 차단
+function save(field){
+  if(!_dataLoaded) return;
+  // field 힌트가 있으면 해당 필드만 dirty 마킹, 없으면 전체 마킹
+  if(field){
+    markDirty(field);
+  } else {
+    // 호출 스택 분석 없이 안전하게 전체 마킹 (기존 호출부 하위호환)
+    markDirty('items','projects','minutes','archiving','plannerMeta','misc');
+  }
   setSyncStatus('saving');
   clearTimeout(_saveTimer);
   _saveTimer = setTimeout(async ()=>{
+    if(_dirty.size === 0){ setSyncStatus('saved'); return; }
+    const snapshot = new Set(_dirty);
+    _dirty.clear();
+    _saveInProgress = gsSaveAll(buildPayload().data, snapshot);
     try{
-      await gsSaveAll(buildPayload().data);
+      await _saveInProgress;
       setSyncStatus('saved');
     } catch(e){
-      console.warn('[Sync] 저장 실패:', e);
+      console.warn('[Sync] 저장 실패 (dirty 복원됨):', e);
       setSyncStatus('error');
+    } finally{
+      _saveInProgress = null;
     }
   }, 300);
 }
@@ -3902,19 +4146,408 @@ async function load(){
 }
 
 function renderAll(){
-  [renderCal, renderDash, renderProjs, renderArchive, renderMemoPad,
+  [renderCal, renderDash, renderProjs, renderArchive,
    renderMinutesList, renderWeeklyRptPage, renderWeeklyReport].forEach(fn=>{
     try{ fn(); } catch(e){ console.warn(fn.name+' 오류:', e); }
   });
+  // 메모패드: 해당 탭이 보일 때만 렌더 (contentEditable 에디터 파괴 방지)
+  const memoTabActive = document.getElementById('archive-tab-memo');
+  if(memoTabActive && memoTabActive.style.display !== 'none' && memoTabActive.offsetParent !== null){
+    try{ renderMemoPad(); } catch(e){ console.warn('renderMemoPad 오류:', e); }
+  }
   if(typeof plannerOpen!=='undefined' && plannerOpen){
     try{ renderPlanner(); } catch(e){ console.warn('renderPlanner 오류:', e); }
   }
+  try{ renderTodoPanel(); } catch(e){ console.warn('renderTodoPanel 오류:', e); }
   const curPage = (location.hash||'').replace('#','') || 'dashboard';
   try{ navigateTo(curPage); } catch(e){ console.warn('navigateTo 오류:', e); }
-  // 아이패드 레이아웃 재적용
   if(typeof applyTabletClass === 'function') setTimeout(applyTabletClass, 0);
 }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,5); }
+
+// ════════════════════════════════════════
+//  TODO PANEL
+//  저장 구조: D.items['__todo__'] 배열
+//  날짜 지정 시 해당 D.items[dateKey]로 이동, __todo__에서 제거
+//  프로젝트 tasks 중 date==='' 인 항목도 표시 (읽기 전용 뱃지)
+// ════════════════════════════════════════
+
+let _todoPanelCollapsed = false;
+let _todoMobileOpen = false;
+function _isMobile(){ return window.innerWidth <= 950; }
+
+// ── To-Do pill 버튼 토글 (저장중과 동일한 방식) ──
+function toggleTodoPanel(){
+  const panel = document.getElementById('todo-panel-wrap');
+  const fab   = document.getElementById('todo-fab-btn');
+  if(!panel || !fab) return;
+  const isOpen = panel.classList.contains('todo-open');
+  if(isOpen){
+    panel.classList.remove('todo-open');
+    fab.classList.remove('todo-open');
+    setTimeout(()=>{ if(!panel.classList.contains('todo-open')) panel.style.display='none'; }, 200);
+  } else {
+    panel.style.display = 'flex';
+    requestAnimationFrame(()=>{
+      panel.classList.add('todo-open');
+      fab.classList.add('todo-open');
+    });
+    renderTodoPanel();
+  }
+}
+
+function _toggleTodoBottomSheet(){ toggleTodoPanel(); }
+function toggleTodoMobile(){ toggleTodoPanel(); }
+function _initTodoMobileHeader(){}
+function _updateCollapsedBtn(){}
+function _updateTodoMobileToggle(){
+  const cnt = document.getElementById('todo-bookmark-cnt');
+  if(cnt) cnt.classList.toggle('visible', !!(cnt.textContent && cnt.textContent !== '0'));
+}
+window.addEventListener('resize', _updateTodoMobileToggle);
+
+
+document.addEventListener('click', function(e){
+  const panel = document.getElementById('todo-panel-wrap');
+  const fab   = document.getElementById('todo-fab-btn');
+  if(!panel || !panel.classList.contains('todo-open')) return;
+  if(!panel.contains(e.target) && (!fab || !fab.contains(e.target))){
+    panel.classList.remove('todo-open');
+    if(fab) fab.classList.remove('todo-open');
+    setTimeout(()=>{ if(!panel.classList.contains('todo-open')) panel.style.display='none'; }, 200);
+  }
+});
+
+// ── 투두 목록 수집 ──
+// 반환: [{id, name, type, project, projName, status, _source}]
+// _source: 'todo'(D.items.__todo__) | 'proj'(프로젝트 task date없는것)
+function getTodoItems(){
+  const list = [];
+
+  // 1) D.items['__todo__'] 직접 투두
+  (D.items['__todo__']||[]).forEach(it=>{
+    if(it.isSpan) return;
+    const proj = it.project ? D.projects.find(p=>p.id===it.project) : null;
+    list.push({
+      id: it.id, name: it.name, type: it.type,
+      project: it.project||'', projName: proj ? proj.name : '',
+      status: it.status||'active', _source:'todo', _item: it
+    });
+  });
+
+  // 2) 프로젝트 tasks 중 date==='' 인 항목
+  D.projects.forEach(proj=>{
+    (proj.tasks||[]).forEach(tk=>{
+      if(tk.date) return; // 날짜 있으면 제외
+      list.push({
+        id: tk.id, name: tk.name, type:'task',
+        project: proj.id, projName: proj.name,
+        status: tk.done ? 'done' : 'active', _source:'proj', _item: tk, _proj: proj
+      });
+    });
+  });
+
+  return list;
+}
+
+// ── 투두 패널 렌더링 ──
+function renderTodoPanel(){
+  _updateTodoMobileToggle();
+  _initTodoMobileHeader(); // no-op
+
+  const items = getTodoItems();
+  const todoItems = items.filter(t=>t._source==='todo');
+  const projItems  = items.filter(t=>t._source==='proj');
+  const activeCount = items.filter(t=>t.status!=='done').length;
+
+  // FAB 카운트 뱃지
+  const cntEl = document.getElementById('todo-bookmark-cnt');
+  if(cntEl){
+    cntEl.textContent = activeCount > 0 ? activeCount : '';
+    cntEl.style.display = activeCount > 0 ? 'flex' : 'none';
+  }
+  // 데스크탑 원형 버튼 카운트
+  _updateCollapsedBtn(activeCount);
+
+  // 헤더 타이틀
+  const titleEl = document.querySelector('.todo-panel-title');
+  if(titleEl) titleEl.textContent = 'To-Do';
+
+  // ── 풀 목록 렌더 ──
+  const wrap = document.getElementById('todo-list-wrap');
+  if(!wrap) return;
+  wrap.innerHTML = '';
+
+  if(!items.length){
+    // 2열 그리드 빈 상태
+    wrap.innerHTML=`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;height:100%;min-height:80px;">
+        <div style="padding:12px 10px;border-right:1px solid #F0E8E8;">
+          <div style="font-size:8px;font-weight:800;color:var(--rose);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:4px;">
+            <i class="fa-solid fa-list-check" style="font-size:7px;"></i> Tasks
+          </div>
+          <div style="font-size:10px;color:var(--ink-soft);text-align:center;padding:8px 0;">없음</div>
+        </div>
+        <div style="padding:12px 10px;">
+          <div style="font-size:8px;font-weight:800;color:#7AAFC8;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:4px;">
+            <i class="fa-solid fa-diagram-project" style="font-size:7px;"></i> Project
+          </div>
+          <div style="font-size:10px;color:var(--ink-soft);text-align:center;padding:8px 0;">없음</div>
+        </div>
+      </div>`;
+    return;
+  }
+
+  // 2열 그리드 렌더
+  const grid = document.createElement('div');
+  grid.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:0;';
+
+  // 왼쪽: 일반 투두 (Tasks)
+  const leftCol = document.createElement('div');
+  leftCol.style.cssText='border-right:1px solid #F0E8E8;min-width:0;';
+  const leftLbl = document.createElement('div');
+  leftLbl.className='todo-section-label';
+  leftLbl.innerHTML=`<i class="fa-solid fa-list-check" style="font-size:7px;"></i> Tasks`;
+  leftCol.appendChild(leftLbl);
+  if(todoItems.length){
+    todoItems.forEach(t=>leftCol.appendChild(_makeTodoItem(t)));
+  } else {
+    leftCol.innerHTML += `<div style="padding:8px 12px;font-size:10px;color:var(--ink-soft);">없음</div>`;
+  }
+  grid.appendChild(leftCol);
+
+  // 오른쪽: 프로젝트 Tasks
+  const rightCol = document.createElement('div');
+  rightCol.style.cssText='min-width:0;';
+  const rightLbl = document.createElement('div');
+  rightLbl.className='todo-section-label';
+  rightLbl.style.color='#7AAFC8';
+  rightLbl.innerHTML=`<i class="fa-solid fa-diagram-project" style="font-size:7px;color:#7AAFC8;"></i> Project`;
+  rightCol.appendChild(rightLbl);
+  if(projItems.length){
+    projItems.forEach(t=>rightCol.appendChild(_makeTodoItem(t)));
+  } else {
+    rightCol.innerHTML += `<div style="padding:8px 12px;font-size:10px;color:var(--ink-soft);">없음</div>`;
+  }
+  grid.appendChild(rightCol);
+
+  wrap.appendChild(grid);
+}
+
+function _makeTodoItem(t){
+  const el = document.createElement('div');
+  el.className='todo-item'+(t.status==='done'?' todo-done':'');
+  el.dataset.id = t.id;
+  el.dataset.source = t._source;
+
+  const checkDiv = document.createElement('div');
+  checkDiv.className='todo-check'+(t.status==='done'?' checked':'');
+  checkDiv.onclick=(e)=>{e.stopPropagation(); toggleTodoDone(t);};
+
+  const nameDiv = document.createElement('div');
+  nameDiv.className='todo-name';
+  nameDiv.textContent = t.name;
+  nameDiv.onclick=(e)=>{e.stopPropagation(); openTodoEdit(t);};
+
+  el.appendChild(checkDiv);
+  el.appendChild(nameDiv);
+
+  if(t.projName){
+    const badge = document.createElement('span');
+    badge.className='todo-proj-badge';
+    badge.title = t.projName;
+    badge.textContent = t.projName.length>6 ? t.projName.slice(0,5)+'…' : t.projName;
+    el.appendChild(badge);
+  }
+
+  // 드래그 (데스크탑 마우스)
+  _initTodoDrag(el, t);
+
+  return el;
+}
+
+// ── 투두 체크(완료) 토글 ──
+function toggleTodoDone(t){
+  if(t._source==='todo'){
+    const it = (D.items['__todo__']||[]).find(x=>x.id===t.id);
+    if(!it) return;
+    // 날짜 있고 프로젝트도 있으면 체크 후 사라짐(이미 조건 불일치하므로 실제론 투두에 안 옴)
+    it.status = it.status==='done' ? 'active' : 'done';
+    save('items');
+  } else {
+    // 프로젝트 task
+    const proj = D.projects.find(p=>p.id===t.project);
+    if(!proj) return;
+    const tk = (proj.tasks||[]).find(x=>x.id===t.id);
+    if(!tk) return;
+    tk.done = !tk.done;
+    save('projects');
+  }
+  renderTodoPanel();
+  renderProjs();
+}
+
+// ── 투두 추가 (기존 openAdd 활용, editKey='__todo__') ──
+function openTodoAdd(){
+  // D.items['__todo__'] 초기화
+  if(!D.items['__todo__']) D.items['__todo__'] = [];
+
+  // 날짜 필드 표시, editKey를 __todo__로
+  document.getElementById('item-date-field').style.display = 'block';
+  document.getElementById('item-date').value = '';
+  openAdd('__todo__');
+}
+
+// ── 투두 아이템 편집 ──
+function openTodoEdit(t){
+  if(t._source==='todo'){
+    if(!D.items['__todo__']) return;
+    const idx = D.items['__todo__'].findIndex(x=>x.id===t.id);
+    if(idx === -1) return;
+    document.getElementById('item-date-field').style.display = 'block';
+    document.getElementById('item-date').value = '';
+    openEdit('__todo__', idx);
+  } else {
+    // 프로젝트 task는 프로젝트 뷰에서 편집하도록 안내
+    alert('프로젝트 할일은 프로젝트뷰 → 해당 프로젝트에서 수정할 수 있어요.');
+  }
+}
+
+// ── saveItem 훅: __todo__에서 날짜 지정 시 이동 ──
+// item-save-btn onclick 이전에 날짜 이동 처리
+function _handleTodoSave(item, editKey, editIdx){
+  const dateVal = document.getElementById('item-date').value.trim();
+  if(editKey !== '__todo__') return false; // 일반 저장 흐름
+
+  if(dateVal){
+    // 날짜 지정됨 → __todo__에서 제거 후 해당 날짜로 이동
+    if(!D.items['__todo__']) D.items['__todo__'] = [];
+    if(editIdx !== null){
+      D.items['__todo__'].splice(editIdx, 1);
+    }
+    if(!D.items['__todo__'].length) delete D.items['__todo__'];
+    if(!D.items[dateVal]) D.items[dateVal] = [];
+    D.items[dateVal].push(item);
+    save('items');
+    closeItemModal();
+    renderCal(); renderTodoPanel(); renderDash();
+    return true; // 처리 완료
+  }
+  // 날짜 없음 → __todo__에 저장
+  if(!D.items['__todo__']) D.items['__todo__'] = [];
+  if(editIdx !== null){
+    D.items['__todo__'][editIdx] = item;
+  } else {
+    D.items['__todo__'].push(item);
+  }
+  save('items');
+  closeItemModal();
+  renderTodoPanel(); renderDash();
+  return true;
+}
+
+// ── 드래그 앤 드롭 (투두 → 캘린더) ──
+let _todoDragItem = null;
+const _todoGhost = ()=> document.getElementById('todo-drag-ghost');
+
+function _initTodoDrag(el, t){
+  // 마우스
+  el.addEventListener('mousedown', e=>{
+    if(e.target.closest('.todo-check')) return;
+    if(e.button !== 0) return;
+    _todoDragStart(e.clientX, e.clientY, t, e);
+  });
+  // 터치
+  el.addEventListener('touchstart', e=>{
+    if(e.target.closest('.todo-check')) return;
+    const touch = e.touches[0];
+    _todoDragStart(touch.clientX, touch.clientY, t, e);
+  }, {passive:false});
+}
+
+function _todoDragStart(cx, cy, t, e){
+  _todoDragItem = t;
+  const ghost = _todoGhost();
+  if(ghost){
+    ghost.textContent = t.name.length > 24 ? t.name.slice(0,22)+'…' : t.name;
+    ghost.style.display = 'block';
+    ghost.style.left = cx+'px';
+    ghost.style.top  = cy+'px';
+  }
+
+  function onMove(ev){
+    const px = ev.touches ? ev.touches[0].clientX : ev.clientX;
+    const py = ev.touches ? ev.touches[0].clientY : ev.clientY;
+    if(ghost){ ghost.style.left=px+'px'; ghost.style.top=py+'px'; }
+    // 드롭 대상 하이라이트
+    document.querySelectorAll('.cal-day.todo-drop-target').forEach(d=>d.classList.remove('todo-drop-target'));
+    const el2 = document.elementFromPoint(px, py);
+    const dayEl = el2 ? el2.closest('.cal-day') : null;
+    if(dayEl && !dayEl.closest('#todo-panel-wrap')) dayEl.classList.add('todo-drop-target');
+  }
+
+  function onUp(ev){
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('mouseup',   onUp);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('touchend',  onUp);
+
+    const px = ev.changedTouches ? ev.changedTouches[0].clientX : ev.clientX;
+    const py = ev.changedTouches ? ev.changedTouches[0].clientY : ev.clientY;
+
+    if(ghost) ghost.style.display='none';
+    document.querySelectorAll('.cal-day.todo-drop-target').forEach(d=>d.classList.remove('todo-drop-target'));
+
+    const elDrop = document.elementFromPoint(px, py);
+    const dayEl  = elDrop ? elDrop.closest('.cal-day') : null;
+    if(dayEl && !dayEl.closest('#todo-panel-wrap')){
+      const dropZone = dayEl.querySelector('.task-drop-zone[data-zone="ts"]');
+      const dateKey  = dropZone ? dropZone.dataset.key : null;
+      if(dateKey) _todoDropToDate(dateKey);
+    }
+    _todoDragItem = null;
+  }
+
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup',   onUp);
+  document.addEventListener('touchmove', onMove, {passive:false});
+  document.addEventListener('touchend',  onUp);
+}
+
+// ── 투두 → 날짜 드롭 처리 ──
+function _todoDropToDate(dateKey){
+  const t = _todoDragItem;
+  if(!t || !dateKey) return;
+
+  if(t._source === 'todo'){
+    // __todo__ 에서 꺼내 dateKey로 이동
+    const arr = D.items['__todo__']||[];
+    const idx = arr.findIndex(x=>x.id===t.id);
+    if(idx === -1) return;
+    const [moved] = arr.splice(idx, 1);
+    moved.allDay = true;
+    if(!arr.length) delete D.items['__todo__'];
+    if(!D.items[dateKey]) D.items[dateKey] = [];
+    D.items[dateKey].push(moved);
+  } else {
+    // 프로젝트 task → date 지정 (proj.tasks에 date 기록)
+    const proj = D.projects.find(p=>p.id===t.project);
+    if(!proj) return;
+    const tk = (proj.tasks||[]).find(x=>x.id===t.id);
+    if(tk) tk.date = dateKey;
+    // 캘린더에도 추가
+    if(!D.items[dateKey]) D.items[dateKey] = [];
+    D.items[dateKey].push({
+      id: uid(), name: t.name, type:'task',
+      allDay:true, startTime:'', endTime:'',
+      status: tk && tk.done ? 'done' : 'active',
+      project: t.project, memo:'', partner:''
+    });
+    save('projects');
+  }
+  save('items');
+  renderCal(); renderTodoPanel(); renderDash();
+}
 
 // ════════════════════════════════════════
 //  DATE HELPERS  (Monday first)
@@ -3998,10 +4631,21 @@ function switchTaskTab(view, btn){
   const wv = document.getElementById('task-view-weekly');
   if(wv) wv.style.display = (view==='weekly') ? '' : 'none';
   document.getElementById('task-view-projects').style.display = (view==='projects') ? '' : 'none';
+
+  // 투두 FAB: 캘린더뷰일 때만 표시
+  const panel = document.getElementById('todo-panel-wrap');
+  const fab   = document.getElementById('todo-fab-btn');
+  if(view === 'calendar'){
+    if(fab) fab.style.display = 'inline-flex';
+    renderTodoPanel();
+  } else {
+    if(panel){ panel.classList.remove('todo-open'); panel.style.display = 'none'; }
+    if(fab){ fab.classList.remove('todo-open'); fab.style.display = 'none'; }
+  }
+
   if(view==='calendar') renderCal();
   if(view==='weekly') renderWeeklyView();
   if(view==='projects') renderProjs();
-  // URL hash 업데이트
   const newHash = '#task:' + view;
   if(location.hash !== newHash) history.pushState(null,'', newHash);
 }
@@ -4214,7 +4858,7 @@ function renderWeeklyView(){
   const isCurrentWeek = weekOffset===0;
 
   let html = `
-    <div class="wv-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;position:relative;">
+    <div class="wv-header" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;padding-top:16px;position:relative;">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-width:0;">
         <div class="cal-month-title wv-month-picker-btn" onclick="toggleWvPicker()" style="cursor:pointer;user-select:none;line-height:1;">
           ${yearN}. ${String(monthN).padStart(2,'0')} <i class="fa-solid fa-chevron-down" style="font-size:11px;margin-left:3px;"></i>
@@ -4397,7 +5041,7 @@ function setStatusWv(key,idx,st){
   const it=D.items[key][idx];
   it.status = it.status===st?'active':st;
   if(it.status==='done') it.doneAt=Date.now();
-  save(); renderWeeklyView(); renderDash();
+  save('items'); renderWeeklyView(); renderDash();
 }
 
 function renderCal(){
@@ -4824,7 +5468,7 @@ function setStatus(key,idx,st){
   const it=D.items[key][idx];
   it.status= it.status===st?'active':st;
   if(it.status==='done') it.doneAt=Date.now();
-  save(); renderCal(); renderWeeklyView(); renderDash();
+  save('items'); renderCal(); renderWeeklyView(); renderDash();
 }
 
 function deleteItem(key,idx){
@@ -4832,7 +5476,7 @@ function deleteItem(key,idx){
   const it=D.items[key][idx];
   if(it.endDate && it.endDate > key) removeMultiDaySpans(it.id, key, it.endDate);
   D.items[key].splice(idx,1);
-  save(); renderCal(); renderDash();
+  save('items'); renderCal(); renderDash();
 }
 
 function delayItem(key,idx){
@@ -4843,7 +5487,7 @@ function delayItem(key,idx){
   if(!D.items[nk]) D.items[nk]=[];
   D.items[nk].unshift(copy);
   D.items[key][idx].status='delayed';
-  save(); renderCal(); renderDash();
+  save('items'); renderCal(); renderDash();
 }
 
 function initSortable(){
@@ -4902,7 +5546,7 @@ function initSortable(){
         }
 
         if(D.items[fromKey] && !D.items[fromKey].length) delete D.items[fromKey];
-        save(); renderCal(); renderDash();
+        save('items'); renderCal(); renderDash();
       }
     });
   });
@@ -5094,6 +5738,14 @@ function openEdit(key,idx){
   document.getElementById('meal-partner').value=it.partner||'';
   document.getElementById('item-del-btn').style.display='inline-flex';
   restoreProjField(it.project||'');
+  // 날짜 필드: 캘린더 아이템 수정 시에도 표시 (비우면 투두로 이동)
+  if(key !== '__todo__'){
+    const dateField = document.getElementById('item-date-field');
+    const dateLabel = dateField.querySelector('.fl');
+    if(dateLabel) dateLabel.innerHTML = '날짜 <span style="font-weight:400;color:var(--ink-soft);">· 비우면 To-Do로 이동</span>';
+    dateField.style.display = 'block';
+    document.getElementById('item-date').value = key; // 현재 날짜로 채워둠
+  }
   document.getElementById('item-modal').classList.add('open');
 }
 
@@ -5101,7 +5753,7 @@ document.getElementById('item-save-btn').onclick=()=>{
   const name=document.getElementById('item-name').value.trim();
   if(!name) return;
   const startTime=document.getElementById('item-time-start').value.trim();
-  const allDay = !startTime; // 시간 없으면 자동으로 종일 처리
+  const allDay = !startTime;
   const isTask=selType==='task';
   const endDate=(!isTask&&document.getElementById('item-enddate').value)||'';
   const item={
@@ -5118,9 +5770,48 @@ document.getElementById('item-save-btn').onclick=()=>{
     status: editIdx!==null ? D.items[editKey][editIdx].status : 'active'
   };
 
+  // ── 투두 저장 훅 (__todo__ 키) ──
+  if(editKey === '__todo__'){
+    if(_handleTodoSave(item, editKey, editIdx)) return;
+  }
+
+  // ── 캘린더 → 투두 이동: 날짜 필드가 표시된 상태에서 비워서 저장 ──
+  if(editKey !== '__todo__'){
+    const dateFieldEl = document.getElementById('item-date-field');
+    if(dateFieldEl && dateFieldEl.style.display !== 'none'){
+      const newDate = document.getElementById('item-date').value.trim();
+      if(!newDate){
+        // 날짜 비움 → 캘린더에서 제거 후 __todo__로
+        if(editIdx !== null){
+          const oldItem = D.items[editKey][editIdx];
+          if(oldItem.endDate && oldItem.endDate > editKey) removeMultiDaySpans(oldItem.id, editKey, oldItem.endDate);
+          D.items[editKey].splice(editIdx, 1);
+          if(!D.items[editKey].length) delete D.items[editKey];
+        }
+        if(!D.items['__todo__']) D.items['__todo__'] = [];
+        item.allDay = true; item.startTime = ''; item.endTime = ''; item.endDate = '';
+        D.items['__todo__'].push(item);
+        save('items'); closeItemModal(); renderCal(); renderTodoPanel(); renderDash();
+        return;
+      }
+      // 날짜 변경 → 기존 날짜에서 제거 후 새 날짜로 이동
+      if(newDate !== editKey){
+        if(editIdx !== null){
+          const oldItem = D.items[editKey][editIdx];
+          if(oldItem.endDate && oldItem.endDate > editKey) removeMultiDaySpans(oldItem.id, editKey, oldItem.endDate);
+          D.items[editKey].splice(editIdx, 1);
+          if(!D.items[editKey].length) delete D.items[editKey];
+        }
+        if(!D.items[newDate]) D.items[newDate] = [];
+        D.items[newDate].push(item);
+        save('items'); closeItemModal(); renderCal(); renderWeeklyView(); renderDash();
+        return;
+      }
+    }
+  }
+
   // 기존 항목 삭제 (수정 시 멀티데이 span 재생성 위해)
   if(editIdx!==null){
-    // 멀티데이였던 기존 span 제거
     const oldItem=D.items[editKey][editIdx];
     if(oldItem.endDate && oldItem.endDate > editKey){
       removeMultiDaySpans(oldItem.id, editKey, oldItem.endDate);
@@ -5153,7 +5844,7 @@ document.getElementById('item-save-btn').onclick=()=>{
     addMultiDaySpans(item, editKey, endDate);
   }
 
-  save(); closeItemModal(); renderCal(); renderWeeklyView(); renderDash(); renderProjs();
+  save('items'); closeItemModal(); renderCal(); renderWeeklyView(); renderDash(); renderProjs();
   if(plannerOpen) renderPlanner();
 };
 
@@ -5165,7 +5856,8 @@ document.getElementById('item-del-btn').onclick=()=>{
     }
     D.items[editKey].splice(editIdx,1);
     if(!D.items[editKey].length) delete D.items[editKey];
-    save(); closeItemModal(); renderCal(); renderWeeklyView(); renderDash(); renderProjs();
+    save('items'); closeItemModal(); renderCal(); renderWeeklyView(); renderDash(); renderProjs();
+    if(editKey === '__todo__') renderTodoPanel();
     if(plannerOpen) renderPlanner();
   }
 };
@@ -5211,7 +5903,12 @@ function removeMultiDaySpans(itemId, startKey, endDate){
   }
 }
 
-function closeItemModal(){ document.getElementById('item-modal').classList.remove('open'); }
+function closeItemModal(){
+  document.getElementById('item-modal').classList.remove('open');
+  // 투두에서 열었을 때만 표시한 날짜 필드 숨기기
+  document.getElementById('item-date-field').style.display='none';
+  document.getElementById('item-date').value='';
+}
 
 // ════════════════════════════════════════
 //  DASHBOARD
@@ -5419,7 +6116,7 @@ document.getElementById('pj-save').onclick=()=>{
   // order: put at end of its category
   const maxOrder=Math.max(0,...D.projects.filter(p=>p.category===cat).map(p=>p.order||0));
   D.projects.push({id:uid(),name,status:document.getElementById('pj-status').value,desc:document.getElementById('pj-desc').value.trim(),memo:'',category:cat,order:maxOrder+1});
-  save(); document.getElementById('proj-modal').classList.remove('open'); renderProjs();
+  save('projects'); document.getElementById('proj-modal').classList.remove('open'); renderProjs();
 };
 
 function projPct(id){
@@ -5592,7 +6289,7 @@ function renderProjs(){
         // Re-assign order values within this category
         let ord=0;
         D.projects.filter(x=>(x.category||'work')===activeProjCat&&x.status!=='routine').forEach(x=>{x.order=ord++;});
-        save(); renderProjs(); projDragSrcId=null;
+        save('projects'); renderProjs(); projDragSrcId=null;
       });
       // ── 터치 드래그 (모바일/아이패드) ──
       (()=>{
@@ -5647,7 +6344,7 @@ function renderProjs(){
                 D.projects.splice(insertBefore?finalIdx:finalIdx+1,0,moved);
                 let ord=0;
                 D.projects.filter(x=>(x.category||'work')===activeProjCat&&x.status!=='routine').forEach(x=>{x.order=ord++;});
-                save(); renderProjs();
+                save('projects'); renderProjs();
               }
             }
             projDragSrcId=null;
@@ -5774,7 +6471,7 @@ async function runProjAiAnalysis(id){
     const result = await callGemini(sys, usr, 500);
     if(!_dataLoaded) return;
     p.aiAnalysis = result;
-    save();
+    save('projects');
     renderProjDetail(id);
   } catch(e){
     if(sec) sec.innerHTML = `
@@ -5855,7 +6552,7 @@ async function analyzeProject(id){
     if(!_dataLoaded) return; // 안전장치: 로드 전이면 저장 안 함
     p.aiManual = parsed;
     delete p.aiSummary;
-    save();
+    save('projects');
     renderProjs();
     renderProjDetail(id);
   } catch(e){
@@ -6153,7 +6850,7 @@ function renderDoneDetail(p, id, pct, d, t, allTasksHtml){
             <i class="fa-solid fa-list-check"></i> 업무 매뉴얼
             <span style="font-size:9px;font-weight:400;color:var(--rose);">클릭하면 업무 목록 펼쳐져요</span>
           </div>
-          <button onclick="const pp=D.projects.find(x=>x.id==='${id}');delete pp.aiManual;save();analyzeProject('${id}')"
+          <button onclick="const pp=D.projects.find(x=>x.id==='${id}');delete pp.aiManual;save('projects');analyzeProject('${id}')"
             style="font-size:10px;color:var(--rose-mid);background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:3px;">
             <i class="fa-solid fa-rotate" style="font-size:9px;"></i> 재생성
           </button>
@@ -6536,7 +7233,7 @@ function confirmAiQuick(isMobile){
       status: 'active'
     });
   });
-  save(); renderCal(); renderDash();
+  save('items'); renderCal(); renderDash();
   if(isMobile){
     const inp = document.getElementById('mobile-ai-input');
     if(inp) inp.value='';
@@ -6890,7 +7587,7 @@ function setRoutineTaskStatus(projId, taskId, newStatus){
   tk.taskStatus=newStatus;
   if(newStatus==='done') tk.done=true;
   else tk.done=false;
-  save(); renderProjs(); renderProjDetail(projId);
+  save('projects'); renderProjs(); renderProjDetail(projId);
 }
 
 function saveRoutineTaskInline(projId){
@@ -6906,7 +7603,7 @@ function saveRoutineTaskInline(projId){
     if(!D.items[dateVal]) D.items[dateVal]=[];
     D.items[dateVal].push({id:uid(),type:'task',name,allDay:true,startTime:'',endTime:'',memo:'',project:projId,status:'active',_fromProjTask:tk.id});
   }
-  save(); renderDash(); renderProjs(); renderProjDetail(projId); renderCal();
+  save('misc'); renderDash(); renderProjs(); renderProjDetail(projId); renderCal();
   cancelProjTaskForm(projId);
 }
 
@@ -6919,7 +7616,7 @@ function toggleRoutineTask(projId, taskId){
   } else {
     tk.taskStatus='upcoming'; tk.done=false;
   }
-  save(); renderProjs(); renderProjDetail(projId);
+  save('projects'); renderProjs(); renderProjDetail(projId);
 }
 
 // ── 프로젝트 자체 task CRUD ──
@@ -6946,19 +7643,19 @@ function saveProjTaskInline(projId){
     if(!D.items[dateVal]) D.items[dateVal]=[];
     D.items[dateVal].push({id:uid(),type:'task',name,allDay:true,startTime:'',endTime:'',memo:'',project:projId,status:'active',_fromProjTask:tk.id});
   }
-  save(); renderDash(); renderProjs(); renderProjDetail(projId); renderCal();
+  save('items'); renderDash(); renderProjs(); renderProjDetail(projId); renderCal();
   cancelProjTaskForm(projId);
 }
 function toggleProjTask(projId, taskId){
   const p=D.projects.find(x=>x.id===projId); if(!p) return;
   const tk=(p.tasks||[]).find(x=>x.id===taskId); if(!tk) return;
   tk.done=!tk.done;
-  save(); renderDash(); renderProjs(); renderProjDetail(projId);
+  save('projects'); renderDash(); renderProjs(); renderProjDetail(projId);
 }
 function delProjTask(projId, taskId){
   const p=D.projects.find(x=>x.id===projId); if(!p) return;
   p.tasks=(p.tasks||[]).filter(x=>x.id!==taskId);
-  save(); renderDash(); renderProjs(); renderProjDetail(projId);
+  save('projects'); renderDash(); renderProjs(); renderProjDetail(projId);
 }
 function editProjTaskName(projId, taskId, el){
   const p=D.projects.find(x=>x.id===projId); if(!p) return;
@@ -6969,7 +7666,7 @@ function editProjTaskName(projId, taskId, el){
   el.onblur=()=>{
     el.contentEditable='false';
     tk.name=el.textContent.trim()||old;
-    save(); renderProjDetail(projId);
+    save('projects'); renderProjDetail(projId);
   };
   el.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();el.blur();}if(e.key==='Escape'){el.textContent=old;el.blur();}};
 }
@@ -6997,7 +7694,7 @@ function editProjTaskDate(projId, taskId, btn){
         D.items[tk.date].push({id:uid(),type:'task',name:tk.name,allDay:true,startTime:'',endTime:'',memo:'',project:projId,status:'active',_fromProjTask:taskId});
       }
     }
-    save(); renderDash(); renderProjs(); renderProjDetail(projId); renderCal();
+    save('items'); renderDash(); renderProjs(); renderProjDetail(projId); renderCal();
   };
   inp.onblur=apply;
   inp.onkeydown=e=>{if(e.key==='Enter')inp.blur();if(e.key==='Escape'){inp.value=tk.date;inp.blur();}};
@@ -7014,7 +7711,7 @@ function editProjName(id, el){
     const val = input.value.trim();
     if(val && val !== p.name){
       p.name = val;
-      save();
+      save('projects');
       renderProjs();
     }
     renderProjDetail(id);
@@ -7038,7 +7735,7 @@ function chProjStatus(id,st){
   if(st === 'done'){
     delete p.aiAnalysis; // 완료되면 분석 삭제 (매뉴얼로 대체)
   }
-  save();
+  save('projects');
   renderProjs();
   renderProjDetail(id); // 먼저 렌더링 (매뉴얼 없는 상태로)
   // 완료로 바뀔 때 업무 있으면 자동 AI 매뉴얼 생성
@@ -7053,15 +7750,15 @@ function toggleTaskDone(projId,dateKey,itemId){
   const arr=D.items[dateKey]; if(!arr) return;
   const it=arr.find(x=>x.id===itemId); if(!it) return;
   it.status=it.status==='done'?'active':'done';
-  save(); renderDash(); renderProjs(); renderProjDetail(projId);
+  save('projects'); renderDash(); renderProjs(); renderProjDetail(projId);
 }
 function delProj(id){
   if(!confirm('프로젝트를 삭제하시겠습니까?')) return;
   D.projects=D.projects.filter(p=>p.id!==id);
   if(selProjId===id){selProjId=null;document.getElementById('proj-detail').style.display='none';document.getElementById('proj-det-empty').style.display='block';}
-  save();renderProjs();
+  save('projects');renderProjs();
 }
-function saveProjMemo(id,v){const p=D.projects.find(x=>x.id===id);if(p){p.memo=v;save();}}
+function saveProjMemo(id,v){const p=D.projects.find(x=>x.id===id);if(p){p.memo=v;save('projects');}}
 
 // ════════════════════════════════════════
 //  ARCHIVE
@@ -7074,7 +7771,7 @@ function saveMeals(){
     dp:document.getElementById('ad-partner').value,
     dm:document.getElementById('ad-menu').value
   };
-  save();
+  save('misc');
   // sync meal items in calendar if ev-lunch/dinner exist
   renderDash();
 }
@@ -7088,7 +7785,7 @@ function renderArchive(){
 // ── MEMO PAD ──
 function addMemo(){
   D.memos.push({id:uid(), title:'메모', content:'', w:280, h:220});
-  save(); renderMemoPad();
+  save('misc'); renderMemoPad();
 }
 
 // 저장된 plain text → HTML 변환 (표시용)
@@ -7131,22 +7828,56 @@ function applyMemoMark(id, mark){
   }
   // save
   const m=D.memos.find(x=>x.id===id);
-  if(m){ m.content=htmlToMemoText(editor.innerHTML); save(); }
+  if(m){ m.content=htmlToMemoText(editor.innerHTML); save('misc'); }
 }
 
 function renderMemoPad(){
   const wrap=document.getElementById('memo-pad-wrap');
   if(!wrap) return;
-  wrap.innerHTML='';
+
   const q = (document.getElementById('memo-search')?.value||'').toLowerCase();
   const memos = q
     ? D.memos.filter(m=>(m.title||'').toLowerCase().includes(q)||(m.content||'').toLowerCase().includes(q))
     : D.memos;
+
+  // ── 현재 포커스된 에디터/타이틀 보호 ──
+  // 포커스가 memo-pad 안에 있으면 해당 패드는 재렌더하지 않음
+  const focusedPad = document.activeElement?.closest('.memo-pad');
+  const focusedId  = focusedPad ? focusedPad.dataset.id : null;
+
+  // 기존 렌더된 패드 목록
+  const existingIds = [...wrap.querySelectorAll('.memo-pad')].map(p=>p.dataset.id);
+  const newIds = memos.map(m=>m.id);
+
+  // 완전히 다른 경우(검색어 변경 등)만 전체 재렌더
+  const needFullRender = existingIds.join(',') !== newIds.join(',');
+
+  if(needFullRender && focusedId){
+    // 포커스 중이면 전체 재렌더 건너뜀 — 포커스 해제 후 자동으로 다시 호출됨
+    return;
+  }
+
+  if(needFullRender){
+    wrap.innerHTML='';
+  }
+
   if(!memos.length){
     wrap.innerHTML='<div style="color:var(--ink-soft);font-size:13px;padding:20px 0">Add Memo 버튼으로 메모를 만들어보세요<br><span style="font-size:11px;opacity:.7">팁: 텍스트 선택 후 <b>B</b>=볼드, <span style="color:var(--rose);font-weight:600">P</span>=핑크 강조</span></div>';
     return;
   }
+
   memos.forEach(m=>{
+    // 이미 렌더된 패드는 포커스 중이 아닐 때만 업데이트
+    const existingPad = wrap.querySelector(`.memo-pad[data-id="${m.id}"]`);
+    if(existingPad){
+      if(m.id === focusedId) return; // 포커스 중 — 건드리지 않음
+      // 크기만 업데이트 (내용은 사용자가 입력 중일 수 있으므로 건드리지 않음)
+      existingPad.style.width = m.w+'px';
+      existingPad.style.minHeight = m.h+'px';
+      return;
+    }
+
+    // 새 패드 생성
     const pad=document.createElement('div');
     pad.className='memo-pad';
     pad.style.width=m.w+'px';
@@ -7178,13 +7909,16 @@ function renderMemoPad(){
     editor.innerHTML=memoToHtml(m.content);
     editor.addEventListener('input',()=>{
       const mx=D.memos.find(x=>x.id===m.id);
-      if(mx){ mx.content=htmlToMemoText(editor.innerHTML); save(); }
+      if(mx){ mx.content=htmlToMemoText(editor.innerHTML); save('misc'); }
+    });
+    // 포커스 해제 시 한 번 더 저장 (입력 후 즉시 탭 이동 대비)
+    editor.addEventListener('blur',()=>{
+      const mx=D.memos.find(x=>x.id===m.id);
+      if(mx){ mx.content=htmlToMemoText(editor.innerHTML); save('misc'); }
     });
     editor.addEventListener('mousedown',e=>e.stopPropagation());
     editor.addEventListener('keydown',e=>{
-      // Ctrl+B → bold
       if(e.ctrlKey&&e.key==='b'){ e.preventDefault(); applyMemoMark(m.id,'bold'); }
-      // Ctrl+P → pink
       if(e.ctrlKey&&e.key==='p'){ e.preventDefault(); applyMemoMark(m.id,'pink'); }
     });
 
@@ -7207,14 +7941,14 @@ function escAttr(s){ return (s||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;')
 function saveWeekMemo(wkKey,val){
   if(!D.weekMemos) D.weekMemos={};
   D.weekMemos[wkKey]=val;
-  save();
+  save('misc');
 }
 
 function updateMemo(id,field,val){
-  const m=D.memos.find(x=>x.id===id); if(m){m[field]=val;save();}
+  const m=D.memos.find(x=>x.id===id); if(m){m[field]=val;save('misc');}
 }
 function delMemo(id){
-  D.memos=D.memos.filter(x=>x.id!==id); save(); renderMemoPad();
+  D.memos=D.memos.filter(x=>x.id!==id); save('misc'); renderMemoPad();
 }
 
 // Resize drag
@@ -7243,7 +7977,7 @@ function startResizeMemo(e,id){
     document.removeEventListener('mouseup',onUp);
     document.removeEventListener('touchmove',onMove);
     document.removeEventListener('touchend',onUp);
-    save();
+    save('misc');
   }
   document.addEventListener('mousemove',onMove);
   document.addEventListener('mouseup',onUp);
@@ -7269,16 +8003,16 @@ function addRow(type){
   const id=uid();
   if(type==='contacts') D.contacts.push({id,name:'',person:'',tel:'',addr:'',note:''});
   else D.system.push({id,label:'',val1:'',val2:'',note:''});
-  save(); renderTbl(type);
+  save('misc'); renderTbl(type);
 }
 function delRow(type,id){
   if(type==='contacts') D.contacts=D.contacts.filter(x=>x.id!==id);
   else D.system=D.system.filter(x=>x.id!==id);
-  save(); renderTbl(type);
+  save('misc'); renderTbl(type);
 }
 function updateField(type,id,field,val){
   const arr=type==='contacts'?D.contacts:D.system;
-  const item=arr.find(x=>x.id===id); if(item){item[field]=val;save();}
+  const item=arr.find(x=>x.id===id); if(item){item[field]=val;save('misc');}
 }
 function renderTbl(type){
   if(type==='contacts'){ renderContactsGrouped(); return; }
@@ -7427,7 +8161,7 @@ function saveContact(){
     });
   }
   openCompanies.add(company);
-  save(); closeContactModal(); renderContactsGrouped();
+  save('misc'); closeContactModal(); renderContactsGrouped();
 }
 function quickAddContact(){
   const company = document.getElementById('qi-company').value.trim();
@@ -7449,7 +8183,7 @@ function quickAddContact(){
   document.getElementById('qi-tel').value='';
   document.getElementById('qi-email').value='';
   if(company) openCompanies.add(company||'기타');
-  save(); renderContactsGrouped();
+  save('misc'); renderContactsGrouped();
   document.getElementById('qi-person').focus();
 }
 // 빠른 입력에서 Enter 키 지원
@@ -7461,17 +8195,17 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 function updateContact(id, field, val){
   const c = (D.contacts||[]).find(x=>x.id===id);
-  if(c){ c[field]=val; save(); }
+  if(c){ c[field]=val; save('misc'); }
 }
 function deleteContactById(id){
   if(!confirm('이 연락처를 삭제하시겠습니까?')) return;
   D.contacts = D.contacts.filter(x=>x.id!==id);
-  save(); renderContactsGrouped();
+  save('misc'); renderContactsGrouped();
 }
 function deleteContact(){
   if(!editContactId||!confirm('이 연락처를 삭제하시겠습니까?')) return;
   D.contacts = D.contacts.filter(x=>x.id!==editContactId);
-  save(); closeContactModal(); renderContactsGrouped();
+  save('misc'); closeContactModal(); renderContactsGrouped();
 }
 
 // 담당자 메모 모달
@@ -7568,7 +8302,7 @@ function saveCmemoEntry(existingId){
     c.memos.push({ id:uid(), text, date:dateStr, tag });
   }
   document.querySelectorAll('.cmemo-input-form').forEach(el=>el.remove());
-  save(); renderCmemoEntries(c); renderContactsGrouped();
+  save('misc'); renderCmemoEntries(c); renderContactsGrouped();
 }
 
 function editCmemoEntry(memoId){
@@ -7612,7 +8346,7 @@ function deleteCmemoEntry(memoId){
   const c = (D.contacts||[]).find(x=>x.id===currentCmemoId);
   if(!c) return;
   c.memos = (c.memos||[]).filter(x=>x.id!==memoId);
-  save(); renderCmemoEntries(c); renderContactsGrouped();
+  save('misc'); renderCmemoEntries(c); renderContactsGrouped();
 }
 
 // ════════════════════════════════════════
@@ -7869,7 +8603,7 @@ function applySymModal(){
   if(!D.symSettings) D.symSettings={};
   D.symSettings.numStyle = numVal;
   D.symSettings.subStyle = subVal;
-  save();
+  save('misc');
   closeSymModal();
 }
 
@@ -7952,7 +8686,7 @@ function saveGoal(){
   } else {
     D.annualGoals.push(obj);
   }
-  save(); closeGoalModal(); renderGoalList();
+  save('misc'); closeGoalModal(); renderGoalList();
   if(selGoalId===editGoalId||!editGoalId) { selGoalId=obj.id; openPeriodicDetail(); }
 }
 function deleteGoal(){
@@ -7961,7 +8695,7 @@ function deleteGoal(){
   if(selGoalId===editGoalId){
     closePeriodicDetail();
   }
-  save(); closeGoalModal(); renderGoalList();
+  save('misc'); closeGoalModal(); renderGoalList();
 }
 function _isMobilePeriodic(){ return window.innerWidth <= 600; }
 
@@ -8163,7 +8897,7 @@ function saveResult(goalId, qKey, actionId, resultId){
     results.push(obj);
   }
   document.querySelectorAll('.result-input-wrap').forEach(el=>el.remove());
-  save();
+  save('misc');
   renderResultEntries(goalId, qKey, actionId, results);
 }
 function deleteResult(goalId, qKey, actionId, resultId){
@@ -8171,7 +8905,7 @@ function deleteResult(goalId, qKey, actionId, resultId){
   const g=(D.annualGoals||[]).find(x=>x.id===goalId);
   if(!g||!g.results[qKey]||!g.results[qKey][actionId]) return;
   g.results[qKey][actionId]=g.results[qKey][actionId].filter(r=>r.id!==resultId);
-  save(); renderResultEntries(goalId, qKey, actionId, g.results[qKey][actionId]);
+  save('misc'); renderResultEntries(goalId, qKey, actionId, g.results[qKey][actionId]);
 }
 
 // ══ 전체 복사 ══
@@ -8239,7 +8973,7 @@ function saveManualRpt(){
   D.weeklyReports.push(snap);
   D.weeklyReports.sort((a,b)=>b.weekKey.localeCompare(a.weekKey));
   selRptId = snap.id;
-  save(); closeManualRptModal(); renderWeeklyRptPage(); showRptDetail(snap.id);
+  save('misc'); closeManualRptModal(); renderWeeklyRptPage(); showRptDetail(snap.id);
 }
 
 // ── 주간보고 페이지 (아카이브) ──
@@ -8268,7 +9002,7 @@ function saveWeeklySnapshot(){
     savedAt: Date.now()
   };
   D.weeklyReports.unshift(snap);
-  save();
+  save('misc');
   renderWeeklyRptPage();
   alert(`${month}월 ${wn}주차 보고서가 저장되었습니다.`);
 }
@@ -8298,7 +9032,7 @@ function delRpt(id){
   if(!confirm('이 Weekly Report를 삭제하시겠습니까?')) return;
   D.weeklyReports=D.weeklyReports.filter(r=>r.id!==id);
   if(selRptId===id){ closeRptDetail(); return; }
-  save(); renderWeeklyRptPage();
+  save('misc'); renderWeeklyRptPage();
 }
 
 function closeRptDetail(){
@@ -8382,7 +9116,7 @@ function saveEditRptCard(id, which){
   if(which==='this') r.thisText=newText;
   else r.nextText=newText;
   r.savedAt=Date.now();
-  save();
+  save('misc');
   showRptDetail(id);
 }
 
@@ -8551,7 +9285,7 @@ function initTouchDragFromCard(cardEl){
     it.startTime = minsToTm(sm);
     it.endTime   = minsToTm(sm + 60);
     it.allDay    = false;
-    save(); renderPlanner(); renderPlannerCardView(); renderCal();
+    save('plannerMeta'); renderPlanner(); renderPlannerCardView(); renderCal();
   };
 
   cardEl.addEventListener('touchend',    endDrag, {passive:true});
@@ -8831,7 +9565,7 @@ function buildPlannerGrid(){
     it.startTime=minsToTm(sm);
     it.endTime=minsToTm(sm+60);
     it.allDay=false;
-    save(); renderPlanner(); renderCal();
+    save('plannerMeta'); renderPlanner(); renderCal();
   });
 }
 
@@ -8954,7 +9688,7 @@ function saveRoutine(){
   } else {
     D.routines.push(obj);
   }
-  save();
+  save('misc');
   resetRoutineForm();
   renderRoutineList();
   switchRoutineTab('list');
@@ -8985,7 +9719,7 @@ function editRoutine(id){
 function deleteRoutine(){
   if(!editRoutineId||!confirm('이 루틴을 삭제하시겠습니까?')) return;
   D.routines = (D.routines||[]).filter(r=>r.id!==editRoutineId);
-  save(); resetRoutineForm(); renderRoutineList();
+  save('misc'); resetRoutineForm(); renderRoutineList();
   switchRoutineTab('list');
   if(plannerOpen) renderPlanner();
 }
@@ -9015,7 +9749,7 @@ function renderRoutineList(){
       </div>
       ${!isDone ? `<button onclick="event.stopPropagation();editRoutine('${r.id}');switchRoutineTab('form');"
         style="border:none;background:var(--rose-pale);border-radius:7px;padding:4px 10px;font-size:11px;font-weight:600;cursor:pointer;color:var(--rose-mid);font-family:inherit;">수정</button>` : ''}
-      <button onclick="event.stopPropagation();if(confirm('삭제할까요?')){D.routines=D.routines.filter(x=>x.id!=='${r.id}');save();renderRoutineList();if(plannerOpen)renderPlanner();}"
+      <button onclick="event.stopPropagation();if(confirm('삭제할까요?')){D.routines=D.routines.filter(x=>x.id!=='${r.id}');save('misc');renderRoutineList();if(plannerOpen)renderPlanner();}"
         style="border:none;background:none;cursor:pointer;font-size:13px;color:#CCA0A0;padding:0 2px;" title="삭제"><i class="fa-solid fa-trash"></i></button>
     `;
     return row;
@@ -9209,7 +9943,7 @@ function makePlannerDrag(block, it){
         D.items[key][idx].startTime=minsToTm(newSm);
         D.items[key][idx].endTime=minsToTm(newSm+dur);
         D.items[key][idx].allDay=false; // 타임라인 배치 시 allDay 해제
-        save(); renderPlanner(); renderCal();
+        save('plannerMeta'); renderPlanner(); renderCal();
       }
       document.removeEventListener('mousemove',onMove);
       document.removeEventListener('mouseup',onUp);
@@ -9234,7 +9968,7 @@ function makePlannerResize(handle, it){
       if(idx>-1){ D.items[key][idx].endTime=minsToTm(clamped); renderPlanner(); }
     };
     const onUp=()=>{
-      save(); renderPlanner(); renderCal();
+      save('plannerMeta'); renderPlanner(); renderCal();
       document.removeEventListener('mousemove',onMove);
       document.removeEventListener('mouseup',onUp);
     };
@@ -9300,7 +10034,7 @@ function getPlannerMeta(key){
 }
 function setPlannerMeta(key,meta){
   if(!D.plannerMeta) D.plannerMeta={};
-  D.plannerMeta[key]=meta; save();
+  D.plannerMeta[key]=meta; save('plannerMeta');
 }
 function loadPlannerMeta(){
   const meta=getPlannerMeta(plannerKey);
@@ -9430,7 +10164,7 @@ function initSampleMinutes(){
       summary: ``
     }
   ];
-  save();
+  save('misc');
 }
 
 let minSortMode = 'date-desc';
@@ -9724,7 +10458,7 @@ async function saveMinute(){
   }
   selMinId = obj.id;
   if(saveBtn){ saveBtn.disabled=false; saveBtn.textContent='저장'; }
-  save(); closeMinutesModal(); renderMinutesList(); showMinuteDetail(obj.id);
+  save('minutes'); closeMinutesModal(); renderMinutesList(); showMinuteDetail(obj.id);
 }
 
 // ══ 손글씨 캔버스 ══
@@ -10086,7 +10820,7 @@ function deleteMinuteById(id){
   if(!confirm('이 회의록을 삭제하시겠습니까?')) return;
   D.minutes = (D.minutes||[]).filter(m=>m.id!==id);
   closeMinDetail();
-  save(); renderMinutesList();
+  save('minutes'); renderMinutesList();
 }
 
 // ══ 내보내기 설정 저장/불러오기 ══
@@ -10097,7 +10831,7 @@ function saveExportSettings(){
     closing:  document.getElementById('exp-closing').value,
     signature:document.getElementById('exp-signature').value,
   };
-  save();
+  save('misc');
   closeMinExportSettings();
 }
 function loadExportSettings(){
@@ -10199,7 +10933,7 @@ function deleteMinute(){
     document.getElementById('min-detail').style.display='none';
     document.getElementById('min-empty').style.display='block';
   }
-  save(); closeMinutesModal(); renderMinutesList();
+  save('minutes'); closeMinutesModal(); renderMinutesList();
 }
 
 document.getElementById('min-modal').onclick=e=>{
@@ -10603,7 +11337,7 @@ function quickAddProjFromNote(){
   if(!D.projects) D.projects=[];
   const newP = {id:uid(), name:name.trim(), status:'upcoming', tasks:[], memo:'', createdAt:Date.now()};
   D.projects.unshift(newP);
-  save();
+  save('projects');
   // 드롭다운에 추가 후 선택
   const lpSel = document.getElementById('ac-linked-proj');
   const opt = document.createElement('option');
@@ -10781,14 +11515,14 @@ function saveArchiving(){
   else { D.archiving.unshift(obj); selAcId=obj.id; }
   // 저장한 노트의 프로젝트 폴더 자동 열기
   if(obj.project){ selFolderProj=obj.project; acProjFilter=''; acTypeFilter='all'; }
-  save(); closeArchivingModal(); renderArchivingPage(); showAcDetail(obj.id);
+  save('archiving'); closeArchivingModal(); renderArchivingPage(); showAcDetail(obj.id);
 }
 
 function deleteArchiving(){
   if(!editAcId||!confirm('이 노트를 삭제하시겠습니까?')) return;
   D.archiving=(D.archiving||[]).filter(x=>x.id!==editAcId);
   if(selAcId===editAcId){ selAcId=null; document.getElementById('ac-detail').style.display='none'; document.getElementById('ac-empty').style.display='block'; }
-  save(); closeArchivingModal(); renderArchivingPage();
+  save('archiving'); closeArchivingModal(); renderArchivingPage();
 }
 
 function getFilteredAc(){
@@ -11027,7 +11761,7 @@ function deleteAcById(id){
   if(!confirm('이 노트를 삭제할까요?')) return;
   D.archiving=(D.archiving||[]).filter(x=>x.id!==id);
   closeAcDetail();
-  save(); renderArchivingPage();
+  save('archiving'); renderArchivingPage();
 }
 
 // ════════════════════════════════════════
@@ -11443,5 +12177,36 @@ function changeApiKey(){
 }
 </script>
 
+
+<!-- ══ TO-DO 플로팅 패널 (fixed, 모든 페이지 공통) ══ -->
+<!-- 버튼: 좌측 하단 동그란 버튼 (저장중과 동일 스타일) -->
+<div id="todo-fab-btn" onclick="toggleTodoPanel()" title="To-Do 열기">
+  <span class="todo-fab-label">To-Do</span>
+  <span class="todo-bookmark-count" id="todo-bookmark-cnt">0</span>
+</div>
+
+<!-- 데스크탑 닫힘 원형 버튼 -->
+<div id="todo-collapsed-btn" onclick="toggleTodoPanel()" title="To-Do 열기">
+  <span class="todo-col-label">To-Do</span>
+  <span class="todo-col-count" id="todo-col-count">0</span>
+</div>
+
+<!-- 패널: 좌측 하단에서 위로 팝업 -->
+<div id="todo-panel-wrap">
+  <div id="todo-panel-inner">
+    <div class="todo-panel-header">
+      <span class="todo-panel-title">To-Do</span>
+      <button class="todo-toggle-btn" onclick="toggleTodoPanel()" title="닫기"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="todo-add-row" id="todo-add-row">
+      <button class="todo-add-btn" onclick="openTodoAdd()"><i class="fa-solid fa-plus"></i></button>
+      <span class="todo-add-label">할 일 추가</span>
+    </div>
+    <div class="todo-list-wrap" id="todo-list-wrap"></div>
+  </div>
+</div>
+
+<!-- 드래그 고스트 -->
+<div class="todo-drag-ghost" id="todo-drag-ghost"></div>
 </body>
 </html>
