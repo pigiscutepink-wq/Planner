@@ -29,22 +29,30 @@
     link.rel = 'manifest';
     link.href = URL.createObjectURL(blob);
     document.head.appendChild(link);
-    // Apple Touch Icon
-    var c = document.createElement('canvas'); c.width = c.height = 180;
-    var ctx = c.getContext('2d');
-    ctx.beginPath();
-    var r=38, w=180;
-    ctx.moveTo(r,0); ctx.lineTo(w-r,0); ctx.quadraticCurveTo(w,0,w,r);
-    ctx.lineTo(w,w-r); ctx.quadraticCurveTo(w,w,w-r,w);
-    ctx.lineTo(r,w); ctx.quadraticCurveTo(0,w,0,w-r);
-    ctx.lineTo(0,r); ctx.quadraticCurveTo(0,0,r,0);
-    ctx.fillStyle='#DEC0C2'; ctx.fill();
-    ctx.fillStyle='white'; ctx.font='bold 100px serif';
-    ctx.textAlign='center'; ctx.textBaseline='middle';
-    ctx.fillText('B', 90, 95);
-    var ilink = document.createElement('link');
-    ilink.rel = 'apple-touch-icon'; ilink.href = c.toDataURL();
-    document.head.appendChild(ilink);
+    // Apple Touch Icon — 로고 이미지 사용
+    var logoImg = new Image();
+    logoImg.onload = function(){
+      var c = document.createElement('canvas'); c.width = c.height = 180;
+      var ctx = c.getContext('2d');
+      // 흰 배경
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, 180, 180);
+      // 로고 비율 유지하며 중앙 배치
+      var scale = Math.min(160 / logoImg.width, 160 / logoImg.height);
+      var w = logoImg.width * scale, h = logoImg.height * scale;
+      ctx.drawImage(logoImg, (180 - w) / 2, (180 - h) / 2, w, h);
+      var iconDataUrl = c.toDataURL('image/png');
+      var ilink = document.createElement('link');
+      ilink.rel = 'apple-touch-icon'; ilink.href = iconDataUrl;
+      document.head.appendChild(ilink);
+      // manifest 아이콘도 업데이트
+      manifest.icons = [{ src: iconDataUrl, sizes: '180x180', type: 'image/png' }];
+      var blob2 = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+      var mlink2 = document.createElement('link');
+      mlink2.rel = 'manifest'; mlink2.href = URL.createObjectURL(blob2);
+      document.head.appendChild(mlink2);
+    };
+    logoImg.src = document.querySelector('.logo-img') ? document.querySelector('.logo-img').src : '';
     // PWA install prompt (Android)
     window.addEventListener('beforeinstallprompt', function(e){
       e.preventDefault();
@@ -3859,7 +3867,7 @@ let D = {
   routines: []      // [{id, title, icon, startTime, endTime, color, repeat, repeatEnd}]
 };
 
-const GS_URL = 'https://script.google.com/macros/s/AKfycby_3dptm80D3-UgB73GRfqPoU5pQr8HG9UyZU1ivOXUEh_wK48aMVmEe8s1d53l48Gn6Q/exec';
+const GS_URL = 'https://script.google.com/macros/s/AKfycbx7i_rv66kzsokpfp7GVvk8jqvcVS4y8mleQSjLQjc0rXQ8UtGkZS8rPye9OpdBMyVqOw/exec';
 
 // GS 항상 활성화
 function isGsEnabled(){ return true; }
@@ -4032,6 +4040,12 @@ function applyGSData(d){
         it.startTime = cleanTime(it.startTime);
         it.endTime   = cleanTime(it.endTime);
         if(!it.startTime && !it.endTime) it.allDay = true;
+      });
+      // ID 기준 중복 제거 (GS 이중 저장 방지)
+      const seen = new Set();
+      d.items[date] = (d.items[date]||[]).filter(it=>{
+        if(!it.id || seen.has(it.id)) return false;
+        seen.add(it.id); return true;
       });
     });
     D.items = d.items;
