@@ -1071,19 +1071,34 @@ main.main{display:block;}
   .proj-card { width:100% !important; box-sizing:border-box !important; transform:none !important; }
   .proj-card:hover { transform:none !important; }
   .proj-card.sel  { transform:none !important; }
-  /* 필터바: 2줄로 — 첫줄 필터들, 둘째줄 새 프로젝트 버튼 오른쪽 정렬 */
+  /* 필터바: 한 줄 유지, 필터들은 wrap 허용, 새프로젝트 버튼은 우측 고정 */
   #task-view-projects > div:first-of-type {
-    flex-wrap: wrap !important;
+    flex-wrap: nowrap !important;
     gap: 8px !important;
+    align-items: center !important;
   }
   #task-view-projects > div:first-of-type > div:first-child {
-    flex-wrap: wrap !important;
+    flex-wrap: nowrap !important;
     gap: 6px !important;
-    width: 100% !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
   }
   #btn-new-proj {
-    width: 100% !important;
-    justify-content: center !important;
+    width: auto !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    font-size: 11px !important;
+    padding: 0 10px !important;
+  }
+  /* 상태 필터 버튼 글자 크기 줄이기 */
+  #proj-status-toggle .ac-toggle-btn {
+    font-size: 10px !important;
+    padding: 5px 7px !important;
+  }
+  .proj-cat-btn.ac-toggle-btn {
+    font-size: 10px !important;
+    padding: 5px 8px !important;
   }
 }
 .prog-bg{background:var(--gray);height:5px;border-radius:50px;overflow:hidden;margin:8px 0 4px;}
