@@ -445,6 +445,9 @@ main.main{display:block;}
 .todo-item:last-child{ border-bottom:none; }
 .todo-item:hover{ background:var(--rose-pale); }
 .todo-item.todo-done .todo-name{ text-decoration:line-through; opacity:.45; }
+.todo-item.todo-done{ opacity:.7; }
+/* 프로젝트 없는 완료 항목: 체크박스를 회색으로 (드래그로 이동 안내) */
+.todo-item.todo-done .todo-check{ background:var(--ink-soft); border-color:var(--ink-soft); }
 .todo-check{
   width:13px; height:13px; border-radius:3px;
   border:1.5px solid var(--rose-light); background:white; cursor:pointer; flex-shrink:0;
@@ -4267,6 +4270,8 @@ function getTodoItems(){
   (D.items['__todo__']||[]).forEach(it=>{
     if(it.isSpan) return;
     const proj = it.project ? D.projects.find(p=>p.id===it.project) : null;
+    // 프로젝트 있고 완료된 것은 표시 안 함 (체크 후 사라짐)
+    if(proj && it.status === 'done') return;
     list.push({
       id: it.id, name: it.name, type: it.type,
       project: it.project||'', projName: proj ? proj.name : '',
@@ -4274,14 +4279,16 @@ function getTodoItems(){
     });
   });
 
-  // 2) 프로젝트 tasks 중 date==='' 인 항목
+  // 2) 진행중 프로젝트 tasks 중 date==='' 이고 미완료인 항목만
   D.projects.forEach(proj=>{
+    if(proj.status !== 'ongoing') return; // 진행중만
     (proj.tasks||[]).forEach(tk=>{
-      if(tk.date) return; // 날짜 있으면 제외
+      if(tk.date) return;   // 날짜 있으면 제외
+      if(tk.done) return;   // 완료된 것 제외 (체크 후 사라짐)
       list.push({
         id: tk.id, name: tk.name, type:'task',
         project: proj.id, projName: proj.name,
-        status: tk.done ? 'done' : 'active', _source:'proj', _item: tk, _proj: proj
+        status: 'active', _source:'proj', _item: tk, _proj: proj
       });
     });
   });
@@ -4407,23 +4414,49 @@ function _makeTodoItem(t){
 
 // ── 투두 체크(완료) 토글 ──
 function toggleTodoDone(t){
-  if(t._source==='todo'){
-    const it = (D.items['__todo__']||[]).find(x=>x.id===t.id);
-    if(!it) return;
-    // 날짜 있고 프로젝트도 있으면 체크 후 사라짐(이미 조건 불일치하므로 실제론 투두에 안 옴)
-    it.status = it.status==='done' ? 'active' : 'done';
-    save('items');
-  } else {
-    // 프로젝트 task
+  if(t._source === 'proj'){
+    // 프로젝트 task → 완료 처리 후 투두에서 사라짐
     const proj = D.projects.find(p=>p.id===t.project);
     if(!proj) return;
     const tk = (proj.tasks||[]).find(x=>x.id===t.id);
     if(!tk) return;
-    tk.done = !tk.done;
+    tk.done = true;
+    tk.doneAt = Date.now();
     save('projects');
+    renderTodoPanel(); renderProjs(); renderDash();
+
+  } else {
+    // _source === 'todo'
+    const it = (D.items['__todo__']||[]).find(x=>x.id===t.id);
+    if(!it) return;
+
+    if(it.project){
+      // 프로젝트 지정된 todo → 완료 후 투두에서 제거, 프로젝트 task로 이동
+      const proj = D.projects.find(p=>p.id===it.project);
+      it.status = 'done';
+      // __todo__에서 제거
+      const arr = D.items['__todo__'];
+      const idx = arr.findIndex(x=>x.id===it.id);
+      if(idx !== -1) arr.splice(idx, 1);
+      if(!arr.length) delete D.items['__todo__'];
+      // proj.tasks에 완료 task로 추가 (없을 경우)
+      if(proj){
+        if(!(proj.tasks||[]).find(tk=>tk.id===it.id)){
+          if(!proj.tasks) proj.tasks=[];
+          proj.tasks.push({ id:it.id, name:it.name, done:true, doneAt:Date.now(), date:'' });
+        }
+        save('projects');
+      }
+      save('items');
+      renderTodoPanel(); renderProjs(); renderDash();
+
+    } else {
+      // 프로젝트 없는 일반 todo → 취소선만, 그자리 유지 (드래그드롭으로만 이동)
+      it.status = it.status==='done' ? 'active' : 'done';
+      save('items');
+      renderTodoPanel();
+    }
   }
-  renderTodoPanel();
-  renderProjs();
 }
 
 // ── 투두 추가 (기존 openAdd 활용, editKey='__todo__') ──
