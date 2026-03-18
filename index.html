@@ -472,6 +472,12 @@ main.main{display:block;}
   background:#FFF0F8 !important;
   box-shadow:inset 0 0 0 2px var(--rose-mid) !important;
 }
+#todo-panel-wrap.cal-drag-over,
+#todo-fab-btn.cal-drag-over{
+  box-shadow:0 0 0 3px var(--rose-mid), 0 4px 20px rgba(201,168,170,.45) !important;
+  background:var(--rose-pale) !important;
+}
+#todo-fab-btn.cal-drag-over .todo-fab-label{ color:var(--rose-mid); }
 
 /* 데스크탑 닫힘 원형버튼: 더 이상 사용 안 함 */
 #todo-collapsed-btn{ display:none !important; }
@@ -945,7 +951,9 @@ main.main{display:block;}
 }
 /* 아이패드 미니 터치도 동일 */
 @media (min-width:744px) and (max-width:820px) and (pointer:coarse){
-  .proj-layout{ display:block !important; }
+  .proj-layout{ display:flex !important; flex-direction:column !important; width:100% !important; }
+  #proj-list-col { width:100% !important; max-width:100% !important; }
+  .proj-card { width:100% !important; box-sizing:border-box !important; transform:none !important; }
   #proj-detail-wrap{ display:none !important; }
 }
 
@@ -1043,13 +1051,38 @@ main.main{display:block;}
     touch-action: none;
   }
 }
-.proj-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
-.proj-name{font-size:14px;font-weight:700;color:var(--rose-mid);}
-.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;}
+.proj-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;}
+.proj-name{font-size:14px;font-weight:700;color:var(--rose-mid);flex:1;min-width:0;word-break:keep-all;}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:50px;flex-shrink:0;white-space:nowrap;}
 .badge-up{background:#E8F4FD;color:#1A6FA8;}
 .badge-on{background:#D4EDDA;color:#1A6338;}
 .badge-dn{background:var(--gray);color:var(--ink-soft);}
 .badge-rt{background:#F3ECFA;color:#7B3FA0;}
+
+/* ── 모바일: 프로젝트 뷰 전체 너비 + 필터바 줄바꿈 ── */
+@media (max-width:743px) {
+  /* 그리드 완전 해제 */
+  .proj-layout { display:flex !important; flex-direction:column !important; width:100% !important; }
+  #proj-list-col { width:100% !important; max-width:100% !important; max-height:none !important; overflow-y:visible !important; }
+  .proj-list { width:100% !important; }
+  .proj-card { width:100% !important; box-sizing:border-box !important; transform:none !important; }
+  .proj-card:hover { transform:none !important; }
+  .proj-card.sel  { transform:none !important; }
+  /* 필터바: 2줄로 — 첫줄 필터들, 둘째줄 새 프로젝트 버튼 오른쪽 정렬 */
+  #task-view-projects > div:first-of-type {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+  #task-view-projects > div:first-of-type > div:first-child {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    width: 100% !important;
+  }
+  #btn-new-proj {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
 .prog-bg{background:var(--gray);height:5px;border-radius:50px;overflow:hidden;margin:8px 0 4px;}
 .prog-fill{height:100%;border-radius:50px;background:linear-gradient(90deg,var(--rose),var(--rose-mid));transition:width .4s ease;}
 .proj-detail{
@@ -2622,7 +2655,13 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
           <div id="dash-meals-today"></div>
         </div>
         <div class="card">
-          <div class="card-title"><i class="fa-solid fa-diagram-project"></i> 진행 중 프로젝트</div>
+          <div class="card-title" style="justify-content:space-between;">
+            <span style="display:flex;align-items:center;gap:7px;"><i class="fa-solid fa-diagram-project"></i> 진행 중 프로젝트</span>
+            <div style="display:flex;border:1.5px solid var(--rose-light);border-radius:var(--rs);overflow:hidden;flex-shrink:0;" id="dash-proj-cat-toggle">
+              <button class="ac-toggle-btn on" data-dcat="work"  onclick="switchDashProjCat('work',this)"  style="font-size:10px;padding:3px 9px;">업무</button>
+              <button class="ac-toggle-btn"    data-dcat="personal" onclick="switchDashProjCat('personal',this)" style="font-size:10px;padding:3px 9px;">개인</button>
+            </div>
+          </div>
           <div id="dash-proj-mini"></div>
         </div>
       </div>
@@ -2705,8 +2744,8 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
     <div class="mobile-page-title">Projects</div>
   </div>
     <!-- 필터 + 새 프로젝트 — cal-page-head와 동일한 패딩/높이로 맞춤 -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0 22px 0;gap:8px;">
-      <div style="display:flex;align-items:center;gap:8px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0 22px 0;gap:8px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1;min-width:0;">
         <!-- 업무 / 개인 -->
         <div style="display:flex;border:1.5px solid var(--rose-light);border-radius:var(--rs);overflow:hidden;flex-shrink:0;">
           <button class="proj-cat-btn ac-toggle-btn on" data-cat="work" onclick="switchProjCat('work',this)">업무</button>
@@ -3802,7 +3841,7 @@ let D = {
   routines: []      // [{id, title, icon, startTime, endTime, color, repeat, repeatEnd}]
 };
 
-const GS_URL = 'https://script.google.com/macros/s/AKfycbzhGtmj3hY3FCv6GrWw2C50BJL8FGA2bllDnb-rRkJpqVhVZu3jHLXHrzjB5v_8SGDQ1w/exec';
+const GS_URL = 'https://script.google.com/macros/s/AKfycby_3dptm80D3-UgB73GRfqPoU5pQr8HG9UyZU1ivOXUEh_wK48aMVmEe8s1d53l48Gn6Q/exec';
 
 // GS 항상 활성화
 function isGsEnabled(){ return true; }
@@ -4448,6 +4487,7 @@ function _handleTodoSave(item, editKey, editIdx){
 
 // ── 드래그 앤 드롭 (투두 → 캘린더) ──
 let _todoDragItem = null;
+let _calDragItem = null; // 캘린더 → 투두 드래그 추적
 const _todoGhost = ()=> document.getElementById('todo-drag-ghost');
 
 function _initTodoDrag(el, t){
@@ -4545,6 +4585,31 @@ function _todoDropToDate(dateKey){
     });
     save('projects');
   }
+  save('items');
+  renderCal(); renderTodoPanel(); renderDash();
+}
+
+// ── 캘린더 task 칩 → 투두 패널 드롭 처리 ──
+function _calDropToTodo(){
+  const d = _calDragItem;
+  if(!d) return;
+  const { it, key } = d;
+
+  // D.items[key]에서 해당 아이템 제거
+  const arr = D.items[key] || [];
+  const idx = arr.findIndex(x => x.id === it.id);
+  if(idx === -1) return;
+  arr.splice(idx, 1);
+  if(!arr.length) delete D.items[key];
+
+  // __todo__ 배열 맨 앞에 추가 (날짜 정보 제거)
+  const todoItem = { ...it, allDay: true };
+  delete todoItem.startTime;
+  delete todoItem.endTime;
+  delete todoItem.endDate;
+  if(!D.items['__todo__']) D.items['__todo__'] = [];
+  D.items['__todo__'].unshift(todoItem);
+
   save('items');
   renderCal(); renderTodoPanel(); renderDash();
 }
@@ -4815,6 +4880,8 @@ function navigateTo(pg){
   // hash 업데이트 (popstate 루프 방지)
   const newHash = '#' + pg + (subtab ? ':'+subtab : '');
   if(location.hash !== newHash) history.pushState(null,'', newHash);
+  // 마지막 페이지 기억 (PWA 재실행/새로고침 복원용)
+  localStorage.setItem('lastPage', pg + (subtab ? ':'+subtab : ''));
 }
 
 document.querySelectorAll('.nav-btn').forEach(btn=>{
@@ -5460,6 +5527,63 @@ function makeChip(it,key,idx){
       document.removeEventListener('touchstart', handler);
     }
   }, {passive:true});
+
+  // ── 캘린더 → 투두 드래그 (task 타입만) ──
+  if(it.type === 'task'){
+    div.style.cursor = 'grab';
+    function _calChipDragStart(cx, cy){
+      _calDragItem = { it, key };
+      const ghost = _todoGhost();
+      if(ghost){
+        ghost.textContent = it.name.length > 24 ? it.name.slice(0,22)+'…' : it.name;
+        ghost.style.display = 'block';
+        ghost.style.left = cx+'px';
+        ghost.style.top  = cy+'px';
+      }
+      function onMove(ev){
+        const px = ev.touches ? ev.touches[0].clientX : ev.clientX;
+        const py = ev.touches ? ev.touches[0].clientY : ev.clientY;
+        if(ghost){ ghost.style.left=px+'px'; ghost.style.top=py+'px'; }
+        const el2 = document.elementFromPoint(px, py);
+        const overPanel = el2 && (el2.closest('#todo-panel-wrap') || el2.closest('#todo-fab-btn'));
+        document.getElementById('todo-panel-wrap').classList.toggle('cal-drag-over', !!overPanel);
+        document.getElementById('todo-fab-btn').classList.toggle('cal-drag-over', !!overPanel);
+      }
+      function onUp(ev){
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('mouseup',   onUp);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('touchend',  onUp);
+        if(ghost) ghost.style.display='none';
+        document.getElementById('todo-panel-wrap').classList.remove('cal-drag-over');
+        document.getElementById('todo-fab-btn').classList.remove('cal-drag-over');
+        const px = ev.changedTouches ? ev.changedTouches[0].clientX : ev.clientX;
+        const py = ev.changedTouches ? ev.changedTouches[0].clientY : ev.clientY;
+        const elDrop = document.elementFromPoint(px, py);
+        if(elDrop && (elDrop.closest('#todo-panel-wrap') || elDrop.closest('#todo-fab-btn'))){
+          _calDropToTodo();
+          // 패널이 닫혀있으면 열기
+          const panel = document.getElementById('todo-panel-wrap');
+          if(panel && !panel.classList.contains('todo-open')) toggleTodoPanel();
+        }
+        _calDragItem = null;
+      }
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup',   onUp);
+      document.addEventListener('touchmove', onMove, {passive:false});
+      document.addEventListener('touchend',  onUp);
+    }
+    div.addEventListener('mousedown', function(e){
+      if(e.target.closest('.chip-acts')||e.target.closest('.cn')||e.target.closest('.chip-proj')) return;
+      if(e.button !== 0) return;
+      _calChipDragStart(e.clientX, e.clientY);
+    });
+    div.addEventListener('touchstart', function(e){
+      if(e.target.closest('.chip-acts')||e.target.closest('.cn')||e.target.closest('.chip-proj')) return;
+      _calChipDragStart(e.touches[0].clientX, e.touches[0].clientY);
+    }, {passive:true});
+  }
+
   return div;
 }
 
@@ -5988,12 +6112,12 @@ function renderDash(){
   `;
 
   // mini proj list
-  const onProjs=D.projects.filter(p=>p.status==='ongoing'||p.status==='routine').sort((a,b)=>(a.order||0)-(b.order||0));
+  const _dashProjCat = window._dashProjCat || 'work';
+  const onProjs=D.projects.filter(p=>(p.status==='ongoing'||p.status==='routine') && (p.category||'work')===_dashProjCat).sort((a,b)=>(a.order||0)-(b.order||0));
   const pm=document.getElementById('dash-proj-mini');
   if(!onProjs.length){ pm.innerHTML='<div style="font-size:12px;color:var(--ink-soft);padding:8px 0">진행 중인 프로젝트가 없습니다</div>'; }
   else {
-    pm.innerHTML=onProjs.map(p=>{
-      if(p.status==='routine'){
+    pm.innerHTML=onProjs.map(p=>{      if(p.status==='routine'){
         const tasks=p.tasks||[];
         const done=tasks.filter(tk=>tk.taskStatus==='done').length;
         const total=tasks.length;
@@ -6016,8 +6140,43 @@ function renderDash(){
   }
 
   renderWeeklyReport();
+  // 토글 버튼 상태 동기화
+  const _curCat = window._dashProjCat || 'work';
+  document.querySelectorAll('#dash-proj-cat-toggle .ac-toggle-btn').forEach(b=>b.classList.toggle('on', b.dataset.dcat===_curCat));
   // 아이패드 레이아웃 강제 재적용
   if(typeof applyTabletClass === 'function') applyTabletClass();
+}
+
+function switchDashProjCat(cat, btn){
+  window._dashProjCat = cat;
+  document.querySelectorAll('#dash-proj-cat-toggle .ac-toggle-btn').forEach(b=>b.classList.toggle('on', b.dataset.dcat===cat));
+  // 프로젝트 목록만 재렌더 (대시보드 전체 재렌더 없이)
+  const _dashProjCat = cat;
+  const onProjs = D.projects.filter(p=>(p.status==='ongoing'||p.status==='routine') && (p.category||'work')===_dashProjCat).sort((a,b)=>(a.order||0)-(b.order||0));
+  const pm = document.getElementById('dash-proj-mini');
+  if(!pm) return;
+  if(!onProjs.length){ pm.innerHTML='<div style="font-size:12px;color:var(--ink-soft);padding:8px 0">진행 중인 프로젝트가 없습니다</div>'; return; }
+  pm.innerHTML = onProjs.map(p=>{
+    if(p.status==='routine'){
+      const tasks=p.tasks||[];
+      const done=tasks.filter(tk=>tk.taskStatus==='done').length;
+      const total=tasks.length;
+      return `<div style="margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+          <span style="font-weight:600">${p.name}</span>
+          <span style="background:#F3ECFA;color:#7B3FA0;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:600;">루틴</span>
+        </div>
+        <div style="font-size:11px;color:var(--ink-soft)">${done}/${total} 완료</div>
+      </div>`;
+    }
+    const pct=projPct(p.id);
+    return `<div style="margin-bottom:10px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+        <span style="font-weight:600">${p.name}</span><span style="color:var(--ink-soft)">${pct}%</span>
+      </div>
+      <div class="prog-bg"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
 }
 
 function typeEmoji(t){
@@ -7804,7 +7963,7 @@ function htmlToMemoText(html){
     .replace(/<span class="mk-pink">(.*?)<\/span>/gi,'@@$1@@')
     .replace(/<br\s*\/?>/gi,'\n')
     .replace(/<[^>]+>/g,'')
-    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>');
+    .replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&nbsp;/g,' ');
 }
 
 // 선택 텍스트에 스타일 적용
@@ -11821,7 +11980,7 @@ function backToProjList(){
     console.warn('load 오류:', e);
   }
 
-  const initPage = (location.hash||'').replace('#','') || 'dashboard';
+  const initPage = (location.hash||'').replace('#','') || localStorage.getItem('lastPage') || 'dashboard';
   try { navigateTo(initPage); } catch(e){ console.warn('navigateTo 오류:', e); }
 
   // 안전장치: 초기 로드 시 planner가 열려있으면 강제 닫기
