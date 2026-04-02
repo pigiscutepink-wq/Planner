@@ -3894,6 +3894,7 @@ async function gsSend(payload){
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(payload),
     redirect: 'follow',
+    keepalive: true,  // 탭 닫혀도 요청 유지
   });
   if(!res.ok && res.status !== 0) throw new Error('HTTP ' + res.status);
   try { return await res.json(); } catch { return { ok: true }; }
@@ -9194,7 +9195,8 @@ function saveManualRpt(){
   D.weeklyReports.push(snap);
   D.weeklyReports.sort((a,b)=>b.weekKey.localeCompare(a.weekKey));
   selRptId = snap.id;
-  save('misc'); closeManualRptModal(); renderWeeklyRptPage(); showRptDetail(snap.id);
+  markDirty('misc'); saveNow();
+  closeManualRptModal(); renderWeeklyRptPage(); showRptDetail(snap.id);
 }
 
 // ── 주간보고 페이지 (아카이브) ──
@@ -9223,7 +9225,7 @@ function saveWeeklySnapshot(){
     savedAt: Date.now()
   };
   D.weeklyReports.unshift(snap);
-  save('misc');
+  markDirty('misc'); saveNow();
   renderWeeklyRptPage();
   alert(`${month}월 ${wn}주차 보고서가 저장되었습니다.`);
 }
@@ -9253,7 +9255,7 @@ function delRpt(id){
   if(!confirm('이 Weekly Report를 삭제하시겠습니까?')) return;
   D.weeklyReports=D.weeklyReports.filter(r=>r.id!==id);
   if(selRptId===id){ closeRptDetail(); return; }
-  save('misc'); renderWeeklyRptPage();
+  markDirty('misc'); saveNow(); renderWeeklyRptPage();
 }
 
 function closeRptDetail(){
