@@ -645,12 +645,12 @@ main.main{display:block;}
 }
 .multiday-bar:hover{box-shadow:0 3px 10px rgba(243,168,198,.3);transform:translateY(-1px);}
 .multiday-bar.ev-meet{border-left-color:#7AAFC8;background:#EBF3F9;}
-.multiday-bar.ev-out{border-left-color:#6DAA90;background:#EAF4EE;}
+.multiday-bar.ev-out{border-left-color:#A09660;background:#F2EFE4;}
 .multiday-bar.ev-imp{border-left-color:#C07878;background:#F9EEED;}
 .multiday-bar.ev-etc{border-left-color:#A8A098;background:#F3F1EE;}
 .multiday-bar.ev-lunch{border-left-color:#C8A06A;background:#F8F1E6;}
 .multiday-bar.ev-dinner{border-left-color:#9080B8;background:#F1EEFA;}
-.multiday-bar.ev-personal{border-left-color:#5A9CAC;background:#EAF6FA;}
+.multiday-bar.ev-personal{border-left-color:#D4883A;background:#FBF0E6;}
 .multiday-bar.ev-exercise{border-left-color:#5A9A6A;background:#EAF5EE;}
 .multiday-bar.ev-hobby{border-left-color:#A860A8;background:#F6EAF8;}
 
@@ -725,7 +725,7 @@ main.main{display:block;}
 .chip{
   font-size:11.5px;padding:4px 8px 4px 6px;border-radius:6px;
   display:flex;align-items:center;gap:4px;cursor:grab;
-  border-left:3px solid var(--rose);background:var(--rose-pale);
+  border-left:3px solid #C4B49A;background:#F5F0EA;
   transition:all .13s;position:relative;
   width:100%;min-width:0;box-sizing:border-box;overflow:hidden;
   box-shadow:0 1px 4px rgba(0,0,0,0.05);
@@ -734,15 +734,19 @@ main.main{display:block;}
 .chip.done .cn{text-decoration:line-through;opacity:.45;}
 .chip.cancelled{opacity:.3;}
 .chip.cancelled .cn{text-decoration:line-through;}
+.chip.deferred{ opacity:.45; background:#EFEFEF !important; border-left-color:#BBBBBB !important; }
+.chip.deferred .cn{ text-decoration:line-through; color:#999 !important; }
+.ca.defer:hover{background:#E8A020;color:white;}
 .chip.ev-meet{border-left-color:#7AAFC8;background:#EBF3F9;}
-.chip.ev-out{border-left-color:#6DAA90;background:#EAF4EE;}
+.chip.ev-out{border-left-color:#A09660;background:#F2EFE4;}
 .chip.ev-imp{border-left-color:#C07878;background:#F9EEED;}
 .chip.ev-etc{border-left-color:#A8A098;background:#F3F1EE;}
 .chip.ev-lunch{border-left-color:#C8A06A;background:#F8F1E6;}
 .chip.ev-dinner{border-left-color:#9080B8;background:#F1EEFA;}
-.chip.ev-personal{border-left-color:#5A9CAC;background:#EAF6FA;}
+.chip.ev-personal{border-left-color:#D4883A;background:#FBF0E6;}
 .chip.ev-exercise{border-left-color:#5A9A6A;background:#EAF5EE;}
 .chip.ev-hobby{border-left-color:#A860A8;background:#F6EAF8;}
+.chip.ev-dayoff{border-left-color:#C8A0A4;background:#F9EEEF;}
 
 .cn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;color:var(--ink);font-weight:500;}
 .chip-proj{
@@ -898,17 +902,17 @@ main.main{display:block;}
   min-height:36px;display:flex;align-items:center;
 }
 .type-pill.sel{border-color:transparent;color:white;}
-.type-pill[data-v="task"].sel{background:var(--rose);}
+.type-pill[data-v="task"].sel{background:#C4B49A;}
 .type-pill[data-v="ev-meet"].sel{background:#7AAFC8;}
-.type-pill[data-v="ev-out"].sel{background:#6DAA90;}
+.type-pill[data-v="ev-out"].sel{background:#A09660;}
 .type-pill[data-v="ev-imp"].sel{background:#C07878;}
 .type-pill[data-v="ev-etc"].sel{background:#A8A098;}
 .type-pill[data-v="ev-lunch"].sel{background:#C8A06A;}
 .type-pill[data-v="ev-dinner"].sel{background:#9080B8;}
-.type-pill[data-v="ev-personal"].sel{background:#5A9CAC;}
+.type-pill[data-v="ev-personal"].sel{background:#D4883A;}
 .type-pill[data-v="ev-exercise"].sel{background:#5A9A6A;}
 .type-pill[data-v="ev-hobby"].sel{background:#A860A8;}
-.type-pill[data-v="ev-dayoff"].sel{background:var(--rose-mid);}
+.type-pill[data-v="ev-dayoff"].sel{background:#C8A0A4;}
 
 /* 주말/공휴일/연차 핑크 배경 */
 .cal-day.is-offday{
@@ -1304,6 +1308,19 @@ main.main{display:block;}
 .info-tbl td input{border:none;background:transparent;font-size:12px;width:100%;font-family:inherit;outline:none;color:var(--ink);}
 .info-tbl tr:last-child td{border-bottom:none;}
 .info-tbl tr:hover td{background:var(--rose-pale);}
+/* sys-group accordion */
+.sys-group{background:var(--white);border:1.5px solid var(--rose-light);border-radius:var(--rs);overflow:hidden;}
+.sys-group-header{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none;background:var(--rose-pale);}
+.sys-group-header:hover{background:#F5EDEE;}
+.sys-group-title-input{flex:1;border:none;background:transparent;font-size:13px;font-weight:700;color:var(--ink);outline:none;cursor:text;}
+.sys-group-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--rose-light);color:white;flex-shrink:0;}
+.sys-group-chevron{font-size:11px;color:var(--ink-soft);transition:transform .2s;flex-shrink:0;}
+.sys-group-chevron.open{transform:rotate(180deg);}
+.sys-group-body{display:none;padding:0;}
+.sys-group-body.open{display:block;}
+.sys-group-memo-area{width:100%;box-sizing:border-box;border:none;resize:vertical;font-size:12.5px;font-family:inherit;color:var(--ink);padding:12px 14px;min-height:100px;outline:none;background:transparent;line-height:1.6;}
+.sys-group-footer{padding:8px 12px;border-top:1px solid var(--gray);display:flex;justify-content:space-between;align-items:center;}
+.sys-group-del{font-size:11px;color:var(--ink-soft);background:none;border:none;cursor:pointer;padding:2px 4px;}
 .add-row-btn{
   width:100%;margin-top:8px;padding:8px;border:1.5px dashed var(--rose-light);
   border-radius:var(--rs);background:none;cursor:pointer;font-size:12px;color:var(--ink-soft);transition:all .18s;
@@ -2843,12 +2860,14 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
     </div>
     <!-- System Info 탭 -->
     <div id="archive-tab-system" style="display:none;">
-      <div class="card">
-        <div class="card-title"><i class="fa-solid fa-server"></i> System Info</div>
-        <table class="info-tbl"><thead><tr><th>항목</th><th>ID</th><th>Password</th><th>비고</th><th></th></tr></thead>
-        <tbody id="tb-system"></tbody></table>
-        <button class="add-row-btn" onclick="addRow('system')"><i class="fa-solid fa-plus"></i> 추가</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span style="font-size:11px;font-weight:700;color:var(--ink-soft);letter-spacing:.08em;text-transform:uppercase;">System Info</span>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-p" style="font-size:11px;padding:0 12px;height:30px;" onclick="addSysGroup('table')"><i class="fa-solid fa-table"></i> 표 추가</button>
+          <button class="btn btn-p" style="font-size:11px;padding:0 12px;height:30px;" onclick="addSysGroup('memo')"><i class="fa-solid fa-note-sticky"></i> 메모 추가</button>
+        </div>
       </div>
+      <div id="sys-groups-wrap" style="display:flex;flex-direction:column;gap:8px;"></div>
     </div>
     <!-- Contacts 탭 -->
     <div id="archive-tab-contacts" style="display:none;">
@@ -3045,11 +3064,11 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap;">
       <!-- 업무/개인/스터디/아이디어 토글 -->
       <div id="ac-type-toggle" style="display:flex;border:1.5px solid var(--rose-light);border-radius:var(--rs);overflow:hidden;flex-shrink:0;height:44px;box-sizing:border-box;">
-        <button class="ac-toggle-btn on" data-at="all">전체</button>
-        <button class="ac-toggle-btn" data-at="work">💼 업무</button>
-        <button class="ac-toggle-btn" data-at="personal">🌿 개인</button>
+        <button class="ac-toggle-btn on" data-at="work">💼 업무</button>
         <button class="ac-toggle-btn" data-at="study">📚 스터디</button>
+        <button class="ac-toggle-btn" data-at="personal">🌿 개인</button>
         <button class="ac-toggle-btn" data-at="idea">💡 아이디어</button>
+        <button class="ac-toggle-btn" data-at="all">전체</button>
       </div>
       <!-- 프로젝트 드롭다운 -->
       <div style="position:relative;flex-shrink:0;">
@@ -3852,7 +3871,8 @@ let D = {
   items: {},
   projects: [],
   contacts: [],
-  system: [],
+  system: [],          // 레거시 (기존 row 데이터)
+  sysGroups: [],       // [{id, title, type:'table'|'memo', open:false, rows:[{id,label,val1,val2,note}], content:''}]
   globalMemo: '',
   meals: {},
   weeklyReports: [],
@@ -3867,7 +3887,7 @@ let D = {
   routines: []      // [{id, title, icon, startTime, endTime, color, repeat, repeatEnd}]
 };
 
-const GS_URL = 'https://script.google.com/macros/s/AKfycbx8tVbjZ8wUtx8dIC_nnlam-kTO-sXvo2kGSmU8aZ58eqx0XYuN5VWPpGXKTAL2iLaC_A/exec';
+const GS_URL = 'https://script.google.com/macros/s/AKfycbx9dqlF7Gvhc-lBmBr1_OBVmtjpf13sX7kc5RUskNZ0cTZg4iK15vBh0LNtX0zXCNVMMw/exec';
 
 // GS 항상 활성화
 function isGsEnabled(){ return true; }
@@ -4059,6 +4079,7 @@ function applyGSData(d){
   const m = d.misc || {};
   if(m.contacts)          D.contacts          = m.contacts;
   if(m.system)            D.system            = m.system;
+  if(m.sysGroups)         D.sysGroups         = m.sysGroups;
   if(m.globalMemo != null) D.globalMemo       = m.globalMemo;
   if(m.meals)             D.meals             = m.meals;
   if(m.weeklyReports)     D.weeklyReports     = m.weeklyReports;
@@ -4067,7 +4088,7 @@ function applyGSData(d){
   if(m.symSettings)       D.symSettings       = m.symSettings;
   if(m.memos)             D.memos             = m.memos;
   if(m.weekMemos)         D.weekMemos         = m.weekMemos;
-  if(m.routines)          D.routines          = m.routines;
+  if(m.routines)          D.routines          = m.routines.map(function(r){ return Object.assign({},r,{startTime:cleanTime(r.startTime),endTime:cleanTime(r.endTime)}); });
 
   // ── 마이그레이션: category/order 없는 기존 프로젝트에 기본값 부여 ──
   let workOrd=0, personalOrd=0;
@@ -4097,6 +4118,7 @@ function buildPayload(){
       misc: {
         contacts:          D.contacts,
         system:            D.system,
+        sysGroups:         D.sysGroups,
         globalMemo:        D.globalMemo,
         meals:             D.meals,
         weeklyReports:     D.weeklyReports,
@@ -4803,11 +4825,11 @@ function renderArchivingInTab(){
       <div id="ac-toolbar" style="display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
         <div style="display:flex;align-items:center;gap:8px;flex:1;flex-wrap:wrap;">
         <div id="ac-type-toggle" style="display:flex;border:1.5px solid var(--rose-light);border-radius:var(--rs);overflow:hidden;flex-shrink:0;">
-          <button class="ac-toggle-btn on" data-at="all">전체</button>
-          <button class="ac-toggle-btn" data-at="work">💼 업무</button>
-          <button class="ac-toggle-btn" data-at="personal">🌿 개인</button>
+          <button class="ac-toggle-btn on" data-at="work">💼 업무</button>
           <button class="ac-toggle-btn" data-at="study">📚 스터디</button>
+          <button class="ac-toggle-btn" data-at="personal">🌿 개인</button>
           <button class="ac-toggle-btn" data-at="idea">💡 아이디어</button>
+          <button class="ac-toggle-btn" data-at="all">전체</button>
         </div>
         <div style="position:relative;flex-shrink:0;">
           <button id="ac-proj-btn" onclick="toggleAcProjDrop()" style="display:flex;align-items:center;gap:6px;padding:0 12px;height:44px;box-sizing:border-box;border-radius:var(--rs);border:1.5px solid var(--rose-light);background:var(--white);font-size:12px;font-weight:600;color:var(--ink-mid);cursor:pointer;font-family:inherit;transition:all .15s;">
@@ -5359,9 +5381,9 @@ function renderCal(){
 
 // 멀티데이 바 색상 맵
 const MULTIDAY_COLORS={
-  'ev-meet':'#8FA8C0','ev-out':'#89A89A','ev-imp':'#C08080',
+  'ev-meet':'#8FA8C0','ev-out':'#A09660','ev-imp':'#C08080',
   'ev-etc':'#B0A898','ev-lunch':'#C0A070','ev-dinner':'#9080A8',
-  'task':'#C8A0A4','ev-dayoff':'#C9A8AA'
+  'task':'#C4B49A','ev-dayoff':'#C8A0A4','ev-personal':'#D4883A'
 };
 
 // ══ 멀티데이 바 — 주 경계에서만 분할, 같은 주 안은 하나의 바 ══
@@ -5498,6 +5520,31 @@ function setStatusById(id, st){
   if(!found) return;
   setStatus(found.key, found.idx, st);
 }
+function deferItemById(id){
+  const found = findItemById(id);
+  if(!found) return;
+  const it = D.items[found.key][found.idx];
+  if(!it) return;
+  if(it.status === 'deferred'){
+    // 다시 누르면 원래대로 (토글)
+    it.status = 'active';
+  } else {
+    it.status = 'deferred';
+    // 프로젝트에 연결되어 있으면 프로젝트 tasks에서 제거
+    if(it.project){
+      const proj = D.projects.find(p=>p.id===it.project);
+      if(proj && proj.tasks){
+        proj.tasks = proj.tasks.filter(tk=>tk.id!==it.id);
+      }
+      it.project = ''; // 프로젝트 연결 해제
+      save('projects');
+    }
+  }
+  save('items');
+  renderCal();
+  if(typeof renderWeeklyView==='function') renderWeeklyView();
+  renderDash();
+}
 function setStatusWvById(id, st){
   const found = findItemById(id);
   if(!found) return;
@@ -5523,8 +5570,8 @@ function renderItems(key){
   items.forEach((it,idx)=>{
     if(it.isSpan) return; // 멀티데이 span은 overlay로 처리
     const chip=makeChip(it,key,idx);
-    // 일정존: 회의/외근출장/중요/기타/연차 (멀티데이 아닌 것만)
-    if(['ev-meet','ev-out','ev-imp','ev-etc','ev-dayoff'].includes(it.type)){
+    // 일정존: 회의/외근출장/중요/연차/저녁/개인 (멀티데이 아닌 것만)
+    if(['ev-meet','ev-out','ev-imp','ev-dayoff','ev-dinner','ev-personal'].includes(it.type)){
       if(!it.endDate || it.endDate<=key) evEl.appendChild(chip);
     } else {
       // task, ev-lunch, ev-dinner, ev-personal, ev-exercise, ev-hobby → 업무존
@@ -5542,7 +5589,7 @@ function makeChip(it,key,idx){
     div.innerHTML=`<span class="cn" style="color:var(--ink-mid);font-style:italic;">${escHtml(it.name)}</span>`;
     return div;
   }
-  div.className=`chip ${it.type}${it.status==='done'?' done':it.status==='cancelled'?' cancelled':''}`;
+  div.className=`chip ${it.type}${it.status==='done'?' done':it.status==='cancelled'?' cancelled':it.status==='deferred'?' deferred':''}`;
   if(it.endDate && it.endDate > key){
     div.style.borderRight='none';
     div.style.borderRadius='4px 0 0 4px';
@@ -5556,6 +5603,7 @@ function makeChip(it,key,idx){
     <span class="cn" onclick="openEditById('${it.id}')" title="${it.name}">${it.name}</span>
     ${partnerTag}
     <div class="chip-acts">
+      <button class="ca defer" onclick="deferItemById('${it.id}')" title="미루기"><i class="fa-solid fa-arrow-right"></i></button>
       <button class="ca done" onclick="setStatusById('${it.id}','done')" title="완료"><i class="fa-solid fa-check"></i></button>
     </div>
   `;
@@ -5696,7 +5744,7 @@ function initSortable(){
 
         // ID 매칭 실패 시 해당 존의 visible 아이템 순서로 fallback
         if(fromIdx === -1){
-          const EV_TYPES = ['ev-meet','ev-out','ev-imp','ev-etc','ev-dayoff'];
+          const EV_TYPES = ['ev-meet','ev-out','ev-imp','ev-dayoff','ev-dinner','ev-personal'];
           const zoneItems = D.items[fromKey].filter(it=>{
             if(it.isSpan) return false;
             return fromZone==='ev' ? EV_TYPES.includes(it.type) : !EV_TYPES.includes(it.type);
@@ -5711,7 +5759,7 @@ function initSortable(){
 
         // 존 간 이동 시 타입 보정
         if(fromZone !== toZone){
-          const EV_TYPES = ['ev-meet','ev-out','ev-imp','ev-etc','ev-dayoff'];
+          const EV_TYPES = ['ev-meet','ev-out','ev-imp','ev-dayoff','ev-dinner','ev-personal'];
           if(toZone==='ts') moved.type = 'task';
           else if(toZone==='ev' && !EV_TYPES.includes(moved.type)) moved.type = 'ev-meet';
         }
@@ -5719,7 +5767,7 @@ function initSortable(){
         if(!D.items[toKey]) D.items[toKey] = [];
 
         // 목적지 존의 visible 아이템 순서로 삽입 위치 결정
-        const EV_TYPES2 = ['ev-meet','ev-out','ev-imp','ev-etc','ev-dayoff'];
+        const EV_TYPES2 = ['ev-meet','ev-out','ev-imp','ev-dayoff','ev-dinner','ev-personal'];
         const toZoneItems = D.items[toKey].filter(it=>{
           if(it.isSpan) return false;
           return toZone==='ev' ? EV_TYPES2.includes(it.type) : !EV_TYPES2.includes(it.type);
@@ -6863,6 +6911,12 @@ function renderProjDetail(id){
   // ── 완료 프로젝트: 매뉴얼 뷰로 분기 ──
   if(p.status === 'done'){
     det.innerHTML = renderDoneDetail(p, id, pct, d, t, allTasksHtml);
+    // aiManual 없으면 자동 생성 트리거 (페이지 재진입 시에도 작동)
+    if(!p.aiManual || !p.aiManual.steps || !p.aiManual.steps.length){
+      const hasItems = Object.values(D.items||{}).some(arr=>arr.some(it=>it.project===id));
+      const hasTasks = (p.tasks||[]).length > 0;
+      if(hasItems || hasTasks) setTimeout(()=>analyzeProject(id), 100);
+    }
     return;
   }
 
@@ -7151,9 +7205,10 @@ async function callGemini(systemPrompt, userPrompt, maxTokens){
   const GEMINI_KEY = _geminiApiKey;
   if(!GEMINI_KEY){ showApiKeyModal(); throw new Error('API 키를 먼저 입력해주세요.'); }
 
-  // 15초 타임아웃
+  // maxTokens 2000 이상(매뉴얼 생성)은 60초, 나머지는 15초
+  const timeoutMs = maxTokens >= 2000 ? 60000 : 15000;
   const controller = new AbortController();
-  const timeout = setTimeout(()=>controller.abort(), 15000);
+  const timeout = setTimeout(()=>controller.abort(), timeoutMs);
 
   try{
     const res = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key='+GEMINI_KEY,{
@@ -7171,7 +7226,7 @@ async function callGemini(systemPrompt, userPrompt, maxTokens){
     return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
   } catch(e){
     clearTimeout(timeout);
-    if(e.name === 'AbortError') throw new Error('AI 응답 시간 초과 (15초). 다시 시도해주세요.');
+    if(e.name === 'AbortError') throw new Error('AI 응답 시간 초과. 다시 시도해주세요.');
     throw e;
   }
 }
@@ -8236,9 +8291,90 @@ function updateField(type,id,field,val){
   const arr=type==='contacts'?D.contacts:D.system;
   const item=arr.find(x=>x.id===id); if(item){item[field]=val;save('misc');}
 }
+// ══ SYSTEM INFO 그룹 ══
+function addSysGroup(type){
+  if(!D.sysGroups) D.sysGroups=[];
+  D.sysGroups.push({id:uid(), title:'새 그룹', type, open:false, rows:[], content:''});
+  save('misc'); renderSysGroups();
+}
+function delSysGroup(id){
+  if(!confirm('이 그룹을 삭제할까요?')) return;
+  D.sysGroups = D.sysGroups.filter(g=>g.id!==id);
+  save('misc'); renderSysGroups();
+}
+function toggleSysGroup(id){
+  const g = D.sysGroups.find(g=>g.id===id); if(!g) return;
+  g.open = !g.open;
+  save('misc'); renderSysGroups();
+}
+function addSysRow(gid){
+  const g = D.sysGroups.find(g=>g.id===gid); if(!g) return;
+  g.rows.push({id:uid(), label:'', val1:'', val2:'', note:''});
+  save('misc'); renderSysGroups();
+}
+function delSysRow(gid, rid){
+  const g = D.sysGroups.find(g=>g.id===gid); if(!g) return;
+  g.rows = g.rows.filter(r=>r.id!==rid);
+  save('misc'); renderSysGroups();
+}
+function updateSysField(gid, rid, field, val){
+  const g = D.sysGroups.find(g=>g.id===gid); if(!g) return;
+  const r = g.rows.find(r=>r.id===rid); if(!r) return;
+  r[field]=val; save('misc');
+}
+function updateSysGroupField(gid, field, val){
+  const g = D.sysGroups.find(g=>g.id===gid); if(!g) return;
+  g[field]=val; save('misc');
+}
+function renderSysGroups(){
+  if(!D.sysGroups) D.sysGroups=[];
+  const wrap = document.getElementById('sys-groups-wrap'); if(!wrap) return;
+  // 기존 row 데이터 마이그레이션 (레거시)
+  if(D.system && D.system.length && !D.sysGroups.length){
+    D.sysGroups.push({id:uid(), title:'기존 데이터', type:'table', open:false, rows:[...D.system], content:''});
+    D.system=[]; save('misc');
+  }
+  wrap.innerHTML='';
+  D.sysGroups.forEach(g=>{
+    const div = document.createElement('div');
+    div.className='sys-group';
+    const badgeLabel = g.type==='table' ? '표' : '메모';
+    const bodyContent = g.type==='table' ? `
+      <table class="info-tbl"><thead><tr><th>항목</th><th>ID</th><th>Password</th><th>비고</th><th></th></tr></thead>
+      <tbody>${(g.rows||[]).map(row=>`
+        <tr>
+          <td><input value="${escAttr(row.label||'')}" placeholder="항목" oninput="updateSysField('${g.id}','${row.id}','label',this.value)"></td>
+          <td><input value="${escAttr(row.val1||'')}" placeholder="ID" oninput="updateSysField('${g.id}','${row.id}','val1',this.value)"></td>
+          <td><input value="${escAttr(row.val2||'')}" placeholder="Password" style="font-family:monospace" oninput="updateSysField('${g.id}','${row.id}','val2',this.value)"></td>
+          <td><input value="${escAttr(row.note||'')}" placeholder="비고" oninput="updateSysField('${g.id}','${row.id}','note',this.value)"></td>
+          <td><button onclick="delSysRow('${g.id}','${row.id}')" style="background:none;border:none;cursor:pointer;color:var(--ink-soft)"><i class="fa-solid fa-xmark"></i></button></td>
+        </tr>`).join('')}
+      </tbody></table>
+      <div class="sys-group-footer">
+        <button class="add-row-btn" style="margin:0" onclick="addSysRow('${g.id}')"><i class="fa-solid fa-plus"></i> 행 추가</button>
+        <button class="sys-group-del" onclick="delSysGroup('${g.id}')"><i class="fa-solid fa-trash"></i> 그룹 삭제</button>
+      </div>` : `
+      <textarea class="sys-group-memo-area" placeholder="메모를 입력하세요..." oninput="updateSysGroupField('${g.id}','content',this.value)">${esc(g.content||'')}</textarea>
+      <div class="sys-group-footer" style="padding:6px 12px;">
+        <span></span>
+        <button class="sys-group-del" onclick="delSysGroup('${g.id}')"><i class="fa-solid fa-trash"></i> 그룹 삭제</button>
+      </div>`;
+    div.innerHTML=`
+      <div class="sys-group-header" onclick="toggleSysGroup('${g.id}')">
+        <i class="fa-solid fa-${g.type==='table'?'table':'note-sticky'}" style="color:var(--rose-mid);font-size:12px;flex-shrink:0;"></i>
+        <input class="sys-group-title-input" value="${escAttr(g.title||'')}" placeholder="그룹명" onclick="event.stopPropagation()" oninput="updateSysGroupField('${g.id}','title',this.value)">
+        <span class="sys-group-badge">${badgeLabel}</span>
+        <i class="fa-solid fa-chevron-down sys-group-chevron${g.open?' open':''}"></i>
+      </div>
+      <div class="sys-group-body${g.open?' open':''}">${bodyContent}</div>`;
+    wrap.appendChild(div);
+  });
+}
+
 function renderTbl(type){
   if(type==='contacts'){ renderContactsGrouped(); return; }
-  const tbody=document.getElementById('tb-'+type); tbody.innerHTML='';
+  if(type==='system'){ renderSysGroups(); return; }
+  const tbody=document.getElementById('tb-'+type); if(!tbody) return; tbody.innerHTML='';
   const arr=D.system;
   arr.forEach(row=>{
     const tr=document.createElement('tr');
@@ -9368,16 +9504,17 @@ const SLOTS    = (DAY_END_MIN - DAY_START_MIN) / 30; // 40 slots
 const START_H  = 5;    // scroll start hour
 
 const TYPE_META = {
-  'task':       { icon:'📋', color:'#A89090',  label:'업무'      },
+  'task':       { icon:'📋', color:'#C4B49A',  label:'업무'      },
   'ev-meet':    { icon:'🤝', color:'#8FA8C0',  label:'회의'      },
-  'ev-out':     { icon:'🚗', color:'#89A89A',  label:'외근/출장' },
+  'ev-out':     { icon:'🚗', color:'#A09660',  label:'외근/출장' },
   'ev-imp':     { icon:'❗', color:'#C08080',  label:'중요'      },
   'ev-lunch':   { icon:'🍱', color:'#C0A070',  label:'점심'      },
   'ev-dinner':  { icon:'🌙', color:'#9080A8',  label:'저녁'      },
-  'ev-personal':{ icon:'🙂', color:'#7AACB8',  label:'개인'      },
+  'ev-personal':{ icon:'🙂', color:'#D4883A',  label:'개인'      },
   'ev-exercise':{ icon:'🏃', color:'#7AAB80',  label:'운동'      },
   'ev-hobby':   { icon:'🎨', color:'#B88AB0',  label:'취미'      },
   'ev-etc':     { icon:'📌', color:'#B0A898',  label:'기타'      },
+  'ev-dayoff':  { icon:'🌸', color:'#C8A0A4',  label:'연차'      },
 };
 const DOW_FULL = ['월요일','화요일','수요일','목요일','금요일','토요일','일요일'];
 
@@ -9386,7 +9523,7 @@ let plannerOpen  = false;
 let nowTimer     = null;
 let activeType   = null;
 
-function tmToMins(t){ if(!t)return null; const[h,m]=t.split(':').map(Number);return h*60+m; }
+function tmToMins(t){ if(!t)return null; const[h,m]=t.split(':').map(Number); if(isNaN(h)||isNaN(m))return null; return h*60+m; }
 function minsToTm(m){ return String(Math.floor(m/60)%24).padStart(2,'0')+':'+String(m%60).padStart(2,'0'); }
 // Convert absolute minutes → pixel Y (relative to DAY_START_MIN)
 function minsToY(m){ return ((m - DAY_START_MIN)/30)*SLOT_H; }
@@ -11444,7 +11581,7 @@ function toggleSidebarSearch(){
 // ════════════════════════════════════════
 let editAcId  = null;
 let selAcType = 'work';   // 'work' | 'personal'
-let acTypeFilter = 'all'; // 'all' | 'work' | 'personal'
+let acTypeFilter = 'work'; // 'all' | 'work' | 'personal'
 let acProjFilter = '';    // project name or ''
 let selAcId   = null;
 

@@ -21,8 +21,7 @@ const BYPASS_ORIGINS = [
   'script.google.com',
   'script.googleusercontent.com',
   'sheets.googleapis.com',
-  'api.anthropic.com',
-  'generativelanguage.googleapis.com',
+  'generativelanguage.googleapis.com', // Gemini AI API (index.html에서 직접 호출)
 ];
 
 // ── 설치: 앱 파일 캐싱 ──
