@@ -500,6 +500,7 @@ main.main{display:block;}
   flex-direction:row;
   gap:0;
   position:relative;
+  overflow:hidden;
 }
 
 /* 평일 블록 (월~금, 5칸) */
@@ -646,13 +647,14 @@ main.main{display:block;}
 .multiday-bar:hover{box-shadow:0 3px 10px rgba(243,168,198,.3);transform:translateY(-1px);}
 .multiday-bar.ev-meet{border-left-color:#7AAFC8;background:#EBF3F9;}
 .multiday-bar.ev-out{border-left-color:#A09660;background:#F2EFE4;}
-.multiday-bar.ev-imp{border-left-color:#C07878;background:#F9EEED;}
+.multiday-bar.ev-imp{border-left-color:#C07878;background:#f5e6e5;color:#A04040;}
 .multiday-bar.ev-etc{border-left-color:#A8A098;background:#F3F1EE;}
 .multiday-bar.ev-lunch{border-left-color:#C8A06A;background:#F8F1E6;}
 .multiday-bar.ev-dinner{border-left-color:#9080B8;background:#F1EEFA;}
 .multiday-bar.ev-personal{border-left-color:#D4883A;background:#FBF0E6;}
 .multiday-bar.ev-exercise{border-left-color:#5A9A6A;background:#EAF5EE;}
 .multiday-bar.ev-hobby{border-left-color:#A860A8;background:#F6EAF8;}
+.multiday-bar.ev-dayoff{border-left-color:#e1939e;background:#eed1d3;color:#ffffff;}
 
 /* ── ROUTINE ── */
 .rt-color-btn{
@@ -725,7 +727,7 @@ main.main{display:block;}
 .chip{
   font-size:11.5px;padding:4px 8px 4px 6px;border-radius:6px;
   display:flex;align-items:center;gap:4px;cursor:grab;
-  border-left:3px solid #C4B49A;background:#F5F0EA;
+  border-left:3px solid #e3c7c9;background:#f9f5f5;
   transition:all .13s;position:relative;
   width:100%;min-width:0;box-sizing:border-box;overflow:hidden;
   box-shadow:0 1px 4px rgba(0,0,0,0.05);
@@ -739,14 +741,14 @@ main.main{display:block;}
 .ca.defer:hover{background:#E8A020;color:white;}
 .chip.ev-meet{border-left-color:#7AAFC8;background:#EBF3F9;}
 .chip.ev-out{border-left-color:#A09660;background:#F2EFE4;}
-.chip.ev-imp{border-left-color:#C07878;background:#F9EEED;}
+.chip.ev-imp{border-left-color:#C07878;background:#f5e6e5;color:#A04040;}
 .chip.ev-etc{border-left-color:#A8A098;background:#F3F1EE;}
 .chip.ev-lunch{border-left-color:#C8A06A;background:#F8F1E6;}
 .chip.ev-dinner{border-left-color:#9080B8;background:#F1EEFA;}
 .chip.ev-personal{border-left-color:#D4883A;background:#FBF0E6;}
 .chip.ev-exercise{border-left-color:#5A9A6A;background:#EAF5EE;}
 .chip.ev-hobby{border-left-color:#A860A8;background:#F6EAF8;}
-.chip.ev-dayoff{border-left-color:#C8A0A4;background:#F9EEEF;}
+.chip.ev-dayoff{border-left-color:#e1939e;background:#eed1d3;color:#ffffff;}
 
 .cn{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;color:var(--ink);font-weight:500;}
 .chip-proj{
@@ -902,7 +904,7 @@ main.main{display:block;}
   min-height:36px;display:flex;align-items:center;
 }
 .type-pill.sel{border-color:transparent;color:white;}
-.type-pill[data-v="task"].sel{background:#C4B49A;}
+.type-pill[data-v="task"].sel{background:#e3c7c9;}
 .type-pill[data-v="ev-meet"].sel{background:#7AAFC8;}
 .type-pill[data-v="ev-out"].sel{background:#A09660;}
 .type-pill[data-v="ev-imp"].sel{background:#C07878;}
@@ -912,7 +914,7 @@ main.main{display:block;}
 .type-pill[data-v="ev-personal"].sel{background:#D4883A;}
 .type-pill[data-v="ev-exercise"].sel{background:#5A9A6A;}
 .type-pill[data-v="ev-hobby"].sel{background:#A860A8;}
-.type-pill[data-v="ev-dayoff"].sel{background:#C8A0A4;}
+.type-pill[data-v="ev-dayoff"].sel{background:#e1939e;}
 
 /* 주말/공휴일/연차 핑크 배경 */
 .cal-day.is-offday{
@@ -1732,7 +1734,7 @@ main.main{display:block;}
 .ac-row-date{font-size:10px;color:var(--ink-soft);white-space:nowrap;flex-shrink:0;}
 .ac-row-bottom{display:flex;gap:5px;flex-wrap:wrap;}
 .ac-tag{font-size:9px;font-weight:700;padding:2px 7px;border-radius:50px;background:var(--rose-pale);color:var(--rose-mid);}
-.ac-tag.work{background:#EEE8E8;color:#A89090;}
+.ac-tag.work{background:#FBF0F2;color:#E08898;}
 .ac-tag.personal{background:#E8EEE8;color:#89A89A;}
 .ac-tag.study{background:#E8EEF5;color:#8FA8C0;}
 .ac-tag.idea{background:#F5EEE0;color:#C0A070;}
@@ -3132,7 +3134,7 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
         <div style="display:flex;align-items:center;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap;padding-bottom:2px;">
         <span style="font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#C9A8AA;white-space:nowrap;flex-shrink:0;">+ 일정 추가</span>
         <div style="display:flex;gap:5px;flex-wrap:nowrap;flex-shrink:0;">
-          <button class="planner-type-btn" data-type="task"        style="--c:#A89090" onclick="plannerQuickAdd('task')">📋 업무</button>
+          <button class="planner-type-btn" data-type="task"        style="--c:#e3c7c9" onclick="plannerQuickAdd('task')">📋 업무</button>
           <button class="planner-type-btn" data-type="ev-meet"     style="--c:#8FA8C0" onclick="plannerQuickAdd('ev-meet')">🤝 일정</button>
           <button class="planner-type-btn" data-type="ev-out"      style="--c:#89A89A" onclick="plannerQuickAdd('ev-out')">🚗 외근/출장</button>
           <button class="planner-type-btn" data-type="ev-imp"      style="--c:#C08080" onclick="plannerQuickAdd('ev-imp')">❗ 중요</button>
@@ -3142,7 +3144,7 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
           <button class="planner-type-btn" data-type="ev-exercise" style="--c:#5A9A6A" onclick="plannerQuickAdd('ev-exercise')">🏃 운동</button>
           <button class="planner-type-btn" data-type="ev-hobby"    style="--c:#A860A8" onclick="plannerQuickAdd('ev-hobby')">🎨 취미</button>
           <button class="planner-type-btn" data-type="ev-etc"      style="--c:#B0A898" onclick="plannerQuickAdd('ev-etc')">📌 기타</button>
-          <button class="planner-type-btn" data-type="ev-dayoff"   style="--c:#C9A8AA" onclick="plannerQuickAdd('ev-dayoff')">🌸 연차</button>
+          <button class="planner-type-btn" data-type="ev-dayoff"   style="--c:#e1939e" onclick="plannerQuickAdd('ev-dayoff')">🌸 연차</button>
         </div>
         </div>
         <div style="font-size:10px;color:#C8B8B8;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">버튼 클릭 → 시간 입력 가능 &nbsp;|&nbsp; 타임라인 드래그 → 시간 자동 지정 &nbsp;|&nbsp; 더블클릭 → 30분 단위</div>
@@ -5383,7 +5385,7 @@ function renderCal(){
 const MULTIDAY_COLORS={
   'ev-meet':'#8FA8C0','ev-out':'#A09660','ev-imp':'#C08080',
   'ev-etc':'#B0A898','ev-lunch':'#C0A070','ev-dinner':'#9080A8',
-  'task':'#C4B49A','ev-dayoff':'#C8A0A4','ev-personal':'#D4883A'
+  'task':'#e3c7c9','ev-dayoff':'#e1939e','ev-personal':'#D4883A'
 };
 
 // ══ 멀티데이 바 — 주 경계에서만 분할, 같은 주 안은 하나의 바 ══
@@ -5487,9 +5489,13 @@ function renderAllMultiDayBars(grid, gridStart){
         // 이어지는 주 세그먼트: border-left 없이 (연속처럼)
         const contStyle = isFirst ? '' : 'border-left:none;border-radius:0 6px 6px 0;padding-left:6px;';
 
+        // 첫 세그먼트는 border-left(3px)가 셀 밖으로 삐져나오지 않도록 1px 보정
+        const safeLeft  = isFirst ? left + 1 : left;
+        const safeWidth = isFirst ? width - 1 : width;
+
         const bar = document.createElement('div');
         bar.className = `multiday-bar${evClass}`;
-        bar.style.cssText = `left:${left}px;width:${width}px;top:${topBase+slot*(BAR_H+BAR_GAP)}px;height:${BAR_H}px;position:absolute;z-index:5;${contStyle}`;
+        bar.style.cssText = `left:${safeLeft}px;width:${safeWidth}px;top:${topBase+slot*(BAR_H+BAR_GAP)}px;height:${BAR_H}px;position:absolute;z-index:5;${contStyle}`;
         bar.textContent = it.name; // 모든 주 세그먼트에 이름 표시
         bar.title = it.name;
         bar.onclick = ()=>openEditById(it.id);
@@ -7439,7 +7445,7 @@ const TYPE_LABEL = {
   'ev-dayoff':'🌸 연차'
 };
 const TYPE_COLOR = {
-  task:'var(--rose-mid)', 'ev-meet':'#7AAFC8', 'ev-out':'#6DAA90',
+  task:'#e3c7c9', 'ev-meet':'#7AAFC8', 'ev-out':'#6DAA90',
   'ev-imp':'#C07878', 'ev-lunch':'#C8A06A', 'ev-dinner':'#9080B8',
   'ev-personal':'#5A9CAC', 'ev-exercise':'#5A9A6A', 'ev-hobby':'#A860A8', 'ev-etc':'#A8A098',
   'ev-dayoff':'var(--rose-mid)'
@@ -9504,7 +9510,7 @@ const SLOTS    = (DAY_END_MIN - DAY_START_MIN) / 30; // 40 slots
 const START_H  = 5;    // scroll start hour
 
 const TYPE_META = {
-  'task':       { icon:'📋', color:'#C4B49A',  label:'업무'      },
+  'task':       { icon:'📋', color:'#e3c7c9',  label:'업무'      },
   'ev-meet':    { icon:'🤝', color:'#8FA8C0',  label:'회의'      },
   'ev-out':     { icon:'🚗', color:'#A09660',  label:'외근/출장' },
   'ev-imp':     { icon:'❗', color:'#C08080',  label:'중요'      },
@@ -9514,7 +9520,7 @@ const TYPE_META = {
   'ev-exercise':{ icon:'🏃', color:'#7AAB80',  label:'운동'      },
   'ev-hobby':   { icon:'🎨', color:'#B88AB0',  label:'취미'      },
   'ev-etc':     { icon:'📌', color:'#B0A898',  label:'기타'      },
-  'ev-dayoff':  { icon:'🌸', color:'#C8A0A4',  label:'연차'      },
+  'ev-dayoff':  { icon:'🌸', color:'#e1939e',  label:'연차'      },
 };
 const DOW_FULL = ['월요일','화요일','수요일','목요일','금요일','토요일','일요일'];
 
