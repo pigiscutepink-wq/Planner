@@ -3901,7 +3901,7 @@ function isGsEnabled(){ return true; }
 //       visibilitychange race condition 방지용 saveInProgress 플래그
 // ════════════════════════════════════════
 
-const GS_BODY_LIMIT = 100_000; // 100KB per chunk
+const GS_BODY_LIMIT = 50_000; // 50KB per chunk (keepalive 브라우저 64KB 제한 대응)
 
 // ── Dirty 추적 ──
 // 변경된 최상위 필드만 저장 대상으로 삼아 불필요한 전송 제거
