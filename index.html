@@ -3916,7 +3916,6 @@ async function gsSend(payload){
     headers: { 'Content-Type': 'text/plain' },
     body: JSON.stringify(payload),
     redirect: 'follow',
-    keepalive: true,  // 탭 닫혀도 요청 유지
   });
   if(!res.ok && res.status !== 0) throw new Error('HTTP ' + res.status);
   try { return await res.json(); } catch { return { ok: true }; }
