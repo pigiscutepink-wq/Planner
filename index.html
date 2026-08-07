@@ -3889,7 +3889,7 @@ let D = {
   routines: []      // [{id, title, icon, startTime, endTime, color, repeat, repeatEnd}]
 };
 
-const GS_URL = 'https://script.google.com/macros/s/AKfycbwTlVzaLNez_Schytf-Pwt3vpM2Ms9fBlcz4Exi3TbFR7eqJbIMVvClhVQq9-31QK_n_A/exec';
+const GS_URL = 'https://script.google.com/macros/s/AKfycbwqYwZR-mNXoOQRyQz0tMhWm_ZWn_rQqKVlULlaOlsX-oQHY3oph86jT_PCsfGMyQBzXw/exec';
 
 // GS 항상 활성화
 function isGsEnabled(){ return true; }
@@ -4048,11 +4048,12 @@ function applyGSData(d){
   function cleanTime(v){
     if(!v) return '';
     var s = String(v).trim();
-    // HH:MM 형식만 허용
     if(/^\d{1,2}:\d{2}$/.test(s)) return s;
-    // "HH:MM:SS" → "HH:MM"
     var m = s.match(/^(\d{1,2}):(\d{2}):/);
     if(m) return m[1].padStart(2,'0')+':'+m[2];
+    // 구글 시트 Date 객체 변환 문자열 처리 (예: "Sat Dec 30 1899 09:00:00 GMT+0900")
+    var m2 = s.match(/(\d{1,2}):(\d{2}):\d{2}/);
+    if(m2) return ('0'+m2[1]).slice(-2)+':'+m2[2];
     return '';
   }
   if(d.items){
@@ -4103,7 +4104,8 @@ function applyGSData(d){
     }
   });
 
-  _dataLoaded = true; // 데이터 로드 완료 — 이제 save() 허용
+  _dataLoaded = true;
+  _loadSuccess = true; // GAS 실데이터 로드 성공 확인
 }
 
 // ── 저장 페이로드 생성 ──
@@ -4136,6 +4138,7 @@ function buildPayload(){
 
 // ── 데이터 로드 완료 플래그 (로드 전 빈 데이터 저장 방지) ──
 let _dataLoaded = false;
+let _loadSuccess = false; // GAS에서 실제 데이터를 성공적으로 받았을 때만 true
 
 // ── 진행 중인 저장 Promise 추적 (race condition 방지) ──
 let _saveInProgress = null;
@@ -4144,6 +4147,7 @@ let _saveInProgress = null;
 // 진행 중인 저장이 있으면 그것이 완료된 후 dirty가 남아있는 경우에만 추가 저장
 async function saveNow(){
   if(!_dataLoaded) return;
+  if(!_loadSuccess){ console.warn('[Save] GAS 로드 실패 상태 — 데이터 보호를 위해 저장 차단'); return; }
   if(_dirty.size === 0) return; // dirty 없으면 불필요한 전송 생략
   const snapshot = new Set(_dirty);
   _dirty.clear();
@@ -4176,6 +4180,7 @@ document.addEventListener('visibilitychange', ()=>{
 let _saveTimer = null;
 function save(field){
   if(!_dataLoaded) return;
+  if(!_loadSuccess){ console.warn('[Save] GAS 로드 실패 상태 — 데이터 보호를 위해 저장 차단'); return; }
   // field 힌트가 있으면 해당 필드만 dirty 마킹, 없으면 전체 마킹
   if(field){
     markDirty(field);
