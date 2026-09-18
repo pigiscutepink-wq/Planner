@@ -1827,7 +1827,7 @@ main.main{display:block;}
   /* 아카이브 */
   .arch-grid{ grid-template-columns:1fr; }
   /* 리포트 */
-  #report-this-week,#report-next-week{ min-width:0; }
+  #report-this-week{ min-width:0; }
   #ac-list{ min-width:0; }
   #planner-modal{ width:96vw!important; }
 }
@@ -1915,7 +1915,7 @@ main.main{display:block;}
   .arch-grid{ grid-template-columns:1fr; }
   /* proj-layout은 743px 이하(진짜 모바일)에서만 1컬럼 */
   /* 보고서 그리드 */
-  #report-this-week,#report-next-week{ width:100%; }
+  #report-this-week{ width:100%; }
   /* 카드 */
   .card{ padding:14px; border-radius:10px; }
   /* 모달 */
@@ -2721,9 +2721,8 @@ body { -webkit-text-size-adjust: 100%; overscroll-behavior-x: none; }
         </div>
         <button onclick="copyWeeklyReport()" title="텍스트 복사" style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;background:var(--rose-pale);color:var(--rose-mid);border:1px solid var(--rose-light);cursor:pointer;font-family:inherit;transition:background .15s;" onmouseover="this.style.background='var(--rose-light)'" onmouseout="this.style.background='var(--rose-pale)'"><i class="fa-regular fa-copy"></i> Copy Report</button>
       </div>
-      <div class="dash-grid" id="weekly-report-grid" style="grid-template-columns:1fr 1fr;">
+      <div class="dash-grid" id="weekly-report-grid" style="grid-template-columns:1fr;">
         <div class="report-card" id="report-this-week"></div>
-        <div class="report-card" id="report-next-week"></div>
       </div>
     </div>
   </div>
@@ -8781,18 +8780,15 @@ function weekRangeLabel(mon){
 // renderWeeklyReport를 더 깔끔하게 재작성
 function renderWeeklyReport(){
   const thisMon=getMonday(0);
-  const nextMon=getMonday(1);
   const wn=getWeekNum(thisMon);
   const month=thisMon.getMonth()+1;
 
   document.getElementById('dash-week-badge').textContent=`금주 주간업무`;
 
   const thisEl=document.getElementById('report-this-week');
-  const nextEl=document.getElementById('report-next-week');
-  if(!thisEl||!nextEl) return;
+  if(!thisEl) return;
 
   thisEl.innerHTML=buildReportCardInner(thisMon,'이번 주');
-  nextEl.innerHTML=buildReportCardInner(nextMon,'Next');
 }
 
 function buildReportCardInner(mon, label){
@@ -8865,8 +8861,7 @@ function buildDayoffNote(days){
 // 보고서 텍스트 복사
 function copyWeeklyReport(){
   const thisMon=getMonday(0);
-  const nextMon=getMonday(1);
-  let txt=buildReportText(thisMon,'이번 주')+'\n\n'+buildReportText(nextMon,'다음 주');
+  let txt=buildReportText(thisMon,'이번 주');
   navigator.clipboard.writeText(txt).then(()=>{
     alert('주간 업무 보고서가 클립보드에 복사되었습니다!');
   }).catch(()=>{
@@ -9383,15 +9378,42 @@ function renderWeeklyRptPage(){
   if(!D.weeklyReports.length){
     list.innerHTML='<div style="font-size:12px;color:var(--ink-soft);padding:8px 0;text-align:center">저장된 보고서가 없습니다</div>';
   } else {
-    D.weeklyReports.forEach(r=>{
-      const item=document.createElement('div');
-      item.className='rpt-week-item'+(r.id===selRptId?' sel':'');
-      item.innerHTML=`
-        <span>${r.label}${r.manual?` <span style="font-size:9px;background:#EDE5D8;color:#8A6A40;padding:1px 5px;border-radius:3px;">수기</span>`:''}</span>
-        <button class="rpt-del" onclick="event.stopPropagation();delRpt('${r.id}')" title="삭제"><i class="fa-solid fa-xmark"></i></button>
-      `;
-      item.onclick=()=>{ selRptId=r.id; renderWeeklyRptPage(); showRptDetail(r.id); };
-      list.appendChild(item);
+    // 시간순(오름차순) 정렬
+    const sorted=[...D.weeklyReports].sort((a,b)=>a.weekKey.localeCompare(b.weekKey));
+    // 연도별 그룹
+    const byYear={};
+    sorted.forEach(r=>{
+      const year=r.weekKey.split('-')[0];
+      if(!byYear[year]) byYear[year]=[];
+      byYear[year].push(r);
+    });
+    const years=Object.keys(byYear).sort();
+    years.forEach(year=>{
+      const section=document.createElement('div');
+      section.style.cssText='margin-bottom:6px;';
+      const header=document.createElement('div');
+      header.style.cssText='display:flex;align-items:center;justify-content:space-between;padding:5px 8px;background:var(--rose-pale);border-radius:6px;cursor:pointer;font-size:11px;font-weight:700;color:var(--rose-mid);margin-bottom:4px;';
+      header.innerHTML=`<span>${year}년</span><i class="fa-solid fa-chevron-down" style="font-size:10px;transition:transform .2s;"></i>`;
+      const body=document.createElement('div');
+      body.style.cssText='display:flex;flex-direction:column;gap:4px;padding-left:4px;';
+      header.onclick=()=>{
+        const open=body.style.display!=='none';
+        body.style.display=open?'none':'flex';
+        header.querySelector('i').style.transform=open?'rotate(-90deg)':'';
+      };
+      byYear[year].forEach(r=>{
+        const item=document.createElement('div');
+        item.className='rpt-week-item'+(r.id===selRptId?' sel':'');
+        item.innerHTML=`
+          <span>${r.label}</span>
+          <button class="rpt-del" onclick="event.stopPropagation();delRpt('${r.id}')" title="삭제"><i class="fa-solid fa-xmark"></i></button>
+        `;
+        item.onclick=()=>{ selRptId=r.id; renderWeeklyRptPage(); showRptDetail(r.id); };
+        body.appendChild(item);
+      });
+      section.appendChild(header);
+      section.appendChild(body);
+      list.appendChild(section);
     });
   }
   if(selRptId) showRptDetail(selRptId);
